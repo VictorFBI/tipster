@@ -1,5 +1,3 @@
-# yaml-language-server: ...
-package: api
 generate:
   gin-server: true
   models: true
