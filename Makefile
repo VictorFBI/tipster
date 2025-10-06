@@ -6,3 +6,6 @@ install-deps:
 api-generate:
 	${BINDIR}/oapi-codegen --config=${CURDIR}/configs/oapi-codegen.yaml -o ${CURDIR}/internal/api/api/gen.go -package api ${CURDIR}/api/api.yaml
 	${BINDIR}/oapi-codegen --config=${CURDIR}/configs/oapi-codegen.yaml -o ${CURDIR}/internal/api/auth/gen.go -package auth ${CURDIR}/api/auth.yaml
+
+run:
+	go run cmd/tipster/main.go

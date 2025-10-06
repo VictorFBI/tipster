@@ -22,3 +22,4 @@ components:
         ping:
           type: string
           example: pong
+          

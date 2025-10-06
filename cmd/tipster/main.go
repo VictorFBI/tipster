@@ -1,26 +1,31 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/gin-gonic/gin"
+
+	swaggerfiles "github.com/swaggo/files"
+	ginswagger "github.com/swaggo/gin-swagger"
+	
+	auth "github.com/VictorFBI/tipster/internal/api/auth"
+	servers "github.com/VictorFBI/tipster/internal/servers/auth"
 )
 
-type Person struct {
-	name string
-	surname string
-}
-
 func main() {
-	server := gin.Default()
+	router := gin.Default()
 
-	server.GET("/ping", func(ctx *gin.Context) {
-		var person Person
-		err := ctx.BindJSON(&person)
-		if err != nil {
-			fmt.Print("HERE")
-		}
-	})
+	router.StaticFile("/api.yaml", "../../api/api.yaml")
+	router.StaticFile("/auth.yaml", "../../api/auth.yaml")
 
-	server.Run(":8080")
+	router.GET("/swagger/*any", ginswagger.WrapHandler(
+		swaggerfiles.Handler,
+		ginswagger.URL("/api.yaml"),
+		ginswagger.URL("/auth.yaml"),
+		ginswagger.DefaultModelsExpandDepth(-1),
+	))
+
+	authServer := &servers.AuthServer{}
+	auth.RegisterHandlers(router, authServer)
+		
+
+	router.Run(":8080")
 }

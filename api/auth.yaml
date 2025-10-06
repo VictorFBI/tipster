@@ -26,16 +26,16 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/User"
+                $ref: "#/components/schemas/Tokens"
 components:
   schemas:
-    User:
+    Tokens:
       type: object
       properties:
-        id:
-          type: integer
-        email:
+        access-token:
+          type: string
+        refresh-token:
           type: string
       required:
-        - id
-        - email
+        - access-token
+        - refresh-token
