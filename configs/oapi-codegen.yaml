@@ -1,3 +1,0 @@
-generate:
-  gin-server: true
-  models: true
