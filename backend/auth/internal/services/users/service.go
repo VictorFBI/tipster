@@ -4,15 +4,21 @@ import (
 	"context"
 	"errors"
 
-	"github.com/jackc/pgx/v5"
 	"tipster/backend/auth/internal/db/postgresql"
+
+	"github.com/jackc/pgx/v5"
 	"golang.org/x/crypto/bcrypt"
 )
 
+var (
+	ErrUserAlreadyExists = errors.New("user already exists")
+	ErrUserNotFound      = errors.New("user not found")
+)
+
 type User struct {
-	Email  string
+	Email     string
 	Password  string
-	Username string
+	Username  string
 	CreatedAt *string
 }
 
@@ -21,7 +27,7 @@ type UsersService struct {
 }
 
 func New(ctx context.Context) *UsersService {
-	conn, err := db.Connect(ctx)
+	conn, err := postgresql.Connect(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -31,11 +37,11 @@ func New(ctx context.Context) *UsersService {
 }
 
 // GetUser retrieves a user by username
-func (us *UsersService) GetUser(ctx context.Context, username string) (*User, error) {
+func (us *UsersService) GetUser(ctx context.Context, email string) (*User, error) {
 	var user User
 	err := us.conn.QueryRow(ctx,
-		"SELECT email, password, username, created_at::text FROM users WHERE username = $1",
-		username,
+		"SELECT email, password, username, created_at::text FROM users WHERE email = $1",
+		email,
 	).Scan(&user.Email, &user.Password, &user.Username, &user.CreatedAt)
 
 	if err != nil {
@@ -56,32 +62,28 @@ func (us *UsersService) ValidateCredentials(ctx context.Context, email, password
 	}
 
 	if user == nil {
-		return false, errors.New("user not found")
+		return false, ErrUserNotFound
 	}
 
 	return bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)) == nil, nil
 }
 
 // AddUser adds a new user to the database
-func (us *UsersService) AddUser(ctx context.Context, email, password string) error {
-	_, err := us.conn.Exec(ctx,
-		"INSERT INTO users (email, password) VALUES ($1, $2) ON CONFLICT (email) DO NOTHING",
-		email, password,
-	)
+func (us *UsersService) AddUser(ctx context.Context, email, password, username string) error {
+	var id string
+	err := us.conn.QueryRow(ctx,
+		"INSERT INTO users (email, password, username) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING RETURNING id",
+		email, password, username,
+	).Scan(&id)
+
 	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			// No rows returned means ON CONFLICT triggered (email or username already exists)
+			return ErrUserAlreadyExists
+		}
 		return err
 	}
 
-	// Check if user was actually inserted (not conflicted)
-	var count int
-	err = us.conn.QueryRow(ctx, "SELECT COUNT(*) FROM users WHERE email = $1", email).Scan(&count)
-	if err != nil {
-		return err
-	}
-
-	if count == 0 {
-		return errors.New("user already exists")
-	}
-
+	// If we got here, user was successfully inserted (id was returned)
 	return nil
 }

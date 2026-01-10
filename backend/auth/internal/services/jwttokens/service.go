@@ -5,11 +5,17 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/joho/godotenv"
 )
 
 var jwtSecret []byte
 
 func init() {
+	err := godotenv.Load("../../.env")
+	if err != nil {
+		panic(err)
+	}
+
 	secret := os.Getenv("JWT_SECRET")
 	if secret == "" {
 		panic("JWT_SECRET environment variable is not set")
@@ -18,7 +24,7 @@ func init() {
 }
 
 type JWTClaims struct {
-	Email string `json:"username"`
+	Email     string `json:"username"`
 	TokenType string `json:"token_type"` // "access" or "refresh"
 	jwt.RegisteredClaims
 }
@@ -35,7 +41,7 @@ func New() *JwtTokensService {
 	return &JwtTokensService{}
 }
 
-// GenerateToken creates a JWT access and refresh tokens for user
+// Creates a JWT access and refresh tokens for user
 func (jts *JwtTokensService) GenerateTokens(email string) (JwtTokens, error) {
 	// Generate access token (short-lived, 15 minutes)
 	accessToken, err := jts.generateToken(email, "access", 15*time.Minute)
@@ -60,7 +66,7 @@ func (jts *JwtTokensService) generateToken(email string, tokenType string, expir
 	expiration := time.Now().Add(expirationTime)
 
 	claims := &JWTClaims{
-		Email: email,
+		Email:     email,
 		TokenType: tokenType,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(expiration),

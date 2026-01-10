@@ -10,22 +10,16 @@ import (
 )
 
 func Login(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		json.NewEncoder(w).Encode(api.ErrorResponse{Error: "Method not allowed"})
-		return
-	}
-
 	var loginReq api.LoginRequest
 	if err := json.NewDecoder(r.Body).Decode(&loginReq); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(api.ErrorResponse{Error: "Invalid request body"})
+		json.NewEncoder(w).Encode(api.ErrorResponse{Message: "Invalid request body"})
 		return
 	}
 
 	if loginReq.Email == "" || loginReq.Password == "" {
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(api.ErrorResponse{Error: "Username and password are required"})
+		json.NewEncoder(w).Encode(api.ErrorResponse{Message: "Username and password are required"})
 		return
 	}
 
@@ -35,13 +29,13 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	ok, err := usersService.ValidateCredentials(r.Context(), loginReq.Email, loginReq.Password)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(api.ErrorResponse{Error: err.Error()})
+		json.NewEncoder(w).Encode(api.ErrorResponse{Message: err.Error()})
 		return
 	}
 
 	if !ok {
 		w.WriteHeader(http.StatusUnauthorized)
-		json.NewEncoder(w).Encode(api.ErrorResponse{Error: "Invalid credentials"})
+		json.NewEncoder(w).Encode(api.ErrorResponse{Message: "Invalid credentials"})
 		return
 	}
 
@@ -49,7 +43,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	jwttokens, err := jwttokensService.GenerateTokens(loginReq.Email)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(api.ErrorResponse{Error: "Failed to generate token"})
+		json.NewEncoder(w).Encode(api.ErrorResponse{Message: "Failed to generate token"})
 		return
 	}
 
