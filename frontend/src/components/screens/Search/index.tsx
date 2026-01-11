@@ -1,7 +1,7 @@
 import { ScrollView, YStack } from "tamagui";
-import { Header } from "../ui/header";
-import { UserCard } from "../ui/user-card";
-import { SearchInput } from "../ui/search-input";
+import { Header } from "../../ui/header";
+import { UserCard } from "../../ui/user-card";
+import { SearchInput } from "./components/search-input";
 
 interface User {
   id: string;
@@ -61,7 +61,7 @@ const mockUsers: User[] = [
   },
 ];
 
-export function Search() {
+export default function Search() {
   return (
     <YStack flex={1} backgroundColor="#0A0A0F">
       <Header headerText="Поиск" />

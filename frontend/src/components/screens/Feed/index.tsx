@@ -1,8 +1,11 @@
 import { ScrollView, YStack } from "tamagui";
-import { InfoBanner } from "../ui/info-banner";
-import { CreatePostButton } from "../ui/create-post-button";
-import { PostCard } from "../ui/post-card";
-import { Header } from "../ui/header";
+
+import { CreatePostButton } from "./components/create-post-button";
+import { PostCard } from "../../ui/post-card";
+import { Header } from "../../ui/header";
+import { InfoBlock } from "../../ui/info-block";
+import { Ionicons } from "@expo/vector-icons";
+import { PostsList } from "../Profile/components/posts-list";
 
 interface Post {
   id: string;
@@ -58,19 +61,25 @@ const mockPosts: Post[] = [
   },
 ];
 
-export function Feed() {
+export default function Feed() {
   return (
     <YStack flex={1} backgroundColor="#0A0A0F">
       <Header balance={5420} headerText="Tipster" />
-      <InfoBanner />
+      <InfoBlock
+        text={
+          "Будьте активны! Каждый пост, лайк и комментарий увеличивает ваш airdrop"
+        }
+        icon={<Ionicons name="bulb" size={20} color="#8B5CF6" />}
+      />
       <CreatePostButton />
-      <ScrollView showsVerticalScrollIndicator={false}>
+      {/* <ScrollView showsVerticalScrollIndicator={false}>
         <YStack paddingBottom="$6">
           {mockPosts.map((post) => (
             <PostCard key={post.id} post={post} />
           ))}
         </YStack>
-      </ScrollView>
+      </ScrollView> */}
+      <PostsList posts={mockPosts} />
     </YStack>
   );
 }

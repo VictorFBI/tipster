@@ -1,7 +1,12 @@
-import { Ionicons } from "@expo/vector-icons";
 import { XStack, Text, Theme } from "tamagui";
 
-export function InfoBanner() {
+export function InfoBlock({
+  text,
+  icon,
+}: {
+  text: string;
+  icon: React.ReactNode;
+}) {
   return (
     <Theme name="accent">
       <XStack
@@ -13,10 +18,9 @@ export function InfoBanner() {
         gap="$3"
         alignItems="flex-start"
       >
-        <Ionicons name="bulb" size={20} color="#8B5CF6" />
+        {icon}
         <Text fontSize={14} color="$color" flex={1} lineHeight={20}>
-          Будьте активны! Каждый пост, лайк и комментарий увеличивает ваш
-          airdrop
+          {text}
         </Text>
       </XStack>
     </Theme>
