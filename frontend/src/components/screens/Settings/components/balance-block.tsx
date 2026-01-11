@@ -1,7 +1,10 @@
 import { Ionicons } from "@expo/vector-icons";
 import { XStack, YStack, Text, Theme } from "tamagui";
+import { useTranslation } from "react-i18next";
 
 export function BalanceBlock({ balance }) {
+  const { t } = useTranslation();
+
   return (
     <Theme name="accent">
       <YStack
@@ -14,7 +17,7 @@ export function BalanceBlock({ balance }) {
         backgroundColor="$background"
       >
         <Text color="white" fontSize={16} fontWeight="500">
-          Баланс токенов
+          {t("settings.tokenBalance")}
         </Text>
 
         <XStack alignItems="center" gap="$2">
@@ -37,7 +40,7 @@ export function BalanceBlock({ balance }) {
           <XStack gap="$2" alignItems="center">
             <Ionicons name="wallet" size={20} color="#8B5CF6" />
             <Text color="$background" fontSize={16} fontWeight="600">
-              Подключить кошелек
+              {t("settings.connectWallet")}
             </Text>
           </XStack>
         </YStack>

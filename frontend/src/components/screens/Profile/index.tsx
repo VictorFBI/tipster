@@ -20,36 +20,37 @@ interface Post {
   comments: number;
 }
 
-const mockUserPosts: Post[] = [
-  {
-    id: "1",
-    author: {
-      name: "Вы",
-      avatar: "https://i.pravatar.cc/150?img=12",
-    },
-    timestamp: "2ч назад",
-    content: "Только что заработал 500 TIP токенов! 🚀 Airdrop будет огромным!",
-    tipAmount: 5420,
-    likes: 234,
-    comments: 45,
-  },
-  {
-    id: "2",
-    author: {
-      name: "Вы",
-      avatar: "https://i.pravatar.cc/150?img=12",
-    },
-    timestamp: "1 день назад",
-    content:
-      "Советую всем активнее постить и лайкать. Каждое действие приносит токены! 💰",
-    tipAmount: 5420,
-    likes: 189,
-    comments: 32,
-  },
-];
-
 export default function Profile() {
   const { t } = useTranslation();
+
+  const mockUserPosts: Post[] = [
+    {
+      id: "1",
+      author: {
+        name: t("common.you"),
+        avatar: "https://i.pravatar.cc/150?img=12",
+      },
+      timestamp: "2ч назад",
+      content:
+        "Только что заработал 500 TIP токенов! 🚀 Airdrop будет огромным!",
+      tipAmount: 5420,
+      likes: 234,
+      comments: 45,
+    },
+    {
+      id: "2",
+      author: {
+        name: t("common.you"),
+        avatar: "https://i.pravatar.cc/150?img=12",
+      },
+      timestamp: "1 день назад",
+      content:
+        "Советую всем активнее постить и лайкать. Каждое действие приносит токены! 💰",
+      tipAmount: 5420,
+      likes: 189,
+      comments: 32,
+    },
+  ];
   const [activeTab, setActiveTab] = useState<"posts" | "liked">("posts");
 
   return (

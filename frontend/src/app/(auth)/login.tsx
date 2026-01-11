@@ -13,6 +13,7 @@ import {
   useTheme,
   View,
 } from "tamagui";
+import { useTranslation } from "react-i18next";
 
 type LoginFormData = {
   email: string;
@@ -20,6 +21,7 @@ type LoginFormData = {
 };
 
 export default function LoginScreen() {
+  const { t } = useTranslation();
   const theme = useTheme();
   const router = useRouter();
 
@@ -97,16 +99,16 @@ export default function LoginScreen() {
           <YStack space="$4" width="100%">
             <YStack space="$2">
               <Text fontSize="$3" fontWeight="800" color="$color">
-                Email
+                {t("auth.email")}
               </Text>
               <Controller
                 control={control}
                 name="email"
                 rules={{
-                  required: "Email обязателен",
+                  required: t("auth.emailRequired") || "Email is required",
                   pattern: {
                     value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                    message: "Неверный формат email",
+                    message: t("auth.invalidEmail") || "Invalid email format",
                   },
                 }}
                 render={({ field: { onChange, onBlur, value } }) => (
@@ -135,16 +137,18 @@ export default function LoginScreen() {
 
             <YStack space="$2">
               <Text fontSize="$3" fontWeight="800" color="$color">
-                Пароль
+                {t("auth.password")}
               </Text>
               <Controller
                 control={control}
                 name="password"
                 rules={{
-                  required: "Пароль обязателен",
+                  required: t("auth.passwordRequired"),
                   minLength: {
                     value: 6,
-                    message: "Пароль должен быть минимум 6 символов",
+                    message:
+                      t("auth.passwordMinLength") ||
+                      "Password must be at least 6 characters",
                   },
                 }}
                 render={({ field: { onChange, onBlur, value } }) => (
@@ -180,7 +184,7 @@ export default function LoginScreen() {
                 pressStyle={{ opacity: 0.8 }}
               >
                 <Text fontSize="$5" fontWeight="800" color="white">
-                  {isSubmitting ? "Вход..." : "Войти"}
+                  {isSubmitting ? t("auth.loggingIn") : t("auth.login")}
                 </Text>
               </Button>
             </Theme>
@@ -197,7 +201,7 @@ export default function LoginScreen() {
 
             <XStack justifyContent="center" alignItems="center" space="$2">
               <Text fontSize="$3" color="$color" opacity={0.7}>
-                Еще нет аккаунта?
+                {t("auth.dontHaveAccount")}
               </Text>
               <Theme name="accent">
                 <Link href="/register" asChild>
@@ -207,7 +211,7 @@ export default function LoginScreen() {
                       color={theme.accentColor?.get()}
                       fontWeight="800"
                     >
-                      Зарегистрироваться
+                      {t("auth.register")}
                     </Text>
                   </TouchableOpacity>
                 </Link>

@@ -23,8 +23,8 @@ export function SettingsBlock() {
       <SettingSection title={t("settings.notifications")}>
         <SettingItem
           icon="notifications-outline"
-          title="Push-уведомления"
-          description="Получать уведомления о новой активности"
+          title={t("settings.pushNotifications")}
+          description={t("settings.pushNotificationsDesc")}
           checked={pushEnabled}
           onCheckedChange={setPushEnabled}
         />
@@ -35,8 +35,8 @@ export function SettingsBlock() {
       <SettingSection title={t("settings.privacy")}>
         <SettingItem
           icon="lock-closed-outline"
-          title="Приватный аккаунт"
-          description="Одобрение новых подписчиков"
+          title={t("settings.privateAccount")}
+          description={t("settings.privateAccountDesc")}
           checked={privateAccount}
           onCheckedChange={setPrivateAccount}
         />
@@ -44,12 +44,12 @@ export function SettingsBlock() {
 
       <Divider />
 
-      <SettingSection title={t("settings.view")}>
-        <YStack gap="$4">
+      <SettingSection title={t("settings.appearance")}>
+        <YStack gap="$5">
           <SettingItem
             icon="moon-outline"
-            title="Темная тема"
-            description="Использовать темное оформление"
+            title={t("settings.darkTheme")}
+            description={t("settings.darkThemeDesc")}
             checked={darkTheme}
             onCheckedChange={setDarkTheme}
           />

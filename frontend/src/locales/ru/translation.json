@@ -7,18 +7,30 @@
     "save": "Сохранить",
     "delete": "Удалить",
     "edit": "Редактировать",
-    "search": "Поиск"
+    "search": "Поиск",
+    "you": "Вы"
   },
   "auth": {
     "login": "Войти",
+    "loggingIn": "Вход...",
     "register": "Регистрация",
+    "createAccount": "Создать аккаунт",
+    "creating": "Создание...",
     "logout": "Выйти из аккаунта",
     "email": "Email",
+    "emailRequired": "Email обязателен",
+    "invalidEmail": "Неверный формат email",
     "password": "Пароль",
+    "passwordRequired": "Пароль обязателен",
+    "passwordMinLength": "Пароль должен быть минимум 6 символов",
     "confirmPassword": "Подтвердите пароль",
+    "username": "Имя пользователя",
     "forgotPassword": "Забыли пароль?",
-    "dontHaveAccount": "Нет аккаунта?",
-    "alreadyHaveAccount": "Уже есть аккаунт?"
+    "dontHaveAccount": "Еще нет аккаунта?",
+    "alreadyHaveAccount": "Уже есть аккаунт?",
+    "usernameRequired": "Имя пользователя обязательно",
+    "confirmPasswordRequired": "Подтверждение пароля обязательно",
+    "passwordsMustMatch": "Пароли не совпадают"
   },
   "tabs": {
     "feed": "Лента",
@@ -30,13 +42,17 @@
     "title": "Лента",
     "createPost": "Создать пост",
     "noPostsYet": "Постов пока нет",
-    "loadMore": "Загрузить еще"
+    "loadMore": "Загрузить еще",
+    "activityTip": "Будьте активны! Каждый пост, лайк и комментарий увеличивает ваш airdrop"
   },
   "search": {
     "title": "Поиск",
-    "placeholder": "Поиск пользователей...",
+    "placeholder": "Найти пользователей...",
     "noResults": "Ничего не найдено",
-    "searchUsers": "Искать пользователей"
+    "searchUsers": "Искать пользователей",
+    "subscribers": "подписчиков",
+    "subscriber": "подписчик",
+    "subscribers_2_4": "подписчика"
   },
   "profile": {
     "title": "Профиль",
@@ -46,28 +62,42 @@
     "edit": "Редактировать профиль",
     "follow": "Подписаться",
     "unfollow": "Отписаться",
+    "subscribe": "Подписаться",
+    "unsubscribe": "Отписаться",
     "noPosts": "Постов пока нет"
   },
   "settings": {
     "title": "Настройки",
     "account": "Аккаунт",
     "notifications": "Уведомления",
+    "pushNotifications": "Push-уведомления",
+    "pushNotificationsDesc": "Получать уведомления о новой активности",
     "privacy": "Приватность",
+    "privateAccount": "Приватный аккаунт",
+    "privateAccountDesc": "Одобрение новых подписчиков",
     "language": "Язык",
+    "changeLanguage": "Изменить",
     "theme": "Тема",
+    "darkTheme": "Темная тема",
+    "darkThemeDesc": "Использовать темное оформление",
+    "appearance": "Внешний вид",
     "about": "О приложении",
     "logout": "Выйти из аккаунта",
     "balance": "Баланс",
+    "tokenBalance": "Баланс токенов",
+    "connectWallet": "Подключить кошелек",
     "security": "Безопасность",
     "securityInfo": "Мы не храним приватные ключи. Ваши токены будут отправлены напрямую на ваш кошелек во время airdrop.",
     "referral": "Реферальная программа",
+    "referralProgram": "Реферальная программа",
+    "referralDescription": "Приглашайте друзей и зарабатывайте больше токенов! Вы получаете бонусы за каждого приглашенного пользователя.",
     "referralCode": "Ваш реферальный код",
     "totalReferrals": "Всего рефералов",
-    "activeReferrals": "Активных рефералов",
-    "earnedFromReferrals": "Заработано с рефералов",
+    "remaining": "Осталось",
+    "invited": "Приглашено",
+    "earned": "Заработано",
     "copyCode": "Скопировать код",
-    "shareCode": "Поделиться кодом",
-    "view": "Внешний вид"
+    "shareCode": "Поделиться кодом"
   },
   "post": {
     "like": "Нравится",

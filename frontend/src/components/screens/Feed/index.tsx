@@ -4,6 +4,7 @@ import { Header } from "../../ui/header";
 import { InfoBlock } from "../../ui/info-block";
 import { Ionicons } from "@expo/vector-icons";
 import { PostsList } from "../Profile/components/posts-list";
+import { useTranslation } from "react-i18next";
 
 interface Post {
   id: string;
@@ -60,13 +61,13 @@ const mockPosts: Post[] = [
 ];
 
 export default function Feed() {
+  const { t } = useTranslation();
+
   return (
     <YStack flex={1} backgroundColor="#0A0A0F">
       <Header balance={5420} headerText="Tipster" />
       <InfoBlock
-        text={
-          "Будьте активны! Каждый пост, лайк и комментарий увеличивает ваш airdrop"
-        }
+        text={t("feed.activityTip")}
         icon={<Ionicons name="bulb" size={20} color="#8B5CF6" />}
         marginHorizontal="$4"
       />

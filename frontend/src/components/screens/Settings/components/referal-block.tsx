@@ -1,6 +1,7 @@
 import { tokens } from "@/tokens";
 import { Ionicons } from "@expo/vector-icons";
 import { XStack, YStack, Text } from "tamagui";
+import { useTranslation } from "react-i18next";
 
 export function ReferalBlock({
   referralCode,
@@ -8,6 +9,8 @@ export function ReferalBlock({
   earnedFromReferrals,
   activeReferrals,
 }) {
+  const { t } = useTranslation();
+
   return (
     <YStack
       backgroundColor={tokens.color.accent}
@@ -18,13 +21,12 @@ export function ReferalBlock({
       <XStack gap="$2" alignItems="center">
         <Ionicons name="gift" size={24} color="white" />
         <Text color="white" fontSize={20} fontWeight="bold">
-          Реферальная программа
+          {t("settings.referralProgram")}
         </Text>
       </XStack>
 
       <Text color="white" fontSize={14} opacity={0.9} lineHeight={20}>
-        Приглашайте друзей и зарабатывайте больше токенов! Вы получаете бонусы
-        за каждого приглашенного пользователя.
+        {t("settings.referralDescription")}
       </Text>
 
       <YStack
@@ -34,7 +36,7 @@ export function ReferalBlock({
         gap="$2"
       >
         <Text color="white" fontSize={13} opacity={0.8}>
-          Ваш реферальный код
+          {t("settings.referralCode")}
         </Text>
         <XStack justifyContent="space-between" alignItems="center">
           <Text color="white" fontSize={24} fontWeight="bold" letterSpacing={2}>
@@ -62,7 +64,7 @@ export function ReferalBlock({
           <XStack gap="$1" alignItems="center">
             <Ionicons name="people" size={16} color="white" />
             <Text color="white" fontSize={12} opacity={0.8}>
-              Осталось
+              {t("settings.remaining")}
             </Text>
           </XStack>
           <Text color="white" fontSize={28} fontWeight="bold">
@@ -80,7 +82,7 @@ export function ReferalBlock({
           <XStack gap="$1" alignItems="center">
             <Ionicons name="trending-up" size={16} color="white" />
             <Text color="white" fontSize={12} opacity={0.8}>
-              Приглашено
+              {t("settings.invited")}
             </Text>
           </XStack>
           <Text color="white" fontSize={28} fontWeight="bold">
@@ -96,7 +98,7 @@ export function ReferalBlock({
           gap="$1"
         >
           <Text color="white" fontSize={12} opacity={0.8}>
-            Заработано
+            {t("settings.earned")}
           </Text>
           <Text color="white" fontSize={28} fontWeight="bold">
             {earnedFromReferrals}

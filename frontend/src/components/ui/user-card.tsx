@@ -1,6 +1,7 @@
 import { XStack, YStack, Text, Theme, Button } from "tamagui";
 import { Image } from "react-native";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 interface User {
   id: string;
@@ -61,6 +62,7 @@ const mockUsers: User[] = [
 ];
 
 export function UserCard({ user }: { user: User }) {
+  const { t } = useTranslation();
   const [users, setUsers] = useState(mockUsers);
 
   const toggleSubscribe = (userId: string) => {
@@ -91,7 +93,8 @@ export function UserCard({ user }: { user: User }) {
           </Text>
           <XStack alignItems="center" gap="$3">
             <Text fontSize={14} color="#8E8E93">
-              {(user.subscribers ?? 0).toLocaleString()} подписчиков
+              {(user.subscribers ?? 0).toLocaleString()}{" "}
+              {t("search.subscribers")}
             </Text>
           </XStack>
         </YStack>
@@ -115,7 +118,9 @@ export function UserCard({ user }: { user: User }) {
             fontWeight="600"
             color={user.isSubscribed ? "#8E8E93" : "white"}
           >
-            {user.isSubscribed ? "Отписаться" : "Подписаться"}
+            {user.isSubscribed
+              ? t("profile.unsubscribe")
+              : t("profile.subscribe")}
           </Text>
         </Button>
       </Theme>

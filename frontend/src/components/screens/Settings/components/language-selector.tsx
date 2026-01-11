@@ -46,7 +46,7 @@ export function LanguageSelector() {
             </YStack>
           </XStack>
           <Text color={tokens.color.accent} fontSize={15} fontWeight="500">
-            Изменить
+            {t("settings.changeLanguage")}
           </Text>
         </XStack>
       </Pressable>
