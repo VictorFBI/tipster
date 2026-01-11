@@ -9,9 +9,15 @@ export function ProfileHeader() {
           <Avatar.Fallback backgroundColor="#1C1C28" />
         </Avatar>
 
-        <Text fontSize={20} fontWeight="600" color="white">
-          @username
-        </Text>
+        <YStack alignItems="center" gap="$1">
+          <Text fontSize={20} fontWeight="600" color="white">
+            Павел Дуров
+          </Text>
+
+          <Text fontSize={15} fontWeight="600" color="white">
+            @username
+          </Text>
+        </YStack>
 
         <XStack
           backgroundColor="transparent"

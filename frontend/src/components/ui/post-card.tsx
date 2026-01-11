@@ -37,7 +37,6 @@ export function PostCard({ post }: { post: Post }) {
       borderRadius="$4"
       gap="$3"
     >
-      {/* Author Header */}
       <XStack alignItems="center" justifyContent="space-between">
         <Theme name="accent">
           <XStack alignItems="center" gap="$3">
@@ -55,20 +54,12 @@ export function PostCard({ post }: { post: Post }) {
             </YStack>
           </XStack>
         </Theme>
-        {/* <XStack alignItems="center" gap="$1">
-          <Ionicons name="diamond" size={14} color="#FF8C42" />
-          <Text fontSize={14} fontWeight="600" color="#FF8C42">
-            {post.tipAmount.toLocaleString()}
-          </Text>
-        </XStack> */}
       </XStack>
 
-      {/* Post Content */}
       <Text fontSize={16} color="white" lineHeight={22}>
         {post.content}
       </Text>
 
-      {/* Actions */}
       <XStack gap="$4" marginTop="$2">
         <Button
           unstyled
@@ -76,7 +67,6 @@ export function PostCard({ post }: { post: Post }) {
           pressStyle={{ opacity: 0.7 }}
           flexDirection="row"
           alignItems="center"
-          gap="$2"
         >
           <Ionicons
             name={liked ? "heart" : "heart-outline"}
@@ -92,7 +82,6 @@ export function PostCard({ post }: { post: Post }) {
           pressStyle={{ opacity: 0.7 }}
           flexDirection="row"
           alignItems="center"
-          gap="$2"
         >
           <Ionicons name="chatbubble-outline" size={20} color="#8E8E93" />
           <Text fontSize={14} color="#8E8E93">
