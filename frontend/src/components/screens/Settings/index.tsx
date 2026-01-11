@@ -6,8 +6,10 @@ import { BalanceBlock } from "./components/balance-block";
 import { ReferalBlock } from "./components/referal-block";
 import { SettingsBlock } from "./components/settings-block";
 import { InfoBlock } from "../../ui/info-block";
+import { useTranslation } from "react-i18next";
 
 export default function Settings() {
+  const { t } = useTranslation();
   const balance = 5420;
 
   const referralCode = "TIPSTER2026";
@@ -17,7 +19,7 @@ export default function Settings() {
 
   return (
     <YStack flex={1} backgroundColor="#0A0A0F">
-      <Header headerText="Настройки" />
+      <Header headerText={t("settings.title")} />
 
       <ScrollView>
         <YStack padding="$4" gap="$4">
@@ -42,15 +44,13 @@ export default function Settings() {
             <XStack gap="$2" alignItems="center">
               <Ionicons name="log-out-outline" size={20} color="#EF4444" />
               <Text color="#EF4444" fontSize={16} fontWeight="600">
-                Выйти из аккаунта
+                {t("settings.logout")}
               </Text>
             </XStack>
           </YStack>
 
           <InfoBlock
-            text={
-              " Мы не храним приватные ключи. Ваши токены будут отправлены напрямую на ваш кошелек во время airdrop."
-            }
+            text={t("settings.securityInfo")}
             icon={
               <Ionicons
                 name="shield-checkmark"
@@ -58,7 +58,7 @@ export default function Settings() {
                 color={tokens.color.accent}
               />
             }
-            header="Безопасность"
+            header={t("settings.security")}
           />
         </YStack>
       </ScrollView>

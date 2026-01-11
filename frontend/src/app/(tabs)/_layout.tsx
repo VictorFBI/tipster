@@ -1,7 +1,10 @@
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { useTranslation } from "react-i18next";
 
 export default function TabLayout() {
+  const { t } = useTranslation();
+
   return (
     <Tabs
       screenOptions={{
@@ -25,7 +28,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: "Лента",
+          title: t("tabs.feed"),
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="home" size={size} color={color} />
           ),
@@ -34,7 +37,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="search"
         options={{
-          title: "Поиск",
+          title: t("tabs.search"),
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="search" size={size} color={color} />
           ),
@@ -43,7 +46,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="profile"
         options={{
-          title: "Профиль",
+          title: t("tabs.profile"),
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="person" size={size} color={color} />
           ),
@@ -52,7 +55,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="settings"
         options={{
-          title: "Настройки",
+          title: t("tabs.settings"),
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="settings" size={size} color={color} />
           ),

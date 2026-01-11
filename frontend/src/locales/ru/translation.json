@@ -1,0 +1,80 @@
+{
+  "common": {
+    "loading": "Загрузка...",
+    "error": "Ошибка",
+    "success": "Успешно",
+    "cancel": "Отмена",
+    "save": "Сохранить",
+    "delete": "Удалить",
+    "edit": "Редактировать",
+    "search": "Поиск"
+  },
+  "auth": {
+    "login": "Войти",
+    "register": "Регистрация",
+    "logout": "Выйти из аккаунта",
+    "email": "Email",
+    "password": "Пароль",
+    "confirmPassword": "Подтвердите пароль",
+    "forgotPassword": "Забыли пароль?",
+    "dontHaveAccount": "Нет аккаунта?",
+    "alreadyHaveAccount": "Уже есть аккаунт?"
+  },
+  "tabs": {
+    "feed": "Лента",
+    "search": "Поиск",
+    "profile": "Профиль",
+    "settings": "Настройки"
+  },
+  "feed": {
+    "title": "Лента",
+    "createPost": "Создать пост",
+    "noPostsYet": "Постов пока нет",
+    "loadMore": "Загрузить еще"
+  },
+  "search": {
+    "title": "Поиск",
+    "placeholder": "Поиск пользователей...",
+    "noResults": "Ничего не найдено",
+    "searchUsers": "Искать пользователей"
+  },
+  "profile": {
+    "title": "Профиль",
+    "posts": "Посты",
+    "followers": "Подписчики",
+    "following": "Подписки",
+    "edit": "Редактировать профиль",
+    "follow": "Подписаться",
+    "unfollow": "Отписаться",
+    "noPosts": "Постов пока нет"
+  },
+  "settings": {
+    "title": "Настройки",
+    "account": "Аккаунт",
+    "notifications": "Уведомления",
+    "privacy": "Приватность",
+    "language": "Язык",
+    "theme": "Тема",
+    "about": "О приложении",
+    "logout": "Выйти из аккаунта",
+    "balance": "Баланс",
+    "security": "Безопасность",
+    "securityInfo": "Мы не храним приватные ключи. Ваши токены будут отправлены напрямую на ваш кошелек во время airdrop.",
+    "referral": "Реферальная программа",
+    "referralCode": "Ваш реферальный код",
+    "totalReferrals": "Всего рефералов",
+    "activeReferrals": "Активных рефералов",
+    "earnedFromReferrals": "Заработано с рефералов",
+    "copyCode": "Скопировать код",
+    "shareCode": "Поделиться кодом",
+    "view": "Внешний вид"
+  },
+  "post": {
+    "like": "Нравится",
+    "comment": "Комментировать",
+    "share": "Поделиться",
+    "likes": "{{count}} нравится",
+    "comments": "{{count}} комментариев",
+    "timeAgo": "{{time}} назад"
+  }
+}

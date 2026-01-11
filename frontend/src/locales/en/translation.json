@@ -1,0 +1,79 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "search": "Search"
+  },
+  "auth": {
+    "login": "Login",
+    "register": "Register",
+    "logout": "Logout",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "forgotPassword": "Forgot Password?",
+    "dontHaveAccount": "Don't have an account?",
+    "alreadyHaveAccount": "Already have an account?"
+  },
+  "tabs": {
+    "feed": "Feed",
+    "search": "Search",
+    "profile": "Profile",
+    "settings": "Settings"
+  },
+  "feed": {
+    "title": "Feed",
+    "createPost": "Create Post",
+    "noPostsYet": "No posts yet",
+    "loadMore": "Load More"
+  },
+  "search": {
+    "title": "Search",
+    "placeholder": "Search users...",
+    "noResults": "No results found",
+    "searchUsers": "Search users"
+  },
+  "profile": {
+    "title": "Profile",
+    "posts": "Posts",
+    "followers": "Followers",
+    "following": "Following",
+    "edit": "Edit Profile",
+    "follow": "Follow",
+    "unfollow": "Unfollow",
+    "noPosts": "No posts yet"
+  },
+  "settings": {
+    "title": "Settings",
+    "account": "Account",
+    "notifications": "Notifications",
+    "privacy": "Privacy",
+    "language": "Language",
+    "theme": "Theme",
+    "about": "About",
+    "logout": "Logout",
+    "balance": "Balance",
+    "security": "Security",
+    "securityInfo": "We don't store private keys. Your tokens will be sent directly to your wallet during the airdrop.",
+    "referral": "Referral Program",
+    "referralCode": "Your Referral Code",
+    "totalReferrals": "Total Referrals",
+    "activeReferrals": "Active Referrals",
+    "earnedFromReferrals": "Earned from Referrals",
+    "copyCode": "Copy Code",
+    "shareCode": "Share Code"
+  },
+  "post": {
+    "like": "Like",
+    "comment": "Comment",
+    "share": "Share",
+    "likes": "{{count}} likes",
+    "comments": "{{count}} comments",
+    "timeAgo": "{{time}} ago"
+  }
+}

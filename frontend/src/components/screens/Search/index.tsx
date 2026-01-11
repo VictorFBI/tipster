@@ -2,6 +2,7 @@ import { ScrollView, YStack } from "tamagui";
 import { Header } from "../../ui/header";
 import { UserCard } from "../../ui/user-card";
 import { SearchInput } from "./components/search-input";
+import { useTranslation } from "react-i18next";
 
 interface User {
   id: string;
@@ -62,9 +63,11 @@ const mockUsers: User[] = [
 ];
 
 export default function Search() {
+  const { t } = useTranslation();
+
   return (
     <YStack flex={1} backgroundColor="#0A0A0F">
-      <Header headerText="Поиск" />
+      <Header headerText={t("search.title")} />
       <SearchInput />
       <ScrollView showsVerticalScrollIndicator={false}>
         <YStack paddingHorizontal="$4" paddingBottom="$6" gap="$3">

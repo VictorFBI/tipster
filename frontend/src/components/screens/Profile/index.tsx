@@ -5,6 +5,7 @@ import { Header } from "../../ui/header";
 import { ProfileHeader } from "./components/profile-header";
 import { PostsList } from "./components/posts-list";
 import { Tabs } from "./components/tabs";
+import { useTranslation } from "react-i18next";
 
 interface Post {
   id: string;
@@ -48,11 +49,12 @@ const mockUserPosts: Post[] = [
 ];
 
 export default function Profile() {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<"posts" | "liked">("posts");
 
   return (
     <YStack flex={1} backgroundColor="#0A0A0F">
-      <Header headerText="Профиль" />
+      <Header headerText={t("profile.title")} />
       <ProfileHeader />
 
       <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
@@ -73,7 +75,7 @@ export default function Profile() {
               marginTop="$3"
               textAlign="center"
             >
-              Нет понравившихся постов
+              {t("profile.noPosts")}
             </Text>
           </YStack>
         )}
