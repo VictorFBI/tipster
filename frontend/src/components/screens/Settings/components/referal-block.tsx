@@ -2,14 +2,37 @@ import { tokens } from "@/tokens";
 import { Ionicons } from "@expo/vector-icons";
 import { XStack, YStack, Text } from "tamagui";
 import { useTranslation } from "react-i18next";
+import * as Clipboard from "expo-clipboard";
+import * as Haptics from "expo-haptics";
+import { useState } from "react";
+
+interface ReferalBlockProps {
+  referralCode: string;
+  totalReferrals: number;
+  earnedFromReferrals: number;
+  activeReferrals: number;
+}
 
 export function ReferalBlock({
   referralCode,
   totalReferrals,
   earnedFromReferrals,
   activeReferrals,
-}) {
+}: ReferalBlockProps) {
   const { t } = useTranslation();
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyCode = async () => {
+    try {
+      await Clipboard.setStringAsync(referralCode);
+      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      setCopied(true);
+
+      setTimeout(() => setCopied(false), 2000);
+    } catch (error) {
+      console.error("Failed to copy:", error);
+    }
+  };
 
   return (
     <YStack
@@ -43,12 +66,20 @@ export function ReferalBlock({
             {referralCode}
           </Text>
           <YStack
-            backgroundColor="rgba(255,255,255,0.2)"
+            backgroundColor={
+              copied ? "rgba(76,175,80,0.3)" : "rgba(255,255,255,0.2)"
+            }
             borderRadius="$2"
             padding="$2"
             pressStyle={{ opacity: 0.7 }}
+            onPress={handleCopyCode}
+            cursor="pointer"
           >
-            <Ionicons name="copy-outline" size={20} color="white" />
+            <Ionicons
+              name={copied ? "checkmark-outline" : "copy-outline"}
+              size={20}
+              color="white"
+            />
           </YStack>
         </XStack>
       </YStack>

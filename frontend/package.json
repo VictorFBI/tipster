@@ -23,6 +23,7 @@
     "@tamagui/theme-builder": "^1.144.1",
     "@tamagui/themes": "^1.144.1",
     "expo": "~54.0.31",
+    "expo-clipboard": "^8.0.8",
     "expo-constants": "~18.0.13",
     "expo-font": "~14.0.10",
     "expo-haptics": "~15.0.8",
