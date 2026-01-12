@@ -13,32 +13,30 @@ export function Header({
 
   return (
     <XStack
-      backgroundColor="#0A0A0F"
+      backgroundColor={"$background"}
       paddingHorizontal="$4"
       paddingVertical="$4"
-      paddingTop={insets.top + 16} // Добавляем отступ сверху
+      paddingTop={insets.top + 16}
       alignItems="center"
       justifyContent="space-between"
     >
-      <Text fontSize={24} fontWeight="bold" color="white">
+      <Text fontSize={24} fontWeight="bold" color="$color">
         {headerText}
       </Text>
       {balance && (
-        <Theme name="accent">
-          <XStack
-            backgroundColor={"$background"}
-            paddingHorizontal="$3"
-            paddingVertical="$2"
-            borderRadius="$10"
-            alignItems="center"
-            gap="$2"
-          >
-            <Ionicons name="diamond" size={16} color="white" />
-            <Text fontSize={16} fontWeight="bold" color="white">
-              {balance.toLocaleString()} TIP
-            </Text>
-          </XStack>
-        </Theme>
+        <XStack
+          backgroundColor={"$accentColor"}
+          paddingHorizontal="$3"
+          paddingVertical="$2"
+          borderRadius="$10"
+          alignItems="center"
+          gap="$2"
+        >
+          <Ionicons name="diamond" size={16} color="white" />
+          <Text fontSize={16} fontWeight="bold" color="white">
+            {balance.toLocaleString()} TIP
+          </Text>
+        </XStack>
       )}
     </XStack>
   );

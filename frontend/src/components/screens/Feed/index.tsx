@@ -64,7 +64,7 @@ export default function Feed() {
   const { t } = useTranslation();
 
   return (
-    <YStack flex={1} backgroundColor="#0A0A0F">
+    <YStack flex={1} backgroundColor={"$background"}>
       <Header balance={5420} headerText="Tipster" />
       <InfoBlock
         text={t("feed.activityTip")}

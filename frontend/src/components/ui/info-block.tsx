@@ -12,37 +12,35 @@ export function InfoBlock({
   marginHorizontal?: string;
 }) {
   return (
-    <Theme name="accent">
-      <YStack
-        backgroundColor="rgba(139,92,246,0.1)"
-        borderWidth={1}
-        borderColor="$borderColor"
-        borderRadius="$4"
-        padding="$4"
-        gap="$2"
-        marginHorizontal={marginHorizontal}
-      >
-        {header ? (
-          <>
-            <XStack gap="$2" alignItems="center">
-              {icon}
-              <Text color="$background" fontSize={16} fontWeight="600">
-                {header}
-              </Text>
-            </XStack>
-            <Text color="$background" fontSize={13} lineHeight={18}>
-              {text}
-            </Text>
-          </>
-        ) : (
-          <XStack gap="$2" alignItems="flex-start">
+    <YStack
+      backgroundColor="rgba(139,92,246,0.1)"
+      borderWidth={1}
+      borderColor="$accentColor"
+      borderRadius="$4"
+      padding="$4"
+      gap="$2"
+      marginHorizontal={marginHorizontal}
+    >
+      {header ? (
+        <>
+          <XStack gap="$2" alignItems="center">
             {icon}
-            <Text color="$background" fontSize={13} lineHeight={18} flex={1}>
-              {text}
+            <Text color="$color" fontSize={16} fontWeight="600">
+              {header}
             </Text>
           </XStack>
-        )}
-      </YStack>
-    </Theme>
+          <Text color="$color" fontSize={13} lineHeight={18}>
+            {text}
+          </Text>
+        </>
+      ) : (
+        <XStack gap="$2" alignItems="flex-start">
+          {icon}
+          <Text color="$color" fontSize={13} lineHeight={18} flex={1}>
+            {text}
+          </Text>
+        </XStack>
+      )}
+    </YStack>
   );
 }

@@ -66,7 +66,7 @@ export default function Search() {
   const { t } = useTranslation();
 
   return (
-    <YStack flex={1} backgroundColor="#0A0A0F">
+    <YStack flex={1} backgroundColor={"$background"}>
       <Header headerText={t("search.title")} />
       <SearchInput />
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -74,7 +74,7 @@ export default function Search() {
           {mockUsers.map((user) => (
             <YStack
               key={user.id}
-              backgroundColor="#1C1C23"
+              backgroundColor="$userBackground"
               borderRadius="$4"
               padding="$4"
             >

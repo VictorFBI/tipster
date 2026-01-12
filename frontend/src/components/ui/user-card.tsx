@@ -76,7 +76,11 @@ export function UserCard({ user }: { user: User }) {
   };
 
   return (
-    <XStack alignItems="center" justifyContent="space-between">
+    <XStack
+      alignItems="center"
+      justifyContent="space-between"
+      backgroundColor={"$userBackground"}
+    >
       <XStack alignItems="center" gap="$3" flex={1}>
         <Image
           source={{ uri: user.avatar }}
@@ -84,11 +88,11 @@ export function UserCard({ user }: { user: User }) {
             width: 56,
             height: 56,
             borderRadius: 28,
-            backgroundColor: "#8B5CF6",
+            backgroundColor: "$accentColor",
           }}
         />
         <YStack flex={1} gap="$1">
-          <Text fontSize={18} fontWeight="600" color="white">
+          <Text fontSize={18} fontWeight="600" color="$color">
             {user.username}
           </Text>
           <XStack alignItems="center" gap="$3">
@@ -100,30 +104,30 @@ export function UserCard({ user }: { user: User }) {
         </YStack>
       </XStack>
 
-      <Theme name={user.isSubscribed ? undefined : "accent"}>
-        <Button
-          backgroundColor={user.isSubscribed ? "#2C2C2E" : "$background"}
-          borderRadius="$3"
-          paddingHorizontal="$3"
-          paddingVertical="$2"
-          onPress={() => toggleSubscribe(user.id)}
-          pressStyle={{
-            opacity: 0.8,
-          }}
-          size="$3"
-          width="$11"
+      <Button
+        backgroundColor={
+          user.isSubscribed ? "$subscribeButton" : "$accentColor"
+        }
+        borderRadius="$3"
+        paddingHorizontal="$3"
+        paddingVertical="$2"
+        onPress={() => toggleSubscribe(user.id)}
+        pressStyle={{
+          opacity: 0.8,
+        }}
+        size="$3"
+        width="$11"
+      >
+        <Text
+          fontSize={14}
+          fontWeight="600"
+          color={user.isSubscribed ? "$secondaryText" : "white"}
         >
-          <Text
-            fontSize={14}
-            fontWeight="600"
-            color={user.isSubscribed ? "#8E8E93" : "white"}
-          >
-            {user.isSubscribed
-              ? t("profile.unsubscribe")
-              : t("profile.subscribe")}
-          </Text>
-        </Button>
-      </Theme>
+          {user.isSubscribed
+            ? t("profile.unsubscribe")
+            : t("profile.subscribe")}
+        </Text>
+      </Button>
     </XStack>
   );
 }

@@ -63,19 +63,17 @@ export default function LoginScreen() {
           space="$4"
         >
           <YStack alignItems="center">
-            <Theme name="accent">
-              <YStack
-                width={80}
-                height={80}
-                borderRadius={40}
-                backgroundColor="$color"
-                alignItems="center"
-                justifyContent="center"
-                marginBottom="$4"
-              >
-                <Text fontSize={40}>🔗</Text>
-              </YStack>
-            </Theme>
+            <YStack
+              width={80}
+              height={80}
+              borderRadius={40}
+              backgroundColor="$accentColor"
+              alignItems="center"
+              justifyContent="center"
+              marginBottom="$4"
+            >
+              <Text fontSize={40}>🔗</Text>
+            </YStack>
           </YStack>
 
           <Text
@@ -174,20 +172,19 @@ export default function LoginScreen() {
               )}
             </YStack>
 
-            <Theme name="accent">
-              <Button
-                size="$5"
-                marginTop="$2"
-                onPress={handleSubmit(onSubmit)}
-                disabled={isSubmitting}
-                opacity={isSubmitting ? 0.5 : 1}
-                pressStyle={{ opacity: 0.8 }}
-              >
-                <Text fontSize="$5" fontWeight="800" color="white">
-                  {isSubmitting ? t("auth.loggingIn") : t("auth.login")}
-                </Text>
-              </Button>
-            </Theme>
+            <Button
+              size="$5"
+              marginTop="$2"
+              onPress={handleSubmit(onSubmit)}
+              disabled={isSubmitting}
+              opacity={isSubmitting ? 0.5 : 1}
+              pressStyle={{ opacity: 0.8 }}
+              backgroundColor="$accentColor"
+            >
+              <Text fontSize="$5" fontWeight="800" color="white">
+                {isSubmitting ? t("auth.loggingIn") : t("auth.login")}
+              </Text>
+            </Button>
 
             <Text
               fontSize="$3"
@@ -203,19 +200,14 @@ export default function LoginScreen() {
               <Text fontSize="$3" color="$color" opacity={0.7}>
                 {t("auth.dontHaveAccount")}
               </Text>
-              <Theme name="accent">
-                <Link href="/register" asChild>
-                  <TouchableOpacity>
-                    <Text
-                      fontSize="$3"
-                      color={theme.accentColor?.get()}
-                      fontWeight="800"
-                    >
-                      {t("auth.register")}
-                    </Text>
-                  </TouchableOpacity>
-                </Link>
-              </Theme>
+
+              <Link href="/register" asChild>
+                <TouchableOpacity>
+                  <Text fontSize="$3" color={"$accentColor"} fontWeight="800">
+                    {t("auth.register")}
+                  </Text>
+                </TouchableOpacity>
+              </Link>
             </XStack>
           </YStack>
         </YStack>

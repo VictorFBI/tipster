@@ -54,7 +54,7 @@ export default function Profile() {
   const [activeTab, setActiveTab] = useState<"posts" | "liked">("posts");
 
   return (
-    <YStack flex={1} backgroundColor="#0A0A0F">
+    <YStack flex={1} backgroundColor={"$background"}>
       <Header headerText={t("profile.title")} />
       <ProfileHeader />
 

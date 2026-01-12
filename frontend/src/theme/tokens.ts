@@ -1,7 +1,6 @@
 
 export const tokens = {
   color: {
-    // Ваши основные цвета
     darkBg: '#0A0E27',
     darkInput: '#1A1F3A',
     darkBorder: '#2D3548',
@@ -9,19 +8,20 @@ export const tokens = {
     darkDivider: '#6B7280',
     darkSecondary: '#9CA3AF',
     white: '#FFFFFF',
+
     
-    // Светлые цвета
     lightBg: '#FFFFFF',
     lightInput: '#F3F4F6',
     lightBorder: '#E5E7EB',
     lightSecondary: '#6B7280',
-    
-    // Акцентный цвет
+
     accent: '#8B5CF6',
     accentHover: '#7C3AED',
     accentPress: '#6D28D9',
+
+
+    gray: "#1C1C28",
     
-    // Дополнительные цвета
     gray1: '#F9FAFB',
     gray2: '#F3F4F6',
     gray3: '#E5E7EB',
@@ -34,8 +34,9 @@ export const tokens = {
     gray10: '#111827',
     gray11: '#0A0E27',
     gray12: '#000000',
+
+    gray13: '#2C2C2E',
     
-    // Dark variants
     gray1Dark: '#0A0E27',
     gray2Dark: '#1A1F3A',
     gray3Dark: '#2D3548',
@@ -49,7 +50,6 @@ export const tokens = {
     gray11Dark: '#F9FAFB',
     gray12Dark: '#FFFFFF',
     
-    // Alpha colors for shadows
     grayA5: 'rgba(0,0,0,0.04)',
     grayA6: 'rgba(0,0,0,0.08)',
     grayA7: 'rgba(0,0,0,0.16)',

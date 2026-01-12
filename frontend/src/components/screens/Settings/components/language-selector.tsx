@@ -2,7 +2,7 @@ import { XStack, YStack, Text } from "tamagui";
 import { useTranslation } from "react-i18next";
 import { Ionicons } from "@expo/vector-icons";
 import { changeLanguage } from "../../../../utils/i18n";
-import { tokens } from "../../../../../tokens";
+import { tokens } from "../../../../theme/tokens";
 import { useState } from "react";
 import { Modal, TouchableOpacity, StyleSheet, Pressable } from "react-native";
 
@@ -37,7 +37,7 @@ export function LanguageSelector() {
           <XStack gap="$3" alignItems="center" flex={1}>
             <Ionicons name="globe-outline" size={24} color="#8E8E93" />
             <YStack flex={1}>
-              <Text color="white" fontSize={16}>
+              <Text color="$color" fontSize={16}>
                 {t("settings.language")}
               </Text>
               <Text color={tokens.color.darkSecondary} fontSize={13}>
@@ -45,7 +45,7 @@ export function LanguageSelector() {
               </Text>
             </YStack>
           </XStack>
-          <Text color={tokens.color.accent} fontSize={15} fontWeight="500">
+          <Text color={"$accentColor"} fontSize={15} fontWeight="500">
             {t("settings.changeLanguage")}
           </Text>
         </XStack>
@@ -63,7 +63,7 @@ export function LanguageSelector() {
             onPress={(e) => e.stopPropagation()}
           >
             <YStack
-              backgroundColor="#1C1C23"
+              backgroundColor="$inputBackground"
               borderTopLeftRadius="$6"
               borderTopRightRadius="$6"
               padding="$4"
@@ -77,7 +77,7 @@ export function LanguageSelector() {
                 marginBottom="$4"
               />
               <Text
-                color="white"
+                color="$color"
                 fontSize={20}
                 fontWeight="bold"
                 marginBottom="$4"
@@ -95,8 +95,8 @@ export function LanguageSelector() {
                       padding="$4"
                       backgroundColor={
                         i18n.language === lang.code
-                          ? tokens.color.accent
-                          : tokens.color.darkInput
+                          ? "$accentColor"
+                          : "$langButton"
                       }
                       borderRadius="$3"
                       alignItems="center"

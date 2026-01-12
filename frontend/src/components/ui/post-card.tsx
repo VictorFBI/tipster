@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
-import { Avatar, XStack, YStack, Text, Button, Theme } from "tamagui";
+import { Avatar, XStack, YStack, Text, Button } from "tamagui";
 
 interface Post {
   id: string;
@@ -30,7 +30,7 @@ export function PostCard({ post }: { post: Post }) {
 
   return (
     <YStack
-      backgroundColor="#1C1C28"
+      backgroundColor="$postBackground"
       marginHorizontal="$4"
       marginTop="$4"
       padding="$4"
@@ -38,25 +38,23 @@ export function PostCard({ post }: { post: Post }) {
       gap="$3"
     >
       <XStack alignItems="center" justifyContent="space-between">
-        <Theme name="accent">
-          <XStack alignItems="center" gap="$3">
-            <Avatar circular size="$4">
-              <Avatar.Image src={post.author.avatar} />
-              <Avatar.Fallback backgroundColor="$background" />
-            </Avatar>
-            <YStack>
-              <Text fontSize={16} fontWeight="600" color="white">
-                {post.author.name}
-              </Text>
-              <Text fontSize={12} color="#8E8E93">
-                {post.timestamp}
-              </Text>
-            </YStack>
-          </XStack>
-        </Theme>
+        <XStack alignItems="center" gap="$3">
+          <Avatar circular size="$4">
+            <Avatar.Image src={post.author.avatar} />
+            <Avatar.Fallback backgroundColor="$accentColor" />
+          </Avatar>
+          <YStack>
+            <Text fontSize={16} fontWeight="600" color="$color">
+              {post.author.name}
+            </Text>
+            <Text fontSize={12} color="#8E8E93">
+              {post.timestamp}
+            </Text>
+          </YStack>
+        </XStack>
       </XStack>
 
-      <Text fontSize={16} color="white" lineHeight={22}>
+      <Text fontSize={16} color="$color" lineHeight={22}>
         {post.content}
       </Text>
 

@@ -10,7 +10,8 @@ export function SearchInput() {
   return (
     <YStack paddingHorizontal="$4" paddingBottom="$4">
       <XStack
-        backgroundColor="#1C1C23"
+        // backgroundColor="#1C1C23"
+        backgroundColor={"$userBackground"}
         borderRadius="$4"
         paddingHorizontal="$3"
         alignItems="center"

@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { YStack, XStack, Text, ScrollView } from "tamagui";
 import { Header } from "../../ui/header";
-import { tokens } from "../../../../tokens";
+import { tokens } from "../../../theme/tokens";
 import { BalanceBlock } from "./components/balance-block";
 import { ReferalBlock } from "./components/referal-block";
 import { SettingsBlock } from "./components/settings-block";
@@ -18,7 +18,7 @@ export default function Settings() {
   const earnedFromReferrals = 600;
 
   return (
-    <YStack flex={1} backgroundColor="#0A0A0F">
+    <YStack flex={1} backgroundColor={"$background"}>
       <Header headerText={t("settings.title")} />
 
       <ScrollView>
@@ -35,7 +35,7 @@ export default function Settings() {
           />
 
           <YStack
-            backgroundColor="white"
+            backgroundColor="$button"
             borderRadius="$4"
             padding="$4"
             alignItems="center"

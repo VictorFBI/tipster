@@ -9,11 +9,14 @@ import "react-native-reanimated";
 import { TamaguiProvider, PortalProvider } from "tamagui";
 import tamaguiConfig from "../../tamagui.config";
 import { useFonts } from "expo-font";
-import { useColorScheme } from "react-native";
 import "../utils/i18n";
+import {
+  ThemeProvider as CustomThemeProvider,
+  useTheme,
+} from "../contexts/ThemeContext";
 
-export default function RootLayout() {
-  const colorScheme = useColorScheme();
+function RootLayoutContent() {
+  const { theme } = useTheme();
 
   const [loaded] = useFonts({
     Inter: require("@tamagui/font-inter/otf/Inter-Medium.otf"),
@@ -25,11 +28,9 @@ export default function RootLayout() {
   }
 
   return (
-    <TamaguiProvider config={tamaguiConfig} defaultTheme="dark">
+    <TamaguiProvider config={tamaguiConfig} defaultTheme={theme} key={theme}>
       <PortalProvider>
-        <ThemeProvider
-          value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
-        >
+        <ThemeProvider value={theme === "dark" ? DarkTheme : DefaultTheme}>
           <Stack
             screenOptions={{
               headerShown: false,
@@ -38,9 +39,17 @@ export default function RootLayout() {
             <Stack.Screen name="(auth)" options={{ headerShown: false }} />
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           </Stack>
-          <StatusBar style="auto" />
+          <StatusBar style={theme === "dark" ? "light" : "dark"} />
         </ThemeProvider>
       </PortalProvider>
     </TamaguiProvider>
+  );
+}
+
+export default function RootLayout() {
+  return (
+    <CustomThemeProvider>
+      <RootLayoutContent />
+    </CustomThemeProvider>
   );
 }
