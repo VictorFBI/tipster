@@ -6,8 +6,6 @@ import { tokens } from "../../../../theme/tokens";
 import { useState } from "react";
 import { Modal, TouchableOpacity, StyleSheet, Pressable } from "react-native";
 
-//TODO refactor
-
 interface Language {
   code: string;
   name: string;

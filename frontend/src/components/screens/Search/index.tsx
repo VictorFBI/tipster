@@ -74,7 +74,7 @@ export default function Search() {
           {mockUsers.map((user) => (
             <YStack
               key={user.id}
-              backgroundColor="$userBackground"
+              backgroundColor="$surface"
               borderRadius="$4"
               padding="$4"
             >
