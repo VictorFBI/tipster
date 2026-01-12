@@ -5,8 +5,7 @@ export function Tabs({ activeTab, setActiveTab }) {
     <XStack
       marginTop="$4"
       marginHorizontal="$4"
-      // backgroundColor="#1C1C28"
-      backgroundColor="$avgGray"
+      backgroundColor="$surface"
       borderRadius="$10"
       padding="$1"
       gap="$2"

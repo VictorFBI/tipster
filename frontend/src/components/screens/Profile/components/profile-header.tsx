@@ -1,4 +1,4 @@
-import { Avatar, YStack, Text, XStack, Theme } from "tamagui";
+import { Avatar, YStack, Text, XStack } from "tamagui";
 
 export function ProfileHeader() {
   return (
@@ -9,11 +9,11 @@ export function ProfileHeader() {
       </Avatar>
 
       <YStack alignItems="center" gap="$1">
-        <Text fontSize={20} fontWeight="600" color="$color">
+        <Text fontSize={20} fontWeight="600" color="$text">
           Павел Дуров
         </Text>
 
-        <Text fontSize={15} fontWeight="600" color="$color">
+        <Text fontSize={15} fontWeight="600" color="$text">
           @username
         </Text>
       </YStack>
@@ -30,7 +30,7 @@ export function ProfileHeader() {
 
       <XStack gap="$8" marginTop="$2">
         <YStack alignItems="center" gap="$1">
-          <Text fontSize={20} fontWeight="700" color="$color">
+          <Text fontSize={20} fontWeight="700" color="$text">
             28
           </Text>
           <Text fontSize={14} color="#8E8E93">
@@ -38,7 +38,7 @@ export function ProfileHeader() {
           </Text>
         </YStack>
         <YStack alignItems="center" gap="$1">
-          <Text fontSize={20} fontWeight="700" color="$color">
+          <Text fontSize={20} fontWeight="700" color="$text">
             145
           </Text>
           <Text fontSize={14} color="#8E8E93">
@@ -46,7 +46,7 @@ export function ProfileHeader() {
           </Text>
         </YStack>
         <YStack alignItems="center" gap="$1">
-          <Text fontSize={20} fontWeight="700" color="$color">
+          <Text fontSize={20} fontWeight="700" color="$text">
             89
           </Text>
           <Text fontSize={14} color="#8E8E93">

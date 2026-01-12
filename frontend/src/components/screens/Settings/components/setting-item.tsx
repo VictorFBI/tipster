@@ -22,7 +22,7 @@ export function SettingItem({
       <XStack gap="$3" alignItems="center" flex={1}>
         <Ionicons name={icon} size={24} color="#8E8E93" />
         <YStack flex={1}>
-          <Text color="$color" fontSize={16}>
+          <Text color="$text" fontSize={16}>
             {title}
           </Text>
           <Text color={tokens.color.darkSecondary} fontSize={13}>
@@ -34,10 +34,7 @@ export function SettingItem({
         size="$3"
         checked={checked}
         onCheckedChange={onCheckedChange}
-        // backgroundColor={
-        //   checked ? tokens.color.accent : tokens.color.darkBorder
-        // }
-        backgroundColor={checked ? "$accentColor" : "$borderColor"}
+        backgroundColor={checked ? "$accent" : "$border"}
       >
         <Switch.Thumb animation="quick" backgroundColor="white" />
       </Switch>

@@ -3,16 +3,7 @@ import { Platform, KeyboardAvoidingView, TouchableOpacity } from "react-native";
 import { Link, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useForm, Controller } from "react-hook-form";
-import {
-  YStack,
-  XStack,
-  Text,
-  Input,
-  Button,
-  Theme,
-  useTheme,
-  View,
-} from "tamagui";
+import { YStack, XStack, Text, Input, Button, View } from "tamagui";
 import { useTranslation } from "react-i18next";
 
 type LoginFormData = {
@@ -22,7 +13,6 @@ type LoginFormData = {
 
 export default function LoginScreen() {
   const { t } = useTranslation();
-  const theme = useTheme();
   const router = useRouter();
 
   const {
@@ -54,7 +44,7 @@ export default function LoginScreen() {
       style={{ flex: 1 }}
     >
       <StatusBar style="light" />
-      <View flex={1} backgroundColor="$background">
+      <View flex={1} backgroundColor="$background2">
         <YStack
           flex={1}
           paddingHorizontal="$6"
@@ -67,7 +57,7 @@ export default function LoginScreen() {
               width={80}
               height={80}
               borderRadius={40}
-              backgroundColor="$accentColor"
+              backgroundColor="$accent"
               alignItems="center"
               justifyContent="center"
               marginBottom="$4"
@@ -79,14 +69,14 @@ export default function LoginScreen() {
           <Text
             fontSize="$9"
             fontWeight="bold"
-            color="$color"
+            color="$text"
             textAlign="center"
           >
             Tipster
           </Text>
           <Text
             fontSize="$3"
-            color="$color"
+            color="$text"
             opacity={0.7}
             textAlign="center"
             marginBottom="$8"
@@ -96,7 +86,7 @@ export default function LoginScreen() {
 
           <YStack space="$4" width="100%">
             <YStack space="$2">
-              <Text fontSize="$3" fontWeight="800" color="$color">
+              <Text fontSize="$3" fontWeight="800" color="$text">
                 {t("auth.email")}
               </Text>
               <Controller
@@ -119,10 +109,10 @@ export default function LoginScreen() {
                     autoCapitalize="none"
                     autoComplete="email"
                     size="$5"
-                    backgroundColor="$background"
-                    borderColor={errors.email ? "$red10" : "$borderColor"}
-                    color="$color"
-                    placeholderTextColor="$placeholderColor"
+                    backgroundColor="$background2"
+                    borderColor={errors.email ? "$red10" : "$border"}
+                    color="$text"
+                    placeholderTextColor="$placeholder"
                   />
                 )}
               />
@@ -134,7 +124,7 @@ export default function LoginScreen() {
             </YStack>
 
             <YStack space="$2">
-              <Text fontSize="$3" fontWeight="800" color="$color">
+              <Text fontSize="$3" fontWeight="800" color="$text">
                 {t("auth.password")}
               </Text>
               <Controller
@@ -158,10 +148,10 @@ export default function LoginScreen() {
                     secureTextEntry
                     autoComplete="password"
                     size="$5"
-                    backgroundColor="$background"
-                    borderColor={errors.password ? "$red10" : "$borderColor"}
-                    color="$color"
-                    placeholderTextColor="$placeholderColor"
+                    backgroundColor="$background2"
+                    borderColor={errors.password ? "$red10" : "$border"}
+                    color="$text"
+                    placeholderTextColor="$placeholder"
                   />
                 )}
               />
@@ -179,7 +169,7 @@ export default function LoginScreen() {
               disabled={isSubmitting}
               opacity={isSubmitting ? 0.5 : 1}
               pressStyle={{ opacity: 0.8 }}
-              backgroundColor="$accentColor"
+              backgroundColor="$accent"
             >
               <Text fontSize="$5" fontWeight="800" color="white">
                 {isSubmitting ? t("auth.loggingIn") : t("auth.login")}
@@ -188,7 +178,7 @@ export default function LoginScreen() {
 
             <Text
               fontSize="$3"
-              color="$color"
+              color="$text"
               opacity={0.5}
               textAlign="center"
               marginVertical="$2"
@@ -197,13 +187,13 @@ export default function LoginScreen() {
             </Text>
 
             <XStack justifyContent="center" alignItems="center" space="$2">
-              <Text fontSize="$3" color="$color" opacity={0.7}>
+              <Text fontSize="$3" color="$text" opacity={0.7}>
                 {t("auth.dontHaveAccount")}
               </Text>
 
               <Link href="/register" asChild>
                 <TouchableOpacity>
-                  <Text fontSize="$3" color={"$accentColor"} fontWeight="800">
+                  <Text fontSize="$3" color={"$accent"} fontWeight="800">
                     {t("auth.register")}
                   </Text>
                 </TouchableOpacity>

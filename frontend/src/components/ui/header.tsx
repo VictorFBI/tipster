@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import { XStack, Text, useTheme, Theme } from "tamagui";
+import { XStack, Text } from "tamagui";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export function Header({
@@ -20,12 +20,12 @@ export function Header({
       alignItems="center"
       justifyContent="space-between"
     >
-      <Text fontSize={24} fontWeight="bold" color="$color">
+      <Text fontSize={24} fontWeight="bold" color="$text">
         {headerText}
       </Text>
       {balance && (
         <XStack
-          backgroundColor={"$accentColor"}
+          backgroundColor={"$accent"}
           paddingHorizontal="$3"
           paddingVertical="$2"
           borderRadius="$10"

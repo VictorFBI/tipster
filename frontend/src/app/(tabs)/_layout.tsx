@@ -11,10 +11,7 @@ export default function TabLayout() {
         tabBarActiveTintColor: "#8B5CF6",
         tabBarInactiveTintColor: "#8E8E93",
         tabBarStyle: {
-          // backgroundColor: "$tabsColor",
           backgroundColor: "#1C1C28",
-          borderTopWidth: 1,
-          borderTopColor: "$subscribeButton",
           height: 80,
           paddingBottom: 20,
           paddingTop: 10,

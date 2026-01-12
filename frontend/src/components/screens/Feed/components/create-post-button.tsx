@@ -1,12 +1,12 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
-import { Button, XStack, Text, Theme } from "tamagui";
+import { Button, XStack, Text } from "tamagui";
 
 export function CreatePostButton() {
   const { t } = useTranslation();
   return (
     <Button
-      backgroundColor="$accentColor"
+      backgroundColor="$accent"
       marginHorizontal="$4"
       marginTop="$4"
       borderRadius="$3"

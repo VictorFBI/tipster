@@ -1,4 +1,4 @@
-import { XStack, Text, Theme, YStack } from "tamagui";
+import { XStack, Text, YStack } from "tamagui";
 
 export function InfoBlock({
   text,
@@ -15,7 +15,7 @@ export function InfoBlock({
     <YStack
       backgroundColor="rgba(139,92,246,0.1)"
       borderWidth={1}
-      borderColor="$accentColor"
+      borderColor="$accent"
       borderRadius="$4"
       padding="$4"
       gap="$2"
@@ -25,18 +25,18 @@ export function InfoBlock({
         <>
           <XStack gap="$2" alignItems="center">
             {icon}
-            <Text color="$color" fontSize={16} fontWeight="600">
+            <Text color="$text" fontSize={16} fontWeight="600">
               {header}
             </Text>
           </XStack>
-          <Text color="$color" fontSize={13} lineHeight={18}>
+          <Text color="$text" fontSize={13} lineHeight={18}>
             {text}
           </Text>
         </>
       ) : (
         <XStack gap="$2" alignItems="flex-start">
           {icon}
-          <Text color="$color" fontSize={13} lineHeight={18} flex={1}>
+          <Text color="$text" fontSize={13} lineHeight={18} flex={1}>
             {text}
           </Text>
         </XStack>

@@ -3,16 +3,7 @@ import { Platform, KeyboardAvoidingView, TouchableOpacity } from "react-native";
 import { Link } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useForm, Controller } from "react-hook-form";
-import {
-  YStack,
-  XStack,
-  Text,
-  Input,
-  Button,
-  Theme,
-  useTheme,
-  ScrollView,
-} from "tamagui";
+import { YStack, XStack, Text, Input, Button, ScrollView } from "tamagui";
 
 type RegisterFormData = {
   username: string;
@@ -22,8 +13,6 @@ type RegisterFormData = {
 };
 
 export default function RegisterScreen() {
-  const theme = useTheme();
-
   const {
     control,
     handleSubmit,
@@ -52,10 +41,10 @@ export default function RegisterScreen() {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={{ flex: 1, backgroundColor: "$background" }}
+      style={{ flex: 1, backgroundColor: "$background2" }}
     >
       <StatusBar style="light" />
-      <ScrollView flex={1} backgroundColor="$background">
+      <ScrollView flex={1} backgroundColor="$background2">
         <YStack
           flex={1}
           paddingHorizontal="$6"
@@ -68,7 +57,7 @@ export default function RegisterScreen() {
               width={80}
               height={80}
               borderRadius={40}
-              backgroundColor="$accentColor"
+              backgroundColor="$accent"
               alignItems="center"
               justifyContent="center"
             >
@@ -79,18 +68,18 @@ export default function RegisterScreen() {
           <Text
             fontSize="$9"
             fontWeight="bold"
-            color="$color"
+            color="$text"
             textAlign="center"
           >
             Создать аккаунт
           </Text>
-          <Text fontSize="$3" color="$color" opacity={0.7} textAlign="center">
+          <Text fontSize="$3" color="$text" opacity={0.7} textAlign="center">
             Присоединяйтесь к Tipster и начните зарабатывать
           </Text>
 
           <YStack space="$4" width="100%">
             <YStack space="$2">
-              <Text fontSize="$3" fontWeight="800" color="$color">
+              <Text fontSize="$3" fontWeight="800" color="$text">
                 Имя пользователя
               </Text>
               <Controller
@@ -116,10 +105,10 @@ export default function RegisterScreen() {
                     autoCapitalize="none"
                     autoComplete="username"
                     size="$5"
-                    backgroundColor="$background"
-                    borderColor={errors.username ? "$red10" : "$borderColor"}
-                    color="$color"
-                    placeholderTextColor="$placeholderColor"
+                    backgroundColor="$background2"
+                    borderColor={errors.username ? "$red10" : "$border"}
+                    color="$text"
+                    placeholderTextColor="$placeholder"
                   />
                 )}
               />
@@ -131,7 +120,7 @@ export default function RegisterScreen() {
             </YStack>
 
             <YStack space="$2">
-              <Text fontSize="$3" fontWeight="800" color="$color">
+              <Text fontSize="$3" fontWeight="800" color="$text">
                 Email
               </Text>
               <Controller
@@ -154,10 +143,10 @@ export default function RegisterScreen() {
                     autoCapitalize="none"
                     autoComplete="email"
                     size="$5"
-                    backgroundColor="$background"
-                    borderColor={errors.email ? "$red10" : "$borderColor"}
-                    color="$color"
-                    placeholderTextColor="$placeholderColor"
+                    backgroundColor="$background2"
+                    borderColor={errors.email ? "$red10" : "$border"}
+                    color="$text"
+                    placeholderTextColor="$placeholder"
                   />
                 )}
               />
@@ -169,7 +158,7 @@ export default function RegisterScreen() {
             </YStack>
 
             <YStack space="$2">
-              <Text fontSize="$3" fontWeight="800" color="$color">
+              <Text fontSize="$3" fontWeight="800" color="$text">
                 Пароль
               </Text>
               <Controller
@@ -188,15 +177,11 @@ export default function RegisterScreen() {
                     value={value}
                     onChangeText={onChange}
                     onBlur={onBlur}
-                    // secureTextEntry
-                    // autoComplete="off"
-                    // textContentType="none"
-                    // passwordRules=""
                     size="$5"
-                    backgroundColor="$background"
-                    borderColor={errors.password ? "$red10" : "$borderColor"}
-                    color="$color"
-                    placeholderTextColor="$placeholderColor"
+                    backgroundColor="$background2"
+                    borderColor={errors.password ? "$red10" : "$border"}
+                    color="$text"
+                    placeholderTextColor="$placeholder"
                   />
                 )}
               />
@@ -208,7 +193,7 @@ export default function RegisterScreen() {
             </YStack>
 
             <YStack space="$2">
-              <Text fontSize="$3" fontWeight="800" color="$color">
+              <Text fontSize="$3" fontWeight="800" color="$text">
                 Повторите пароль
               </Text>
               <Controller
@@ -225,17 +210,11 @@ export default function RegisterScreen() {
                     value={value}
                     onChangeText={onChange}
                     onBlur={onBlur}
-                    // secureTextEntry
-                    // autoComplete="off"
-                    // textContentType="none"
-                    // passwordRules=""
                     size="$5"
-                    backgroundColor="$background"
-                    borderColor={
-                      errors.confirmPassword ? "$red10" : "$borderColor"
-                    }
-                    color="$color"
-                    placeholderTextColor="$placeholderColor"
+                    backgroundColor="$background2"
+                    borderColor={errors.confirmPassword ? "$red10" : "$border"}
+                    color="$text"
+                    placeholderTextColor="$placeholder"
                   />
                 )}
               />
@@ -253,7 +232,7 @@ export default function RegisterScreen() {
               disabled={isSubmitting}
               opacity={isSubmitting ? 0.5 : 1}
               pressStyle={{ opacity: 0.8 }}
-              backgroundColor="$accentColor"
+              backgroundColor="$accent"
             >
               <Text fontSize="$5" fontWeight="800" color="white">
                 {isSubmitting ? "Создание..." : "Создать аккаунт"}
@@ -262,7 +241,7 @@ export default function RegisterScreen() {
 
             <Text
               fontSize="$2"
-              color="$color"
+              color="$text"
               opacity={0.5}
               textAlign="center"
               lineHeight={18}
@@ -271,18 +250,18 @@ export default function RegisterScreen() {
               политикой конфиденциальности
             </Text>
 
-            <Text fontSize="$3" color="$color" opacity={0.5} textAlign="center">
+            <Text fontSize="$3" color="$text" opacity={0.5} textAlign="center">
               или
             </Text>
 
             <XStack justifyContent="center" alignItems="center" space="$2">
-              <Text fontSize="$3" color="$color" opacity={0.7}>
+              <Text fontSize="$3" color="$text" opacity={0.7}>
                 Уже есть аккаунт?
               </Text>
 
               <Link href="/login" asChild>
                 <TouchableOpacity>
-                  <Text fontSize="$3" color={"$accentColor"} fontWeight="800">
+                  <Text fontSize="$3" color={"$accent"} fontWeight="800">
                     Войти
                   </Text>
                 </TouchableOpacity>

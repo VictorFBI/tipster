@@ -1,4 +1,4 @@
-import { XStack, YStack, Text, Theme, Button } from "tamagui";
+import { XStack, YStack, Text, Button } from "tamagui";
 import { Image } from "react-native";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -79,7 +79,7 @@ export function UserCard({ user }: { user: User }) {
     <XStack
       alignItems="center"
       justifyContent="space-between"
-      backgroundColor={"$userBackground"}
+      backgroundColor={"$surface"}
     >
       <XStack alignItems="center" gap="$3" flex={1}>
         <Image
@@ -88,11 +88,11 @@ export function UserCard({ user }: { user: User }) {
             width: 56,
             height: 56,
             borderRadius: 28,
-            backgroundColor: "$accentColor",
+            backgroundColor: "$accent",
           }}
         />
         <YStack flex={1} gap="$1">
-          <Text fontSize={18} fontWeight="600" color="$color">
+          <Text fontSize={18} fontWeight="600" color="$text">
             {user.username}
           </Text>
           <XStack alignItems="center" gap="$3">
@@ -105,9 +105,7 @@ export function UserCard({ user }: { user: User }) {
       </XStack>
 
       <Button
-        backgroundColor={
-          user.isSubscribed ? "$subscribeButton" : "$accentColor"
-        }
+        backgroundColor={user.isSubscribed ? "$surfaceSecondary" : "$accent"}
         borderRadius="$3"
         paddingHorizontal="$3"
         paddingVertical="$2"
@@ -121,7 +119,7 @@ export function UserCard({ user }: { user: User }) {
         <Text
           fontSize={14}
           fontWeight="600"
-          color={user.isSubscribed ? "$secondaryText" : "white"}
+          color={user.isSubscribed ? "$textSecondary" : "white"}
         >
           {user.isSubscribed
             ? t("profile.unsubscribe")

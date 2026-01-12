@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import { XStack, YStack, Text, Theme } from "tamagui";
+import { XStack, YStack, Text } from "tamagui";
 import { useTranslation } from "react-i18next";
 import { tokens } from "@/src/theme/tokens";
 
@@ -14,7 +14,7 @@ export function BalanceBlock({ balance }) {
       style={{
         background: "linear-gradient(135deg, #F97316 0%, #FB923C 100%)",
       }}
-      backgroundColor="$accentColor"
+      backgroundColor="$accent"
     >
       <Text color="white" fontSize={16} fontWeight="500">
         {t("settings.tokenBalance")}

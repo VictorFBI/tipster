@@ -35,7 +35,7 @@ export default function Settings() {
           />
 
           <YStack
-            backgroundColor="$button"
+            backgroundColor="$surface"
             borderRadius="$4"
             padding="$4"
             alignItems="center"

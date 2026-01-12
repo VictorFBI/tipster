@@ -37,7 +37,7 @@ export function LanguageSelector() {
           <XStack gap="$3" alignItems="center" flex={1}>
             <Ionicons name="globe-outline" size={24} color="#8E8E93" />
             <YStack flex={1}>
-              <Text color="$color" fontSize={16}>
+              <Text color="$text" fontSize={16}>
                 {t("settings.language")}
               </Text>
               <Text color={tokens.color.darkSecondary} fontSize={13}>
@@ -45,7 +45,7 @@ export function LanguageSelector() {
               </Text>
             </YStack>
           </XStack>
-          <Text color={"$accentColor"} fontSize={15} fontWeight="500">
+          <Text color={"$accent"} fontSize={15} fontWeight="500">
             {t("settings.changeLanguage")}
           </Text>
         </XStack>
@@ -63,7 +63,7 @@ export function LanguageSelector() {
             onPress={(e) => e.stopPropagation()}
           >
             <YStack
-              backgroundColor="$inputBackground"
+              backgroundColor="$surface"
               borderTopLeftRadius="$6"
               borderTopRightRadius="$6"
               padding="$4"
@@ -77,7 +77,7 @@ export function LanguageSelector() {
                 marginBottom="$4"
               />
               <Text
-                color="$color"
+                color="$text"
                 fontSize={20}
                 fontWeight="bold"
                 marginBottom="$4"
@@ -95,8 +95,8 @@ export function LanguageSelector() {
                       padding="$4"
                       backgroundColor={
                         i18n.language === lang.code
-                          ? "$accentColor"
-                          : "$langButton"
+                          ? "$accent"
+                          : "$surfaceSecondary"
                       }
                       borderRadius="$3"
                       alignItems="center"

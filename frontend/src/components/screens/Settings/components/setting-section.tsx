@@ -9,7 +9,7 @@ interface SettingSectionProps {
 export function SettingSection({ title, children }: SettingSectionProps) {
   return (
     <YStack gap="$3">
-      <Text color="$color" fontSize={18} fontWeight="600">
+      <Text color="$text" fontSize={18} fontWeight="600">
         {title}
       </Text>
       {children}

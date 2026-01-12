@@ -30,7 +30,7 @@ export function PostCard({ post }: { post: Post }) {
 
   return (
     <YStack
-      backgroundColor="$postBackground"
+      backgroundColor="$surface"
       marginHorizontal="$4"
       marginTop="$4"
       padding="$4"
@@ -41,10 +41,10 @@ export function PostCard({ post }: { post: Post }) {
         <XStack alignItems="center" gap="$3">
           <Avatar circular size="$4">
             <Avatar.Image src={post.author.avatar} />
-            <Avatar.Fallback backgroundColor="$accentColor" />
+            <Avatar.Fallback backgroundColor="$accent" />
           </Avatar>
           <YStack>
-            <Text fontSize={16} fontWeight="600" color="$color">
+            <Text fontSize={16} fontWeight="600" color="$text">
               {post.author.name}
             </Text>
             <Text fontSize={12} color="#8E8E93">
@@ -54,7 +54,7 @@ export function PostCard({ post }: { post: Post }) {
         </XStack>
       </XStack>
 
-      <Text fontSize={16} color="$color" lineHeight={22}>
+      <Text fontSize={16} color="$text" lineHeight={22}>
         {post.content}
       </Text>
 

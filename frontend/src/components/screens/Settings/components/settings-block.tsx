@@ -1,4 +1,3 @@
-import { tokens } from "@/src/theme/tokens";
 import { useState } from "react";
 import { YStack } from "tamagui";
 import { SettingSection } from "./setting-section";
@@ -16,8 +15,7 @@ export function SettingsBlock() {
 
   return (
     <YStack
-      // backgroundColor={tokens.color.darkInput}
-      backgroundColor={"$inputBackground"}
+      backgroundColor={"$surface"}
       borderRadius="$4"
       padding="$4"
       gap="$4"
