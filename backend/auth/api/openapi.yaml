@@ -53,6 +53,25 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /auth/send-email/registration:
+    post:
+      summary: Send email for registration
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendEmailRegistrationRequest'
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
 components:
   schemas:
     LoginRequest:
@@ -90,6 +109,14 @@ components:
         - email
         - password
         - username
+
+    SendEmailRegistrationRequest:
+      type: object
+      properties:
+        email:
+          type: string
+      required:
+        - email
         
     ErrorResponse:
       type: object

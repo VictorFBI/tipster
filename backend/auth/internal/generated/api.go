@@ -27,8 +27,16 @@ type RegisterRequest struct {
 	Username string `json:"username"`
 }
 
+// SendEmailRegistrationRequest defines model for SendEmailRegistrationRequest.
+type SendEmailRegistrationRequest struct {
+	Email string `json:"email"`
+}
+
 // PostAuthLoginJSONRequestBody defines body for PostAuthLogin for application/json ContentType.
 type PostAuthLoginJSONRequestBody = LoginRequest
 
 // PostAuthRegisterJSONRequestBody defines body for PostAuthRegister for application/json ContentType.
 type PostAuthRegisterJSONRequestBody = RegisterRequest
+
+// PostAuthSendEmailRegistrationJSONRequestBody defines body for PostAuthSendEmailRegistration for application/json ContentType.
+type PostAuthSendEmailRegistrationJSONRequestBody = SendEmailRegistrationRequest

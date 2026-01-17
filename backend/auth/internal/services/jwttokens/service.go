@@ -8,19 +8,11 @@ import (
 	"github.com/joho/godotenv"
 )
 
-var jwtSecret []byte
-
 func init() {
 	err := godotenv.Load("../../.env")
 	if err != nil {
 		panic(err)
 	}
-
-	secret := os.Getenv("JWT_SECRET")
-	if secret == "" {
-		panic("JWT_SECRET environment variable is not set")
-	}
-	jwtSecret = []byte(secret)
 }
 
 type JWTClaims struct {
@@ -76,6 +68,12 @@ func (jts *JwtTokensService) generateToken(email string, tokenType string, expir
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+
+	secret := os.Getenv("JWT_SECRET")
+	if secret == "" {
+		panic("JWT_SECRET environment variable is not set")
+	}
+	jwtSecret := []byte(secret)
 
 	tokenString, err := token.SignedString(jwtSecret)
 	if err != nil {
