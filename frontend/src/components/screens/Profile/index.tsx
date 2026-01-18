@@ -5,6 +5,7 @@ import { Header } from "../../ui/header";
 import { ProfileHeader } from "./components/profile-header";
 import { PostsList } from "./components/posts-list";
 import { Tabs } from "./components/tabs";
+import { ProfileOnboarding } from "./components/profile-onboarding";
 import { useTranslation } from "react-i18next";
 
 interface Post {
@@ -20,8 +21,24 @@ interface Post {
   comments: number;
 }
 
+interface UserProfile {
+  name: string;
+  username: string;
+  description: string;
+  avatar: string;
+  postsCount: number;
+  followersCount: number;
+  followingCount: number;
+}
+
 export default function Profile() {
   const { t } = useTranslation();
+
+  // State to track if user has completed their profile
+  // In a real app, this would come from user data/API
+  // TODO refactor
+  const [isProfileComplete, setIsProfileComplete] = useState(false);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
 
   const mockUserPosts: Post[] = [
     {
@@ -53,6 +70,44 @@ export default function Profile() {
   ];
   const [activeTab, setActiveTab] = useState<"posts" | "liked">("posts");
 
+  const handleCompleteProfile = (data: {
+    username: string;
+    displayName: string;
+    bio: string;
+    avatar: string | null;
+  }) => {
+    // In a real app, this would save to backend/API
+    setUserProfile({
+      name: data.displayName,
+      username: `@${data.username}`,
+      description: data.bio,
+      avatar: data.avatar || "https://i.pravatar.cc/150?img=12",
+      postsCount: 0,
+      followersCount: 0,
+      followingCount: 0,
+    });
+    setIsProfileComplete(true);
+  };
+
+  const handleSkipOnboarding = () => {
+    // User skips profile setup, show default profile
+    setIsProfileComplete(true);
+  };
+
+  // Show onboarding if profile is not complete
+  if (!isProfileComplete) {
+    return (
+      <YStack flex={1} backgroundColor={"$background"}>
+        <Header headerText={t("profile.title")} />
+        <ProfileOnboarding
+          onComplete={handleCompleteProfile}
+          onSkip={handleSkipOnboarding}
+        />
+      </YStack>
+    );
+  }
+
+  // Show regular profile view
   return (
     <YStack flex={1} backgroundColor={"$background"}>
       <Header headerText={t("profile.title")} />

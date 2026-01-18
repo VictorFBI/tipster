@@ -1,9 +1,13 @@
 import React from "react";
 import { Platform, KeyboardAvoidingView, TouchableOpacity } from "react-native";
-import { Link } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useForm, Controller } from "react-hook-form";
 import { YStack, XStack, Text, Input, Button, ScrollView } from "tamagui";
+import { ConfirmButton } from "../../ui/confirmButton";
+import { PasswordInput } from "../../ui/passwordInput";
+import { EmailInput } from "../../ui/emailInput";
+import { t } from "i18next";
 
 type RegisterFormData = {
   username: string;
@@ -13,6 +17,7 @@ type RegisterFormData = {
 };
 
 export function Registration() {
+  const router = useRouter();
   const {
     control,
     handleSubmit,
@@ -33,6 +38,16 @@ export function Registration() {
   const onSubmit = async (data: RegisterFormData) => {
     try {
       console.log("Register:", data);
+
+      // TODO: Call registration API
+      // Simulate API call
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      // Navigate to verify-email screen with email parameter
+      router.push({
+        pathname: "/verify-email",
+        params: { email: data.email },
+      });
     } catch (error) {
       console.error("Registration error:", error);
     }
@@ -71,7 +86,7 @@ export function Registration() {
             color="$text"
             textAlign="center"
           >
-            Создать аккаунт
+            {t("auth.createAccount")}
           </Text>
           <Text fontSize="$3" color="$text" opacity={0.7} textAlign="center">
             Присоединяйтесь к Tipster и начните зарабатывать
@@ -80,7 +95,7 @@ export function Registration() {
           <YStack space="$4" width="100%">
             <YStack space="$2">
               <Text fontSize="$3" fontWeight="800" color="$text">
-                Имя пользователя
+                {t("auth.username")}
               </Text>
               <Controller
                 control={control}
@@ -106,138 +121,58 @@ export function Registration() {
                     autoComplete="username"
                     size="$5"
                     backgroundColor="$background2"
-                    borderColor={errors.username ? "$red10" : "$border"}
+                    borderColor={errors.username ? "$error" : "$border"}
                     color="$text"
                     placeholderTextColor="$placeholder"
                   />
                 )}
               />
               {errors.username && (
-                <Text fontSize="$2" color="$red10">
+                <Text fontSize="$2" color="$error">
                   {errors.username.message}
                 </Text>
               )}
             </YStack>
 
-            <YStack space="$2">
-              <Text fontSize="$3" fontWeight="800" color="$text">
-                Email
-              </Text>
-              <Controller
-                control={control}
-                name="email"
-                rules={{
-                  required: "Email обязателен",
-                  pattern: {
-                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                    message: "Неверный формат email",
-                  },
-                }}
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <Input
-                    placeholder="your@email.com"
-                    value={value}
-                    onChangeText={onChange}
-                    onBlur={onBlur}
-                    keyboardType="email-address"
-                    autoCapitalize="none"
-                    autoComplete="email"
-                    size="$5"
-                    backgroundColor="$background2"
-                    borderColor={errors.email ? "$red10" : "$border"}
-                    color="$text"
-                    placeholderTextColor="$placeholder"
-                  />
-                )}
-              />
-              {errors.email && (
-                <Text fontSize="$2" color="$red10">
-                  {errors.email.message}
-                </Text>
-              )}
-            </YStack>
+            <EmailInput
+              control={control}
+              errors={errors.email}
+              message={errors.email?.message}
+            />
 
-            <YStack space="$2">
-              <Text fontSize="$3" fontWeight="800" color="$text">
-                Пароль
-              </Text>
-              <Controller
-                control={control}
-                name="password"
-                rules={{
-                  required: "Пароль обязателен",
-                  minLength: {
-                    value: 6,
-                    message: "Пароль должен быть минимум 6 символов",
-                  },
-                }}
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <Input
-                    placeholder="••••••••"
-                    value={value}
-                    onChangeText={onChange}
-                    onBlur={onBlur}
-                    size="$5"
-                    backgroundColor="$background2"
-                    borderColor={errors.password ? "$red10" : "$border"}
-                    color="$text"
-                    placeholderTextColor="$placeholder"
-                  />
-                )}
-              />
-              {errors.password && (
-                <Text fontSize="$2" color="$red10">
-                  {errors.password.message}
-                </Text>
-              )}
-            </YStack>
+            <PasswordInput
+              label={t("auth.password")}
+              control={control}
+              errors={errors.password}
+              message={errors.password?.message}
+              rules={{
+                required: "Пароль обязателен",
+                minLength: {
+                  value: 6,
+                  message: "Пароль должен быть минимум 6 символов",
+                },
+              }}
+            />
 
-            <YStack space="$2">
-              <Text fontSize="$3" fontWeight="800" color="$text">
-                Повторите пароль
-              </Text>
-              <Controller
-                control={control}
-                name="confirmPassword"
-                rules={{
-                  required: "Подтверждение пароля обязательно",
-                  validate: (value) =>
-                    value === password || "Пароли не совпадают",
-                }}
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <Input
-                    placeholder="••••••••"
-                    value={value}
-                    onChangeText={onChange}
-                    onBlur={onBlur}
-                    size="$5"
-                    backgroundColor="$background2"
-                    borderColor={errors.confirmPassword ? "$red10" : "$border"}
-                    color="$text"
-                    placeholderTextColor="$placeholder"
-                  />
-                )}
-              />
-              {errors.confirmPassword && (
-                <Text fontSize="$2" color="$red10">
-                  {errors.confirmPassword.message}
-                </Text>
-              )}
-            </YStack>
+            <PasswordInput
+              label={t("auth.repeatPassword")}
+              control={control}
+              errors={errors.confirmPassword}
+              message={errors.confirmPassword?.message}
+              controlName="confirmPassword"
+              rules={{
+                required: "Подтверждение пароля обязательно",
+                validate: (value) =>
+                  value === password || "Пароли не совпадают",
+              }}
+            />
 
-            <Button
-              size="$5"
-              marginTop="$2"
+            <ConfirmButton
               onPress={handleSubmit(onSubmit)}
               disabled={isSubmitting}
               opacity={isSubmitting ? 0.5 : 1}
-              pressStyle={{ opacity: 0.8 }}
-              backgroundColor="$accent"
-            >
-              <Text fontSize="$5" fontWeight="800" color="white">
-                {isSubmitting ? "Создание..." : "Создать аккаунт"}
-              </Text>
-            </Button>
+              text={isSubmitting ? "Отправляем код на почту..." : "Продолжить"}
+            />
 
             <Text
               fontSize="$2"
@@ -251,18 +186,18 @@ export function Registration() {
             </Text>
 
             <Text fontSize="$3" color="$text" opacity={0.5} textAlign="center">
-              или
+              {t("auth.or")}
             </Text>
 
             <XStack justifyContent="center" alignItems="center" space="$2">
               <Text fontSize="$3" color="$text" opacity={0.7}>
-                Уже есть аккаунт?
+                {t("auth.alreadyHaveAccount")}
               </Text>
 
               <Link href="/login" asChild>
                 <TouchableOpacity>
                   <Text fontSize="$3" color={"$accent"} fontWeight="800">
-                    Войти
+                    {t("auth.login")}
                   </Text>
                 </TouchableOpacity>
               </Link>

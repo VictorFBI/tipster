@@ -23,5 +23,7 @@ export const tokens = {
     gray7: '#4B5563',
     gray11: '#0A0E27',
     gray13: '#2C2C2E',
+
+    error: '#E53E3E'
   }
 }

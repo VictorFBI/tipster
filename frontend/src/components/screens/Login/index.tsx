@@ -2,9 +2,12 @@ import React from "react";
 import { Platform, KeyboardAvoidingView, TouchableOpacity } from "react-native";
 import { Link, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { useForm, Controller } from "react-hook-form";
-import { YStack, XStack, Text, Input, Button, View } from "tamagui";
+import { useForm } from "react-hook-form";
+import { YStack, XStack, Text, Input, View } from "tamagui";
 import { useTranslation } from "react-i18next";
+import { ConfirmButton } from "../../ui/confirmButton";
+import { PasswordInput } from "../../ui/passwordInput";
+import { EmailInput } from "../../ui/emailInput";
 
 type LoginFormData = {
   email: string;
@@ -86,50 +89,16 @@ export function Login() {
 
           <YStack space="$4" width="100%">
             <YStack space="$2">
-              <Text fontSize="$3" fontWeight="800" color="$text">
-                {t("auth.email")}
-              </Text>
-              <Controller
+              <EmailInput
                 control={control}
-                name="email"
-                rules={{
-                  required: t("auth.emailRequired") || "Email is required",
-                  pattern: {
-                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                    message: t("auth.invalidEmail") || "Invalid email format",
-                  },
-                }}
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <Input
-                    placeholder="your@email.com"
-                    value={value}
-                    onChangeText={onChange}
-                    onBlur={onBlur}
-                    keyboardType="email-address"
-                    autoCapitalize="none"
-                    autoComplete="email"
-                    size="$5"
-                    backgroundColor="$background2"
-                    borderColor={errors.email ? "$red10" : "$border"}
-                    color="$text"
-                    placeholderTextColor="$placeholder"
-                  />
-                )}
+                errors={errors.email}
+                message={errors.email?.message}
               />
-              {errors.email && (
-                <Text fontSize="$2" color="$red10">
-                  {errors.email.message}
-                </Text>
-              )}
-            </YStack>
-
-            <YStack space="$2">
-              <Text fontSize="$3" fontWeight="800" color="$text">
-                {t("auth.password")}
-              </Text>
-              <Controller
+              <PasswordInput
+                label={t("auth.password")}
                 control={control}
-                name="password"
+                errors={errors.password}
+                message={errors.password?.message}
                 rules={{
                   required: t("auth.passwordRequired"),
                   minLength: {
@@ -139,42 +108,25 @@ export function Login() {
                       "Password must be at least 6 characters",
                   },
                 }}
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <Input
-                    placeholder="••••••••"
-                    value={value}
-                    onChangeText={onChange}
-                    onBlur={onBlur}
-                    secureTextEntry
-                    autoComplete="password"
-                    size="$5"
-                    backgroundColor="$background2"
-                    borderColor={errors.password ? "$red10" : "$border"}
-                    color="$text"
-                    placeholderTextColor="$placeholder"
-                  />
-                )}
               />
-              {errors.password && (
-                <Text fontSize="$2" color="$red10">
-                  {errors.password.message}
-                </Text>
-              )}
+
+              <XStack justifyContent="flex-end" marginTop="$1">
+                <TouchableOpacity
+                  onPress={() => router.push("/forgot-password")}
+                >
+                  <Text fontSize="$3" color="$accent" fontWeight="600">
+                    {t("auth.forgotPassword")}
+                  </Text>
+                </TouchableOpacity>
+              </XStack>
             </YStack>
 
-            <Button
-              size="$5"
-              marginTop="$2"
+            <ConfirmButton
               onPress={handleSubmit(onSubmit)}
               disabled={isSubmitting}
               opacity={isSubmitting ? 0.5 : 1}
-              pressStyle={{ opacity: 0.8 }}
-              backgroundColor="$accent"
-            >
-              <Text fontSize="$5" fontWeight="800" color="white">
-                {isSubmitting ? t("auth.loggingIn") : t("auth.login")}
-              </Text>
-            </Button>
+              text={isSubmitting ? t("auth.loggingIn") : t("auth.login")}
+            />
 
             <Text
               fontSize="$3"
@@ -183,7 +135,7 @@ export function Login() {
               textAlign="center"
               marginVertical="$2"
             >
-              или
+              {t("auth.or")}
             </Text>
 
             <XStack justifyContent="center" alignItems="center" space="$2">

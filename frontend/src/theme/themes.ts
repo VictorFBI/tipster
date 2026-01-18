@@ -14,6 +14,8 @@ const light = {
   surfaceSecondary: tokens.color.gray7,
   
   placeholder: tokens.color.gray5,
+
+  error: tokens.color.error,
 }
 
 const dark = {
@@ -29,6 +31,8 @@ const dark = {
   surfaceSecondary: tokens.color.gray13,
   
   placeholder: tokens.color.darkPlaceholder,
+
+  error: tokens.color.error,
 }
 
 
