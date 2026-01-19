@@ -55,7 +55,14 @@
     "or": "or",
     "forgetPassword": "Forgot your password?",
     "enterEmail": "Enter email you used for registration",
-    "repeatPassword": "Repeat password"
+    "repeatPassword": "Repeat password",
+    "joinTipster": "Join Tipster and start earning",
+    "earnCrypto": "Earn cryptocurrency for activity",
+    "continue": "Continue",
+    "sendingCode": "Sending code to email...",
+    "termsAgreement": "By registering, you agree to the terms of use and privacy policy",
+    "usernamePattern": "Only letters, numbers and underscores",
+    "minLength3": "Minimum 3 characters"
   },
   "tabs": {
     "feed": "Feed",
@@ -81,8 +88,12 @@
   "profile": {
     "title": "Profile",
     "posts": "Posts",
+    "postsLabel": "Posts",
     "followers": "Followers",
+    "followersLabel": "Followers",
     "following": "Following",
+    "followingLabel": "Following",
+    "liked": "Liked",
     "edit": "Edit Profile",
     "follow": "Follow",
     "unfollow": "Unfollow",

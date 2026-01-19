@@ -2,7 +2,19 @@ import React from "react";
 
 import { Text, Button } from "tamagui";
 
-export function ConfirmButton({ onPress, disabled, opacity, text }) {
+interface ConfirmButtonProps {
+  onPress: () => void;
+  disabled: boolean;
+  opacity: number;
+  text: string;
+}
+
+export function ConfirmButton({
+  onPress,
+  disabled,
+  opacity,
+  text,
+}: ConfirmButtonProps) {
   return (
     <Button
       size="$5"

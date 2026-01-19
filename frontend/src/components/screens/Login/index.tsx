@@ -84,7 +84,7 @@ export function Login() {
             textAlign="center"
             marginBottom="$8"
           >
-            Зарабатывайте криптовалюту за активность
+            {t("auth.earnCrypto")}
           </Text>
 
           <YStack space="$4" width="100%">

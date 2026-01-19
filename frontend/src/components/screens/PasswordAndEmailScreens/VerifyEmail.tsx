@@ -1,8 +1,10 @@
 import React from "react";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { VerificationCodeScreen } from "./VerificationCodeScreen";
+import { useTranslation } from "react-i18next";
 
 export function VerifyEmail() {
+  const { t } = useTranslation();
   const router = useRouter();
   const params = useLocalSearchParams();
   const email = params.email as string;
@@ -24,7 +26,7 @@ export function VerifyEmail() {
     <VerificationCodeScreen
       email={email}
       icon="✉️"
-      title="Подтвердите email"
+      title={t("auth.verifyEmail")}
       onVerifySuccess={handleVerifySuccess}
       onResendCode={handleResendCode}
       showBackButton={false}

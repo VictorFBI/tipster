@@ -97,10 +97,10 @@ export function ResetPassword() {
               errors={errors.password}
               message={errors.password?.message}
               rules={{
-                required: "Пароль обязателен",
+                required: t("auth.passwordRequired"),
                 minLength: {
                   value: 6,
-                  message: "Пароль должен быть минимум 6 символов",
+                  message: t("auth.passwordMinLength"),
                 },
               }}
             />
@@ -111,9 +111,9 @@ export function ResetPassword() {
               errors={errors.confirmPassword}
               message={errors.confirmPassword?.message}
               rules={{
-                required: "Подтверждение пароля обязательно",
+                required: t("auth.confirmPasswordRequired"),
                 validate: (value) =>
-                  value === password || "Пароли не совпадают",
+                  value === password || t("auth.passwordsMustMatch"),
               }}
               controlName="confirmPassword"
             />

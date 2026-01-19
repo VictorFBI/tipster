@@ -253,7 +253,7 @@ export function VerificationCodeScreen({
             >
               <TouchableOpacity onPress={() => router.back()}>
                 <Text fontSize="$3" color="$accent" fontWeight="800">
-                  ← Назад
+                  {t("auth.back")}
                 </Text>
               </TouchableOpacity>
             </XStack>

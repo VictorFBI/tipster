@@ -1,6 +1,8 @@
 import { Avatar, YStack, Text, XStack } from "tamagui";
+import { useTranslation } from "react-i18next";
 
 export function ProfileHeader() {
+  const { t } = useTranslation();
   return (
     <YStack paddingVertical="$2" alignItems="center" gap="$3">
       <Avatar circular size="$10">
@@ -34,7 +36,7 @@ export function ProfileHeader() {
             28
           </Text>
           <Text fontSize={14} color="#8E8E93">
-            Постов
+            {t("profile.postsLabel")}
           </Text>
         </YStack>
         <YStack alignItems="center" gap="$1">
@@ -42,7 +44,7 @@ export function ProfileHeader() {
             145
           </Text>
           <Text fontSize={14} color="#8E8E93">
-            Подписчиков
+            {t("profile.followersLabel")}
           </Text>
         </YStack>
         <YStack alignItems="center" gap="$1">
@@ -50,7 +52,7 @@ export function ProfileHeader() {
             89
           </Text>
           <Text fontSize={14} color="#8E8E93">
-            Подписок
+            {t("profile.followingLabel")}
           </Text>
         </YStack>
       </XStack>

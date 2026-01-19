@@ -1,20 +1,38 @@
-import { Controller } from "react-hook-form";
+import {
+  Controller,
+  Control,
+  FieldError,
+  RegisterOptions,
+} from "react-hook-form";
 import { YStack, Text, Input } from "tamagui";
+import { useTranslation } from "react-i18next";
+
+interface PasswordInputProps {
+  label: string;
+  control: Control<any>;
+  errors?: FieldError;
+  message?: string;
+  rules?: RegisterOptions;
+  controlName?: string;
+}
 
 export function PasswordInput({
   label,
   control,
   errors,
   message,
-  rules = {
-    required: "Пароль обязателен",
+  rules,
+  controlName = "password",
+}: PasswordInputProps) {
+  const { t } = useTranslation();
+
+  const defaultRules = {
+    required: t("auth.passwordRequired"),
     minLength: {
       value: 6,
-      message: "Пароль должен быть минимум 6 символов",
+      message: t("auth.passwordMinLength"),
     },
-  },
-  controlName = "password",
-}) {
+  };
   return (
     <YStack space="$2">
       <Text fontSize="$3" fontWeight="800" color="$text">
@@ -23,7 +41,7 @@ export function PasswordInput({
       <Controller
         control={control}
         name={controlName}
-        rules={rules}
+        rules={rules || defaultRules}
         render={({ field: { onChange, onBlur, value } }) => (
           <Input
             placeholder="••••••••"

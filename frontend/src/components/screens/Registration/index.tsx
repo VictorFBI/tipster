@@ -89,7 +89,7 @@ export function Registration() {
             {t("auth.createAccount")}
           </Text>
           <Text fontSize="$3" color="$text" opacity={0.7} textAlign="center">
-            Присоединяйтесь к Tipster и начните зарабатывать
+            {t("auth.joinTipster")}
           </Text>
 
           <YStack space="$4" width="100%">
@@ -101,14 +101,14 @@ export function Registration() {
                 control={control}
                 name="username"
                 rules={{
-                  required: "Имя пользователя обязательно",
+                  required: t("auth.usernameRequired"),
                   minLength: {
                     value: 3,
-                    message: "Минимум 3 символа",
+                    message: t("auth.minLength3"),
                   },
                   pattern: {
                     value: /^[a-zA-Z0-9_]+$/,
-                    message: "Только буквы, цифры и подчеркивание",
+                    message: t("auth.usernamePattern"),
                   },
                 }}
                 render={({ field: { onChange, onBlur, value } }) => (
@@ -146,10 +146,10 @@ export function Registration() {
               errors={errors.password}
               message={errors.password?.message}
               rules={{
-                required: "Пароль обязателен",
+                required: t("auth.passwordRequired"),
                 minLength: {
                   value: 6,
-                  message: "Пароль должен быть минимум 6 символов",
+                  message: t("auth.passwordMinLength"),
                 },
               }}
             />
@@ -161,9 +161,9 @@ export function Registration() {
               message={errors.confirmPassword?.message}
               controlName="confirmPassword"
               rules={{
-                required: "Подтверждение пароля обязательно",
+                required: t("auth.confirmPasswordRequired"),
                 validate: (value) =>
-                  value === password || "Пароли не совпадают",
+                  value === password || t("auth.passwordsMustMatch"),
               }}
             />
 
@@ -171,7 +171,7 @@ export function Registration() {
               onPress={handleSubmit(onSubmit)}
               disabled={isSubmitting}
               opacity={isSubmitting ? 0.5 : 1}
-              text={isSubmitting ? "Отправляем код на почту..." : "Продолжить"}
+              text={isSubmitting ? t("auth.sendingCode") : t("auth.continue")}
             />
 
             <Text
@@ -181,8 +181,7 @@ export function Registration() {
               textAlign="center"
               lineHeight={18}
             >
-              Регистрируясь, вы соглашаетесь с условиями использования и
-              политикой конфиденциальности
+              {t("auth.termsAgreement")}
             </Text>
 
             <Text fontSize="$3" color="$text" opacity={0.5} textAlign="center">

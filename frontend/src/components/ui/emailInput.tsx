@@ -1,20 +1,28 @@
-import { Controller } from "react-hook-form";
+import { Controller, Control, FieldError } from "react-hook-form";
 import { YStack, Text, Input } from "tamagui";
+import { useTranslation } from "react-i18next";
 
-export function EmailInput({ control, errors, message }) {
+interface EmailInputProps {
+  control: Control<any>;
+  errors?: FieldError;
+  message?: string;
+}
+
+export function EmailInput({ control, errors, message }: EmailInputProps) {
+  const { t } = useTranslation();
   return (
     <YStack space="$2">
       <Text fontSize="$3" fontWeight="800" color="$text">
-        Email
+        {t("auth.email")}
       </Text>
       <Controller
         control={control}
         name="email"
         rules={{
-          required: "Email обязателен",
+          required: t("auth.emailRequired"),
           pattern: {
             value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-            message: "Неверный формат email",
+            message: t("auth.invalidEmail"),
           },
         }}
         render={({ field: { onChange, onBlur, value } }) => (

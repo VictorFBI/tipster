@@ -3,7 +3,11 @@ import { XStack, YStack, Text } from "tamagui";
 import { useTranslation } from "react-i18next";
 import { tokens } from "@/src/theme/tokens";
 
-export function BalanceBlock({ balance }) {
+interface BalanceBlockProps {
+  balance: number;
+}
+
+export function BalanceBlock({ balance }: BalanceBlockProps) {
   const { t } = useTranslation();
 
   return (
