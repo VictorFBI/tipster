@@ -1,9 +1,16 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
+import { useRouter } from "expo-router";
 import { Button, XStack, Text } from "tamagui";
 
 export function CreatePostButton() {
   const { t } = useTranslation();
+  const router = useRouter();
+
+  const handleCreatePost = () => {
+    router.push("/create-post");
+  };
+
   return (
     <Button
       backgroundColor="$accent"
@@ -11,10 +18,7 @@ export function CreatePostButton() {
       marginTop="$4"
       borderRadius="$3"
       pressStyle={{ opacity: 0.8 }}
-      onPress={() => {
-        // TODO: Navigate to create post screen
-        console.log("Create post");
-      }}
+      onPress={handleCreatePost}
     >
       <XStack alignItems="center" gap="$2">
         <Ionicons name="add" size={20} color="white" />

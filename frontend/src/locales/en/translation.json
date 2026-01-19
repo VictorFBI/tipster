@@ -165,5 +165,15 @@
     "writeReply": "Write a reply...",
     "reply": "Reply",
     "send": "Send"
+  },
+  "createPost": {
+    "title": "Create Post",
+    "placeholder": "What's on your mind?",
+    "post": "Post",
+    "posting": "Posting...",
+    "charactersLeft": "characters left",
+    "addImage": "Add Image",
+    "tipsTitle": "💡 Tips",
+    "tipsText": "Quality posts get more engagement! Share interesting thoughts, ask questions, or start discussions to earn more tokens."
   }
 }
