@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
 import { Avatar, XStack, YStack, Text, Button } from "tamagui";
+import { CommentsSection, Comment } from "./comments-section";
 
 interface Post {
   id: string;
@@ -13,11 +14,14 @@ interface Post {
   tipAmount: number;
   likes: number;
   comments: number;
+  commentsList?: Comment[];
 }
 
 export function PostCard({ post }: { post: Post }) {
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(post.likes);
+  const [showComments, setShowComments] = useState(false);
+  const [comments, setComments] = useState<Comment[]>(post.commentsList || []);
 
   const handleLike = () => {
     if (liked) {
@@ -26,6 +30,49 @@ export function PostCard({ post }: { post: Post }) {
       setLikeCount(likeCount + 1);
     }
     setLiked(!liked);
+  };
+
+  const handleAddComment = (content: string) => {
+    const newComment: Comment = {
+      id: Date.now().toString(),
+      author: {
+        name: "Current User", // Replace with actual user data
+        avatar: "https://i.pravatar.cc/150?img=1",
+      },
+      timestamp: "Just now",
+      content,
+      replies: [],
+    };
+    setComments([...comments, newComment]);
+  };
+
+  const handleAddReply = (commentId: string, content: string) => {
+    const newReply: Comment = {
+      id: Date.now().toString(),
+      author: {
+        name: "Current User",
+        avatar: "https://i.pravatar.cc/150?img=1",
+      },
+      timestamp: "Just now",
+      content,
+      replies: [],
+    };
+
+    setComments(
+      comments.map((comment) => {
+        if (comment.id === commentId) {
+          return {
+            ...comment,
+            replies: [...(comment.replies || []), newReply],
+          };
+        }
+        return comment;
+      }),
+    );
+  };
+
+  const toggleComments = () => {
+    setShowComments(!showComments);
   };
 
   return (
@@ -77,16 +124,25 @@ export function PostCard({ post }: { post: Post }) {
         </Button>
         <Button
           unstyled
+          onPress={toggleComments}
           pressStyle={{ opacity: 0.7 }}
           flexDirection="row"
           alignItems="center"
         >
           <Ionicons name="chatbubble-outline" size={20} color="#8E8E93" />
           <Text fontSize={14} color="#8E8E93">
-            {post.comments}
+            {comments.length}
           </Text>
         </Button>
       </XStack>
+
+      {showComments && (
+        <CommentsSection
+          comments={comments}
+          onAddComment={handleAddComment}
+          onAddReply={handleAddReply}
+        />
+      )}
     </YStack>
   );
 }

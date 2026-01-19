@@ -158,5 +158,12 @@
     "likes": "{{count}} likes",
     "comments": "{{count}} comments",
     "timeAgo": "{{time}} ago"
+  },
+  "comments": {
+    "noComments": "No comments yet. Be the first to comment!",
+    "addComment": "Add a comment...",
+    "writeReply": "Write a reply...",
+    "reply": "Reply",
+    "send": "Send"
   }
 }
