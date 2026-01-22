@@ -25,6 +25,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	jwttokensService := jwttokensservice.New()
 	usersService := usersservice.New(r.Context())
+	defer usersService.Close(r.Context())
 
 	ok, err := usersService.ValidateCredentials(r.Context(), loginReq.Email, loginReq.Password)
 	if err != nil {

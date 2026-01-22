@@ -2,10 +2,12 @@ package handlers
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 
 	api "tipster/backend/auth/internal/generated"
 	email "tipster/backend/auth/internal/services/email"
+	users "tipster/backend/auth/internal/services/users"
 )
 
 func SendEmailRegistration(w http.ResponseWriter, r *http.Request) {
@@ -22,9 +24,38 @@ func SendEmailRegistration(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	usersService := users.New(r.Context())
+	defer usersService.Close(r.Context())
+	emailService := email.New(r.Context())
+	defer emailService.Close()
+
+	user, err := usersService.GetUserByEmail(r.Context(), sendEmailRegistrationReq.Email)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(api.ErrorResponse{Message: "Failed to get user"})
+		return
+	}
+
+	if user == nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(api.ErrorResponse{Message: "User not found"})
+		return
+	}
+
+	code, err := emailService.GetCode(r.Context(), user.Id)
+	if err != nil {
+		if errors.Is(err, email.ErrCodeNotFound) {
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(api.ErrorResponse{Message: "Email verification code not found. Possibly because it has expired"})
+			return
+		}
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(api.ErrorResponse{Message: "Failed to get code"})
+		return
+	}
+
 	// Sending email
-	emailService := email.New()
-	err := emailService.SendEmailRegistration(r.Context(), sendEmailRegistrationReq.Email)
+	err = emailService.SendEmailVerificationCode(r.Context(), sendEmailRegistrationReq.Email, code)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(api.ErrorResponse{Message: "Failed to send email"})

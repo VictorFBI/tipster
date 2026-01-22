@@ -52,3 +52,11 @@ Migrations are located in the `migrations/` directory:
 - `0001_create_users_table.down.sql` - Drops users table
 
 Migrations are automatically applied on server startup.
+
+## Connect to docker databases
+PostgreSQL - `docker exec -it auth_postgres psql -U postgres -d auth`
+Redis - `docker exec -it auth_redis redis-cli`
+
+## Swagger
+
+`http://localhost:8080/swagger/index.html`

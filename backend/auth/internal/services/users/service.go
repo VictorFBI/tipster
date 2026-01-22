@@ -16,10 +16,12 @@ var (
 )
 
 type User struct {
-	Email     string
-	Password  string
-	Username  string
-	CreatedAt *string
+	Id        string
+	Email      string
+	Password   string
+	Username   string
+	IsEmailVerified bool
+	CreatedAt    *string
 }
 
 type UsersService struct {
@@ -36,13 +38,13 @@ func New(ctx context.Context) *UsersService {
 	}
 }
 
-// GetUser retrieves a user by username
-func (us *UsersService) GetUser(ctx context.Context, email string) (*User, error) {
+// GetUserByEmail retrieves a user by email
+func (us *UsersService) GetUserByEmail(ctx context.Context, email string) (*User, error) {
 	var user User
 	err := us.conn.QueryRow(ctx,
-		"SELECT email, password, username, created_at::text FROM users WHERE email = $1",
+		"SELECT id, email, password, username, is_email_verified, created_at::text FROM users WHERE email = $1",
 		email,
-	).Scan(&user.Email, &user.Password, &user.Username, &user.CreatedAt)
+	).Scan(&user.Id, &user.Email, &user.Password, &user.Username, &user.IsEmailVerified, &user.CreatedAt)
 
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
@@ -56,7 +58,7 @@ func (us *UsersService) GetUser(ctx context.Context, email string) (*User, error
 
 // ValidateCredentials checks if username and password are correct
 func (us *UsersService) ValidateCredentials(ctx context.Context, email, password string) (bool, error) {
-	user, err := us.GetUser(ctx, email)
+	user, err := us.GetUserByEmail(ctx, email)
 	if err != nil {
 		return false, err
 	}
@@ -69,7 +71,7 @@ func (us *UsersService) ValidateCredentials(ctx context.Context, email, password
 }
 
 // AddUser adds a new user to the database
-func (us *UsersService) AddUser(ctx context.Context, email, password, username string) error {
+func (us *UsersService) AddUser(ctx context.Context, email, password, username string) (string, error) {
 	var id string
 	err := us.conn.QueryRow(ctx,
 		"INSERT INTO users (email, password, username) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING RETURNING id",
@@ -79,11 +81,16 @@ func (us *UsersService) AddUser(ctx context.Context, email, password, username s
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			// No rows returned means ON CONFLICT triggered (email or username already exists)
-			return ErrUserAlreadyExists
+			return "", ErrUserAlreadyExists
 		}
-		return err
+		return "", err
 	}
 
 	// If we got here, user was successfully inserted (id was returned)
-	return nil
+	return id, nil
+}
+
+// Close closes the PostgreSQL connection
+func (us *UsersService) Close(ctx context.Context) error {
+	return us.conn.Close(ctx)
 }
