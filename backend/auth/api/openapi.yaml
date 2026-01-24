@@ -27,6 +27,13 @@ paths:
   /auth/login:
     post:
       summary: Login and get authentication token
+      parameters:
+        - name: X-Device-Id
+          in: header
+          required: true
+          description: Device ID
+          schema:
+            type: string
       requestBody:
         required: true
         content:
@@ -53,15 +60,15 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
-  /auth/send-email/registration:
+  /auth/logout:
     post:
-      summary: Send email for registration
+      summary: Logout and invalidate refresh token
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SendEmailRegistrationRequest'
+              $ref: '#/components/schemas/LogoutRequest'
       responses:
         '200':
           description: Success
@@ -71,6 +78,99 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/refresh:
+    post:
+      summary: Refresh access token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RefreshResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/send-email/registration:
+    post:
+      summary: Send email for registration
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendEmailRequest'
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/confirm-email/registration:
+    post:
+      summary: Confirm email for registration
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConfirmEmailRequest'
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  # /auth/send-email/reset-password:
+  #   post:
+  #     summary: Send email for reset password
+  #     requestBody:
+  #       required: true
+  #       content:
+  #         application/json:
+  #           schema:
+  #             $ref: '#/components/schemas/SendEmailRequest'
+  #     responses:
+  #       '200':
+  #         description: Returns this code in all cases for security reasons
+
+  # /auth/confirm-email/reset-password:
+  #   post:
+  #     summary: Confirm email for reset password
+  #     requestBody:
+  #       required: true
+  #       content:
+  #         application/json:
+  #           schema:
+  #             $ref: '#/components/schemas/ConfirmEmailRequest'
+  #     responses:
+  #       '200':
+  #         description: Success
+  #       '400':
+  #         description: Bad request
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: '#/components/schemas/ErrorResponse'
 
 components:
   schemas:
@@ -96,6 +196,14 @@ components:
         - access_token
         - refresh_token
 
+    LogoutRequest:
+      type: object
+      properties:
+        refresh_token:
+          type: string
+      required:
+        - refresh_token
+
     RegisterRequest:
       type: object
       properties:
@@ -110,13 +218,24 @@ components:
         - password
         - username
 
-    SendEmailRegistrationRequest:
+    SendEmailRequest:
       type: object
       properties:
         email:
           type: string
       required:
         - email
+
+    ConfirmEmailRequest:
+      type: object
+      properties:
+        email:
+          type: string
+        code:
+          type: string
+      required:
+        - email
+        - code
         
     ErrorResponse:
       type: object

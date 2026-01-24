@@ -13,6 +13,8 @@ import (
 var (
 	ErrUserAlreadyExists = errors.New("user already exists")
 	ErrUserNotFound      = errors.New("user not found")
+	ErrInvalidCredentials = errors.New("invalid credentials")
+	ErrEmailNotVerified = errors.New("email not verified")
 )
 
 type User struct {
@@ -56,18 +58,26 @@ func (us *UsersService) GetUserByEmail(ctx context.Context, email string) (*User
 	return &user, nil
 }
 
-// ValidateCredentials checks if username and password are correct
-func (us *UsersService) ValidateCredentials(ctx context.Context, email, password string) (bool, error) {
+// ValidateCredentials checks if username and password are correct and returns the user if successful
+func (us *UsersService) ValidateCredentials(ctx context.Context, email, password string) (*User, error) {
 	user, err := us.GetUserByEmail(ctx, email)
 	if err != nil {
-		return false, err
+		return nil, err
 	}
 
 	if user == nil {
-		return false, ErrUserNotFound
+		return nil, ErrUserNotFound
 	}
 
-	return bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)) == nil, nil
+	if !user.IsEmailVerified {
+		return nil, ErrEmailNotVerified
+	}
+
+	if bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)) != nil {
+		return nil, ErrInvalidCredentials
+	}
+
+	return user, nil
 }
 
 // AddUser adds a new user to the database

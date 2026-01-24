@@ -11,7 +11,7 @@ import (
 )
 
 func SendEmailRegistration(w http.ResponseWriter, r *http.Request) {
-	var sendEmailRegistrationReq api.SendEmailRegistrationRequest
+	var sendEmailRegistrationReq api.SendEmailRequest
 	if err := json.NewDecoder(r.Body).Decode(&sendEmailRegistrationReq); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(api.ErrorResponse{Message: "Invalid request body"})

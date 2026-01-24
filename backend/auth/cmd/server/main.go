@@ -60,6 +60,7 @@ func main() {
 
 	// Auth routes
 	r.Post("/auth/login", handlers.Login)
+	r.Post("/auth/logout", handlers.Logout)
 	r.Post("/auth/register", handlers.Register)
 	r.Post("/auth/send-email/registration", handlers.SendEmailRegistration)
 
