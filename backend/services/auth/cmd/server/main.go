@@ -17,6 +17,7 @@ import (
 
 func checkPostgreSQLConnection(ctx context.Context) {
 	log.Println("Checking PostgreSQL connection...")
+	
 	pgConn, err := postgresql.Connect(ctx)
 	if err != nil {
 		log.Fatalf("Failed to connect to PostgreSQL: %v", err)
@@ -30,7 +31,7 @@ func checkPostgreSQLConnection(ctx context.Context) {
 
 func checkRedisConnection(ctx context.Context) {
 	log.Println("Checking Redis connection...")
-	
+
 	redisConn, err := redis.Connect(ctx)
 	if err != nil {
 		log.Fatalf("Failed to connect to Redis: %v", err)
