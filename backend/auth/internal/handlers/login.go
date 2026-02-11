@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"errors"
 	"net/http"
 
 	api "tipster/backend/auth/internal/generated"
@@ -27,16 +26,11 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	jwttokensService := jwttokensservice.New(r.Context())
 	usersService := usersservice.New(r.Context())
 	defer usersService.Close(r.Context())
-	defer jwttokensService.Close(r.Context())
+	defer jwttokensService.Close()
 
 	user, err := usersService.ValidateCredentials(r.Context(), loginReq.Email, loginReq.Password)
 	if err != nil {
-		if errors.Is(err, usersservice.ErrUserNotFound) {
-			w.WriteHeader(http.StatusUnauthorized)
-			json.NewEncoder(w).Encode(api.ErrorResponse{Message: "Invalid credentials"})
-			return
-		}
-		w.WriteHeader(http.StatusBadRequest)
+		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode(api.ErrorResponse{Message: err.Error()})
 		return
 	}
@@ -67,7 +61,6 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		RefreshToken: tokens.RefreshToken,
 	}
 
-	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(response)
 }

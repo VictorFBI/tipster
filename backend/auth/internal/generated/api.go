@@ -31,11 +31,28 @@ type LogoutRequest struct {
 	RefreshToken string `json:"refresh_token"`
 }
 
+// RefreshRequest defines model for RefreshRequest.
+type RefreshRequest struct {
+	RefreshToken string `json:"refresh_token"`
+}
+
+// RefreshResponse defines model for RefreshResponse.
+type RefreshResponse struct {
+	AccessToken  string `json:"access_token"`
+	RefreshToken string `json:"refresh_token"`
+}
+
 // RegisterRequest defines model for RegisterRequest.
 type RegisterRequest struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
 	Username string `json:"username"`
+}
+
+// ResetPasswordRequest defines model for ResetPasswordRequest.
+type ResetPasswordRequest struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
 }
 
 // SendEmailRequest defines model for SendEmailRequest.
@@ -52,14 +69,26 @@ type PostAuthLoginParams struct {
 // PostAuthConfirmEmailRegistrationJSONRequestBody defines body for PostAuthConfirmEmailRegistration for application/json ContentType.
 type PostAuthConfirmEmailRegistrationJSONRequestBody = ConfirmEmailRequest
 
+// PostAuthConfirmEmailResetPasswordJSONRequestBody defines body for PostAuthConfirmEmailResetPassword for application/json ContentType.
+type PostAuthConfirmEmailResetPasswordJSONRequestBody = ConfirmEmailRequest
+
 // PostAuthLoginJSONRequestBody defines body for PostAuthLogin for application/json ContentType.
 type PostAuthLoginJSONRequestBody = LoginRequest
 
 // PostAuthLogoutJSONRequestBody defines body for PostAuthLogout for application/json ContentType.
 type PostAuthLogoutJSONRequestBody = LogoutRequest
 
+// PostAuthRefreshJSONRequestBody defines body for PostAuthRefresh for application/json ContentType.
+type PostAuthRefreshJSONRequestBody = RefreshRequest
+
 // PostAuthRegisterJSONRequestBody defines body for PostAuthRegister for application/json ContentType.
 type PostAuthRegisterJSONRequestBody = RegisterRequest
 
+// PostAuthResetPasswordJSONRequestBody defines body for PostAuthResetPassword for application/json ContentType.
+type PostAuthResetPasswordJSONRequestBody = ResetPasswordRequest
+
 // PostAuthSendEmailRegistrationJSONRequestBody defines body for PostAuthSendEmailRegistration for application/json ContentType.
 type PostAuthSendEmailRegistrationJSONRequestBody = SendEmailRequest
+
+// PostAuthSendEmailResetPasswordJSONRequestBody defines body for PostAuthSendEmailResetPassword for application/json ContentType.
+type PostAuthSendEmailResetPasswordJSONRequestBody = SendEmailRequest

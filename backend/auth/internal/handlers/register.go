@@ -9,7 +9,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 
 	api "tipster/backend/auth/internal/generated"
-	emailservice "tipster/backend/auth/internal/services/email"
+	registrationconfirmationservice "tipster/backend/auth/internal/services/registrationconfirmation"
 	usersservice "tipster/backend/auth/internal/services/users"
 )
 
@@ -44,8 +44,8 @@ func Register(w http.ResponseWriter, r *http.Request) {
 
 	usersService := usersservice.New(r.Context())
 	defer usersService.Close(r.Context())
-	emailService := emailservice.New(r.Context())
-	defer emailService.Close()
+	registrationConfirmationService := registrationconfirmationservice.New(r.Context())
+	defer registrationConfirmationService.Close()
 
 	// Hash password before storing
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(registerReq.Password), bcrypt.DefaultCost)
@@ -68,7 +68,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Generate and save code
-	err = emailService.GenerateAndSaveCode(r.Context(), userId)
+	err = registrationConfirmationService.GenerateAndSaveConfirmationClaims(r.Context(), userId)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(api.ErrorResponse{Message: "Failed to generate and save code"})

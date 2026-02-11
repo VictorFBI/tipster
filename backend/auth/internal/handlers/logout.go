@@ -23,7 +23,7 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 	}
 
 	jwttokensService := jwttokensservice.New(r.Context())
-	defer jwttokensService.Close(r.Context())
+	defer jwttokensService.Close()
 
 	_ = jwttokensService.DeleteRefreshToken(r.Context(), logoutReq.RefreshToken)
 	w.WriteHeader(http.StatusOK) // to ensure idempotency and prevent refresh tokens enumeration

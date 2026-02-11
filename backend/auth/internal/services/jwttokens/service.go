@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strconv"
 	"time"
 
 	redisdb "tipster/backend/auth/internal/db/redis"
@@ -33,6 +34,12 @@ type JWTClaims struct {
 	jwt.RegisteredClaims
 }
 
+type RefreshTokenClaims struct {
+	UserId string `json:"userId"`
+	DeviceId string `json:"deviceId"`
+	ExpiresAt int64 `json:"expiresAt"`
+}
+
 type Tokens struct {
 	AccessToken  string `json:"access_token"`
 	RefreshToken string `json:"refresh_token"`
@@ -52,10 +59,11 @@ func New(ctx context.Context) *JwtTokensService {
 	}
 }
 
-func (jts *JwtTokensService) Close(ctx context.Context) error {
+func (jts *JwtTokensService) Close() error {
 	return jts.redis.Close()
 }
 
+// SaveRefreshToken saves the refresh token to the Redis database
 func (jts *JwtTokensService) SaveRefreshToken(ctx context.Context, refreshToken string, userId string, deviceId string) error {
 	hashedPassword := sha256.Sum256([]byte(refreshToken))
 
@@ -67,11 +75,30 @@ func (jts *JwtTokensService) SaveRefreshToken(ctx context.Context, refreshToken 
 	return jts.redis.Expire(ctx, key, 7*24*time.Hour).Err()
 }
 
+// DeleteRefreshToken deletes the refresh token from the Redis database
 func (jts *JwtTokensService) DeleteRefreshToken(ctx context.Context, refreshToken string) error {
-	hashedPassword := sha256.Sum256([]byte(refreshToken))
+	hashedRefreshToken := sha256.Sum256([]byte(refreshToken))
 
-	key := fmt.Sprintf("refresh_token:%x", hashedPassword)
+	key := fmt.Sprintf("refresh_token:%x", hashedRefreshToken)
 	return jts.redis.Del(ctx, key).Err()
+}
+
+// GetRefreshTokenClaims gets the refresh token claims from the Redis database
+func (jts *JwtTokensService) GetRefreshTokenClaims(ctx context.Context, refreshToken string) (RefreshTokenClaims, error) {
+	hashedRefreshToken := sha256.Sum256([]byte(refreshToken))
+	key := fmt.Sprintf("refresh_token:%x", hashedRefreshToken)
+
+	claims, err := jts.redis.HGetAll(ctx, key).Result()
+	if err != nil {
+		return RefreshTokenClaims{}, err
+	}
+
+	expiresAt, err := strconv.ParseInt(claims["expires_at"], 10, 64)
+	if err != nil {
+		return RefreshTokenClaims{}, err
+	}
+
+	return RefreshTokenClaims{UserId: claims["user_id"], DeviceId: claims["device_id"], ExpiresAt: expiresAt}, nil
 }
 
 // Creates a JWT access and refresh tokens for user

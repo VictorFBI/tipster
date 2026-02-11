@@ -1,4 +1,4 @@
-package email
+package registrationconfirmation
 
 import (
 	"context"
@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"math/big"
+	"strconv"
 	"os"
 	"time"
 
@@ -36,21 +37,32 @@ func generate6DigitCode() (string, error) {
 	return fmt.Sprintf("%06d", n.Int64()), nil
 }
 
-type EmailService struct {
+type RegistrationConfirmationClaims struct {
+	Code string
+	Attempts int
+	ExpiresAt int64
+}
+
+type RegistrationConfirmationService struct {
 	redis *redis.Client
 }
 
-func New(ctx context.Context) *EmailService {
+func New(ctx context.Context) *RegistrationConfirmationService {
 	redis, err := redisdb.Connect(ctx)
 	if err != nil {
 		panic(err)
 	}
-	return &EmailService{
+	return &RegistrationConfirmationService{
 		redis: redis,
 	}
 }
 
-func (es *EmailService) GenerateAndSaveCode(ctx context.Context, userId string) error {
+func (es *RegistrationConfirmationService) IncrementAttempts(ctx context.Context, userId string) error {
+	key := fmt.Sprintf("registration:%s", userId)
+	return es.redis.HIncrBy(ctx, key, "attempts", 1).Err()
+}
+
+func (es *RegistrationConfirmationService) GenerateAndSaveConfirmationClaims(ctx context.Context, userId string) error {
 	code, err := generate6DigitCode()
 	if err != nil {
 		return fmt.Errorf("failed to generate 6-digit code: %w", err)
@@ -71,27 +83,42 @@ func (es *EmailService) GenerateAndSaveCode(ctx context.Context, userId string) 
 	return nil
 }
 
-func (es *EmailService) GetCode(ctx context.Context, userId string) (string, error) {
+func (es *RegistrationConfirmationService) GetConfirmationClaims(ctx context.Context, userId string) (RegistrationConfirmationClaims, error) {
 	key := fmt.Sprintf("registration:%s", userId)
 
 	exists, err := es.redis.HExists(ctx, key, "code").Result()
 	if err != nil {
-		return "", err
+		return RegistrationConfirmationClaims{}, err
 	}
 
 	if !exists {
-		return "", ErrCodeNotFound
+		return RegistrationConfirmationClaims{}, ErrCodeNotFound
 	}
 
-	code, err := es.redis.HGet(ctx, key, "code").Result()
+	claims, err := es.redis.HGetAll(ctx, key).Result()
 	if err != nil {
-		return "", err
+		return RegistrationConfirmationClaims{}, err
 	}
 
-	return code, nil
+	attempts, err := strconv.Atoi(claims["attempts"])
+	if err != nil {
+		return RegistrationConfirmationClaims{}, err
+	}
+
+	expiresAt, err := strconv.ParseInt(claims["expires_at"], 10, 64)
+	if err != nil {
+		return RegistrationConfirmationClaims{}, err
+	}	
+
+	return RegistrationConfirmationClaims{Code: claims["code"], Attempts: attempts, ExpiresAt: expiresAt}, nil
 }
 
-func (es *EmailService) SendEmailVerificationCode(ctx context.Context, email string, code string) error {
+func (es *RegistrationConfirmationService) DeleteConfirmationClaims(ctx context.Context, userId string) error {
+	key := fmt.Sprintf("registration:%s", userId)
+	return es.redis.Del(ctx, key).Err()
+}
+
+func (es *RegistrationConfirmationService) SendEmailConfirmationCode(ctx context.Context, email string, code string) error {
 	m := mail.NewMessage()
 
 	m.SetHeader("From", "fvictorb04@gmail.com")
@@ -120,6 +147,6 @@ func (es *EmailService) SendEmailVerificationCode(ctx context.Context, email str
 }
 
 // Close closes the Redis connection
-func (es *EmailService) Close() error {
+func (es *RegistrationConfirmationService) Close() error {
 	return es.redis.Close()
 }

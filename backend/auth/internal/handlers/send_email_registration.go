@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	api "tipster/backend/auth/internal/generated"
-	email "tipster/backend/auth/internal/services/email"
+	registrationconfirmationservice "tipster/backend/auth/internal/services/registrationconfirmation"
 	users "tipster/backend/auth/internal/services/users"
 )
 
@@ -26,8 +26,8 @@ func SendEmailRegistration(w http.ResponseWriter, r *http.Request) {
 
 	usersService := users.New(r.Context())
 	defer usersService.Close(r.Context())
-	emailService := email.New(r.Context())
-	defer emailService.Close()
+	registrationConfirmationService := registrationconfirmationservice.New(r.Context())
+	defer registrationConfirmationService.Close()
 
 	user, err := usersService.GetUserByEmail(r.Context(), sendEmailRegistrationReq.Email)
 	if err != nil {
@@ -42,10 +42,10 @@ func SendEmailRegistration(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	code, err := emailService.GetCode(r.Context(), user.Id)
+	registrationConfirmationClaims, err := registrationConfirmationService.GetConfirmationClaims(r.Context(), user.Id)
 	if err != nil {
-		if errors.Is(err, email.ErrCodeNotFound) {
-			w.WriteHeader(http.StatusBadRequest)
+		if errors.Is(err, registrationconfirmationservice.ErrCodeNotFound) {
+			w.WriteHeader(http.StatusNotFound)
 			json.NewEncoder(w).Encode(api.ErrorResponse{Message: "Email verification code not found. Possibly because it has expired"})
 			return
 		}
@@ -55,13 +55,10 @@ func SendEmailRegistration(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Sending email
-	err = emailService.SendEmailVerificationCode(r.Context(), sendEmailRegistrationReq.Email, code)
+	err = registrationConfirmationService.SendEmailConfirmationCode(r.Context(), sendEmailRegistrationReq.Email, registrationConfirmationClaims.Code)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(api.ErrorResponse{Message: "Failed to send email"})
+		json.NewEncoder(w).Encode(api.ErrorResponse{Message: "Failed to send email verification code"})
 		return
 	}
-
-	// Return 200 with no body
-	w.WriteHeader(http.StatusOK)
 }

@@ -62,7 +62,12 @@ func main() {
 	r.Post("/auth/login", handlers.Login)
 	r.Post("/auth/logout", handlers.Logout)
 	r.Post("/auth/register", handlers.Register)
+	r.Post("/auth/refresh", handlers.Refresh)
 	r.Post("/auth/send-email/registration", handlers.SendEmailRegistration)
+	r.Post("/auth/send-email/reset-password", handlers.SendEmailResetPassword)
+	r.Post("/auth/confirm-email/registration", handlers.ConfirmEmailRegistration)
+	r.Post("/auth/confirm-email/reset-password", handlers.ConfirmEmailResetPassword)
+	r.Post("/auth/reset-password", handlers.ResetPassword)
 
 	log.Println("Server is running on port 8080")
 	err := http.ListenAndServe(":8080", r)
