@@ -3,9 +3,9 @@ name: Build auth service
 on:
   push:
     branches:
-      - master
-    # paths:
-    #   - 'backend/services/auth/**'
+      - main
+    paths:
+      - 'backend/services/auth/**'
 
 jobs:
   build:
