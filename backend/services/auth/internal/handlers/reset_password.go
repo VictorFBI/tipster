@@ -64,7 +64,7 @@ func ResetPassword(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		if errors.Is(err, resetpasswordconfirmation.ErrCodeNotFound) {
 			w.WriteHeader(http.StatusForbidden)
-			json.NewEncoder(w).Encode(api.ErrorResponse{Message: "Code does not exist"})
+			json.NewEncoder(w).Encode(api.ErrorResponse{Message: "Reset password confirmation code does not exist"})
 			return
 		}
 		w.WriteHeader(http.StatusInternalServerError)
