@@ -21,6 +21,7 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: '1.24.5'
+          cache-dependency-path: backend/services/auth/go.sum
 
       - name: Download dependencies
         run: go mod download
@@ -32,5 +33,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: auth-server
-          path: ./auth-server
+          path: backend/services/auth/auth-server
           retention-days: 14
