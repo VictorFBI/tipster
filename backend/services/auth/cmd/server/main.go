@@ -34,11 +34,12 @@ func checkRedisConnection(ctx context.Context) {
 	if err != nil {
 		log.Fatalf("Failed to connect to Redis: %v", err)
 	}
-	
+
 	err = redisConn.Close()
 	if err != nil {
 		log.Fatalf("Failed to close Redis connection: %v", err)
 	}
+	
 	log.Println("Redis connection is OK")
 }
 
