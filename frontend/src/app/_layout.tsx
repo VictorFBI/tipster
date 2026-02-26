@@ -9,11 +9,11 @@ import "react-native-reanimated";
 import { TamaguiProvider, PortalProvider } from "tamagui";
 import tamaguiConfig from "../../tamagui.config";
 import { useFonts } from "expo-font";
-import "../utils/i18n";
+import "../core/utils/i18n";
 import {
   ThemeProvider as CustomThemeProvider,
   useTheme,
-} from "../contexts/ThemeContext";
+} from "../core/contexts/ThemeContext";
 
 function RootLayoutContent() {
   const { theme } = useTheme();
@@ -28,7 +28,7 @@ function RootLayoutContent() {
   }
 
   return (
-    <TamaguiProvider config={tamaguiConfig} defaultTheme={theme} key={theme}>
+    <TamaguiProvider config={tamaguiConfig} defaultTheme={theme}>
       <PortalProvider>
         <ThemeProvider value={theme === "dark" ? DarkTheme : DefaultTheme}>
           <Stack

@@ -4,8 +4,8 @@ import { useRouter, useLocalSearchParams } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useForm } from "react-hook-form";
 import { YStack, Text, ScrollView } from "tamagui";
-import { ConfirmButton } from "../../ui/confirmButton";
-import { PasswordInput } from "../../ui/passwordInput";
+import { ConfirmButton } from "../../shared/ui/confirmButton";
+import { PasswordInput } from "../../shared/ui/passwordInput";
 import { t } from "i18next";
 
 type ResetPasswordFormData = {

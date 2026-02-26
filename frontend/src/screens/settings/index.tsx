@@ -1,12 +1,12 @@
 import { Ionicons } from "@expo/vector-icons";
 import { YStack, XStack, Text, ScrollView } from "tamagui";
-import { Header } from "../../ui/header";
-import { tokens } from "../../../theme/tokens";
+import { Header } from "../../shared/ui/header";
 import { BalanceBlock } from "./components/balance-block";
 import { ReferalBlock } from "./components/referal-block";
 import { SettingsBlock } from "./components/settings-block";
-import { InfoBlock } from "../../ui/info-block";
+import { InfoBlock } from "../../shared/ui/info-block";
 import { useTranslation } from "react-i18next";
+import { tokens } from "@/src/core/theme/tokens";
 
 export default function Settings() {
   const { t } = useTranslation();

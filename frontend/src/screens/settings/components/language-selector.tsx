@@ -1,10 +1,10 @@
 import { XStack, YStack, Text } from "tamagui";
 import { useTranslation } from "react-i18next";
 import { Ionicons } from "@expo/vector-icons";
-import { changeLanguage } from "../../../../utils/i18n";
-import { tokens } from "../../../../theme/tokens";
 import { useState } from "react";
 import { Modal, TouchableOpacity, StyleSheet, Pressable } from "react-native";
+import { changeLanguage } from "@/src/core/utils/i18n";
+import { tokens } from "@/src/core/theme/tokens";
 
 interface Language {
   code: string;

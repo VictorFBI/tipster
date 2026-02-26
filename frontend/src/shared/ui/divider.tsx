@@ -1,4 +1,4 @@
-import { tokens } from "@/src/theme/tokens";
+import { tokens } from "@/src/core/theme/tokens";
 import { YStack } from "tamagui";
 
 export function Divider() {

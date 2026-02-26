@@ -3,11 +3,11 @@ import { Platform, KeyboardAvoidingView, TouchableOpacity } from "react-native";
 import { Link, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useForm } from "react-hook-form";
-import { YStack, XStack, Text, Input, View } from "tamagui";
+import { YStack, XStack, Text, View } from "tamagui";
 import { useTranslation } from "react-i18next";
-import { ConfirmButton } from "../../ui/confirmButton";
-import { PasswordInput } from "../../ui/passwordInput";
-import { EmailInput } from "../../ui/emailInput";
+import { ConfirmButton } from "../../shared/ui/confirmButton";
+import { PasswordInput } from "../../shared/ui/passwordInput";
+import { EmailInput } from "../../shared/ui/emailInput";
 
 type LoginFormData = {
   email: string;

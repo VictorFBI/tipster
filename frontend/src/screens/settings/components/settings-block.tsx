@@ -2,10 +2,10 @@ import { useState } from "react";
 import { YStack } from "tamagui";
 import { SettingSection } from "./setting-section";
 import { SettingItem } from "./setting-item";
-import { Divider } from "@/src/components/ui/divider";
 import { useTranslation } from "react-i18next";
-import { LanguageSelector } from "@/src/components/screens/Settings/components/language-selector";
-import { useTheme } from "@/src/contexts/ThemeContext";
+import { useTheme } from "@/src/core/contexts/ThemeContext";
+import { LanguageSelector } from "./language-selector";
+import { Divider } from "@/src/shared/ui/divider";
 
 export function SettingsBlock() {
   const { t } = useTranslation();

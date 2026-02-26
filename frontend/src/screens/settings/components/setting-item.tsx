@@ -1,4 +1,4 @@
-import { tokens } from "@/src/theme/tokens";
+import { tokens } from "@/src/core/theme/tokens";
 import { Ionicons } from "@expo/vector-icons";
 import { XStack, YStack, Text, Switch } from "tamagui";
 

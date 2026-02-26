@@ -1,4 +1,4 @@
-import { ResetPassword } from "@/src/components/screens/PasswordAndEmailScreens/ResetPassword";
+import { ResetPassword } from "@/src/screens/verification/ResetPassword";
 import React from "react";
 
 export default function ResetPasswordScreen() {

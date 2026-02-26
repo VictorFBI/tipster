@@ -3,10 +3,10 @@ import { Platform, KeyboardAvoidingView, TouchableOpacity } from "react-native";
 import { Link, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useForm, Controller } from "react-hook-form";
-import { YStack, XStack, Text, Input, Button, ScrollView } from "tamagui";
-import { ConfirmButton } from "../../ui/confirmButton";
-import { PasswordInput } from "../../ui/passwordInput";
-import { EmailInput } from "../../ui/emailInput";
+import { YStack, XStack, Text, Input, ScrollView } from "tamagui";
+import { ConfirmButton } from "../../shared/ui/confirmButton";
+import { PasswordInput } from "../../shared/ui/passwordInput";
+import { EmailInput } from "../../shared/ui/emailInput";
 import { t } from "i18next";
 
 type RegisterFormData = {

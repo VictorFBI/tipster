@@ -1,10 +1,11 @@
 import { YStack } from "tamagui";
 import { CreatePostButton } from "./components/create-post-button";
-import { Header } from "../../ui/header";
-import { InfoBlock } from "../../ui/info-block";
+import { Header } from "../../shared/ui/header";
+import { InfoBlock } from "../../shared/ui/info-block";
 import { Ionicons } from "@expo/vector-icons";
-import { PostsList } from "../Profile/components/posts-list";
+
 import { useTranslation } from "react-i18next";
+import { PostsList } from "../profile/components/posts-list";
 
 interface Post {
   id: string;

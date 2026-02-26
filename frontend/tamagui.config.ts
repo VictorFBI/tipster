@@ -1,6 +1,7 @@
 import { createTamagui } from 'tamagui'
 import { config as v3Config } from '@tamagui/config/v3'
-import { themes } from './src/theme/themes'
+import { themes } from './src/core/theme/themes'
+
 
 const tamaguiConfig = createTamagui({
   ...v3Config,
