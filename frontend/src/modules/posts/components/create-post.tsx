@@ -14,7 +14,7 @@ import { useTranslation } from "react-i18next";
 import { KeyboardAvoidingView, Platform, TouchableOpacity } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 
-export default function CreatePost() {
+export function CreatePost() {
   const { t } = useTranslation();
   const router = useRouter();
   const [content, setContent] = useState("");

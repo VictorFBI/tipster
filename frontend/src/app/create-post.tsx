@@ -1,4 +1,4 @@
-import CreatePost from "../modules/posts/components";
+import { CreatePost } from "../modules/posts";
 
 export default function CreatePostScreen() {
   return <CreatePost />;

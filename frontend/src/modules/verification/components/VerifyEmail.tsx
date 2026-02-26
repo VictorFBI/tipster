@@ -1,6 +1,6 @@
 import React from "react";
 import { useRouter, useLocalSearchParams } from "expo-router";
-import { VerificationCodeScreen } from "../../../screens/verificationCodeScreen/VerificationCodeScreen";
+import { VerificationCodeScreen } from "./VerificationCodeScreen";
 import { useTranslation } from "react-i18next";
 
 export function VerifyEmail() {

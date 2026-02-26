@@ -1,4 +1,4 @@
-import { ForgotPassword } from "@/src/screens/forgotPasswordScreen/ForgotPassword";
+import { ForgotPassword } from "@/src/screens/forgotPasswordScreen";
 import React from "react";
 
 export default function ForgotPasswordScreen() {

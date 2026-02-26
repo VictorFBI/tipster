@@ -8,7 +8,7 @@ import {
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { YStack, XStack, Text, Button, ScrollView } from "tamagui";
-import { ConfirmButton } from "../../shared/ui/confirmButton";
+import { ConfirmButton } from "../../../shared/ui/confirmButton";
 import { useTranslation } from "react-i18next";
 
 interface VerificationCodeScreenProps {
@@ -44,7 +44,7 @@ export function VerificationCodeScreen({
   errorIncompleteCode,
 }: VerificationCodeScreenProps) {
   const { t } = useTranslation();
-  
+
   // Set default values using translation
   const finalCodeInputLabel = codeInputLabel || t("auth.enterVerificationCode");
   const finalVerifyButtonText = verifyButtonText || t("auth.verify");
@@ -52,7 +52,8 @@ export function VerificationCodeScreen({
   const finalResendText = resendText || t("auth.didntReceiveCode");
   const finalResendButtonText = resendButtonText || t("auth.resendCode");
   const finalErrorInvalidCode = errorInvalidCode || t("auth.invalidCode");
-  const finalErrorIncompleteCode = errorIncompleteCode || t("auth.enterFullCode");
+  const finalErrorIncompleteCode =
+    errorIncompleteCode || t("auth.enterFullCode");
   const router = useRouter();
   const [code, setCode] = useState(["", "", "", "", "", ""]);
   const [isVerifying, setIsVerifying] = useState(false);
@@ -216,7 +217,9 @@ export function VerificationCodeScreen({
                 onPress={handleVerify}
                 disabled={isVerifying || code.join("").length !== 6}
                 opacity={isVerifying || code.join("").length !== 6 ? 0.5 : 1}
-                text={isVerifying ? finalVerifyingButtonText : finalVerifyButtonText}
+                text={
+                  isVerifying ? finalVerifyingButtonText : finalVerifyButtonText
+                }
               />
             ) : (
               <Button
@@ -229,7 +232,9 @@ export function VerificationCodeScreen({
                 backgroundColor="$accent"
               >
                 <Text fontSize="$5" fontWeight="800" color="white">
-                  {isVerifying ? finalVerifyingButtonText : finalVerifyButtonText}
+                  {isVerifying
+                    ? finalVerifyingButtonText
+                    : finalVerifyButtonText}
                 </Text>
               </Button>
             )}
