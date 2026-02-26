@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
 import { YStack, Text } from "tamagui";
-import { Header } from "../../shared/ui/header";
+import { Header } from "../../shared/components/header";
 import { ProfileHeader } from "./components/profile-header";
 import { PostsList } from "./components/posts-list";
 import { Tabs } from "./components/tabs";

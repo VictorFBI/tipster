@@ -1,10 +1,10 @@
 import { Ionicons } from "@expo/vector-icons";
 import { YStack, XStack, Text, ScrollView } from "tamagui";
-import { Header } from "../../shared/ui/header";
+import { Header } from "../../shared/components/header";
 import { BalanceBlock } from "./components/balance-block";
 import { ReferalBlock } from "./components/referal-block";
 import { SettingsBlock } from "./components/settings-block";
-import { InfoBlock } from "../../shared/ui/info-block";
+import { InfoBlock } from "../../shared/components/info-block";
 import { useTranslation } from "react-i18next";
 import { tokens } from "@/src/core/theme/tokens";
 

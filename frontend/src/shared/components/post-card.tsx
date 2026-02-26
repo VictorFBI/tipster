@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
 import { Avatar, XStack, YStack, Text, Button } from "tamagui";
-import { CommentsSection, Comment } from "./comments-section";
+import { CommentsSection, Comment } from "../ui/comments-section";
 
 interface Post {
   id: string;

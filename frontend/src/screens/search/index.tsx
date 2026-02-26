@@ -1,6 +1,6 @@
 import { ScrollView, YStack } from "tamagui";
-import { Header } from "../../shared/ui/header";
-import { UserCard } from "../../shared/ui/user-card";
+import { Header } from "../../shared/components/header";
+import { UserCard } from "../../shared/components/user-card";
 import { SearchInput } from "./components/search-input";
 import { useTranslation } from "react-i18next";
 
