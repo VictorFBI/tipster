@@ -3,7 +3,7 @@ import { useState } from "react";
 import { YStack, Text } from "tamagui";
 import { Header } from "../../shared/components/header";
 import { ProfileHeader } from "./components/profile-header";
-import { PostsList } from "./components/posts-list";
+import { PostsList } from "../../modules/posts/components/posts-list";
 import { Tabs } from "./components/tabs";
 import { ProfileOnboarding } from "./components/profile-onboarding";
 import { useTranslation } from "react-i18next";

@@ -1,4 +1,4 @@
-import { ForgotPasswordVerify } from "@/src/screens/verification/ForgotPasswordVerify";
+import { ForgotPasswordVerify } from "@/src/modules/verification/components/ForgotPasswordVerify";
 import React from "react";
 
 export default function ForgotPasswordVerifyScreen() {

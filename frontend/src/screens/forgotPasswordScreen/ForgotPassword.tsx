@@ -6,13 +6,14 @@ import { useForm } from "react-hook-form";
 import { YStack, XStack, Text, ScrollView } from "tamagui";
 import { ConfirmButton } from "../../shared/ui/confirmButton";
 import { EmailInput } from "../../shared/ui/emailInput";
-import { t } from "i18next";
+import { useTranslation } from "react-i18next";
 
 type ForgotPasswordFormData = {
   email: string;
 };
 
 export function ForgotPassword() {
+  const { t } = useTranslation();
   const router = useRouter();
 
   const {

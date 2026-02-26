@@ -7,7 +7,7 @@ import { YStack, XStack, Text, Input, ScrollView } from "tamagui";
 import { ConfirmButton } from "../../shared/ui/confirmButton";
 import { PasswordInput } from "../../shared/ui/passwordInput";
 import { EmailInput } from "../../shared/ui/emailInput";
-import { t } from "i18next";
+import { useTranslation } from "react-i18next";
 
 type RegisterFormData = {
   username: string;
@@ -17,6 +17,7 @@ type RegisterFormData = {
 };
 
 export function Registration() {
+  const { t } = useTranslation();
   const router = useRouter();
   const {
     control,

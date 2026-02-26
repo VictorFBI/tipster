@@ -9,7 +9,7 @@ import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { YStack, XStack, Text, Button, ScrollView } from "tamagui";
 import { ConfirmButton } from "../../shared/ui/confirmButton";
-import { t } from "i18next";
+import { useTranslation } from "react-i18next";
 
 interface VerificationCodeScreenProps {
   email: string;
@@ -35,14 +35,24 @@ export function VerificationCodeScreen({
   onVerifySuccess,
   onResendCode,
   useConfirmButton = false,
-  codeInputLabel = t("auth.enterVerificationCode"),
-  verifyButtonText = t("auth.verify"),
-  verifyingButtonText = t("auth.verifying"),
-  resendText = t("auth.didntReceiveCode"),
-  resendButtonText = t("auth.resendCode"),
-  errorInvalidCode = t("auth.invalidCode"),
-  errorIncompleteCode = t("auth.enterFullCode"),
+  codeInputLabel,
+  verifyButtonText,
+  verifyingButtonText,
+  resendText,
+  resendButtonText,
+  errorInvalidCode,
+  errorIncompleteCode,
 }: VerificationCodeScreenProps) {
+  const { t } = useTranslation();
+  
+  // Set default values using translation
+  const finalCodeInputLabel = codeInputLabel || t("auth.enterVerificationCode");
+  const finalVerifyButtonText = verifyButtonText || t("auth.verify");
+  const finalVerifyingButtonText = verifyingButtonText || t("auth.verifying");
+  const finalResendText = resendText || t("auth.didntReceiveCode");
+  const finalResendButtonText = resendButtonText || t("auth.resendCode");
+  const finalErrorInvalidCode = errorInvalidCode || t("auth.invalidCode");
+  const finalErrorIncompleteCode = errorIncompleteCode || t("auth.enterFullCode");
   const router = useRouter();
   const [code, setCode] = useState(["", "", "", "", "", ""]);
   const [isVerifying, setIsVerifying] = useState(false);
@@ -73,7 +83,7 @@ export function VerificationCodeScreen({
     const verificationCode = code.join("");
 
     if (verificationCode.length !== 6) {
-      setError(errorIncompleteCode);
+      setError(finalErrorIncompleteCode);
       return;
     }
 
@@ -82,7 +92,7 @@ export function VerificationCodeScreen({
       await onVerifySuccess(verificationCode);
     } catch (error) {
       console.error("Verification error:", error);
-      setError(errorInvalidCode);
+      setError(finalErrorInvalidCode);
       setCode(["", "", "", "", "", ""]);
       inputRefs.current[0]?.focus();
     } finally {
@@ -156,7 +166,7 @@ export function VerificationCodeScreen({
               color="$text"
               textAlign="center"
             >
-              {codeInputLabel}
+              {finalCodeInputLabel}
             </Text>
 
             <XStack justifyContent="center" space="$3">
@@ -206,7 +216,7 @@ export function VerificationCodeScreen({
                 onPress={handleVerify}
                 disabled={isVerifying || code.join("").length !== 6}
                 opacity={isVerifying || code.join("").length !== 6 ? 0.5 : 1}
-                text={isVerifying ? verifyingButtonText : verifyButtonText}
+                text={isVerifying ? finalVerifyingButtonText : finalVerifyButtonText}
               />
             ) : (
               <Button
@@ -219,7 +229,7 @@ export function VerificationCodeScreen({
                 backgroundColor="$accent"
               >
                 <Text fontSize="$5" fontWeight="800" color="white">
-                  {isVerifying ? verifyingButtonText : verifyButtonText}
+                  {isVerifying ? finalVerifyingButtonText : finalVerifyButtonText}
                 </Text>
               </Button>
             )}
@@ -231,7 +241,7 @@ export function VerificationCodeScreen({
                 opacity={0.7}
                 textAlign="center"
               >
-                {resendText}
+                {finalResendText}
               </Text>
               <Button
                 size="$4"
@@ -240,7 +250,7 @@ export function VerificationCodeScreen({
                 pressStyle={{ opacity: 0.7 }}
               >
                 <Text fontSize="$4" color="$accent" fontWeight="800">
-                  {resendButtonText}
+                  {finalResendButtonText}
                 </Text>
               </Button>
             </YStack>

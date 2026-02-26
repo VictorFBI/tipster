@@ -1,9 +1,10 @@
 import React from "react";
 import { useRouter, useLocalSearchParams } from "expo-router";
-import { VerificationCodeScreen } from "./VerificationCodeScreen";
-import { t } from "i18next";
+import { VerificationCodeScreen } from "../../../screens/verificationCodeScreen/VerificationCodeScreen";
+import { useTranslation } from "react-i18next";
 
-export function ForgotPasswordVerify() {
+export function VerifyEmail() {
+  const { t } = useTranslation();
   const router = useRouter();
   const params = useLocalSearchParams();
   const email = params.email as string;
@@ -13,10 +14,7 @@ export function ForgotPasswordVerify() {
     console.log("Verifying code:", code);
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
-    router.push({
-      pathname: "/reset-password",
-      params: { email, code },
-    });
+    router.replace("/(tabs)");
   };
 
   const handleResendCode = async () => {
@@ -27,12 +25,12 @@ export function ForgotPasswordVerify() {
   return (
     <VerificationCodeScreen
       email={email}
-      icon="🔑"
-      title={t("auth.enterCode")}
+      icon="✉️"
+      title={t("auth.verifyEmail")}
       onVerifySuccess={handleVerifySuccess}
       onResendCode={handleResendCode}
-      showBackButton={true}
-      useConfirmButton={true}
+      showBackButton={false}
+      useConfirmButton={false}
     />
   );
 }

@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { YStack, Text, ScrollView } from "tamagui";
 import { ConfirmButton } from "../../shared/ui/confirmButton";
 import { PasswordInput } from "../../shared/ui/passwordInput";
-import { t } from "i18next";
+import { useTranslation } from "react-i18next";
 
 type ResetPasswordFormData = {
   password: string;
@@ -14,6 +14,7 @@ type ResetPasswordFormData = {
 };
 
 export function ResetPassword() {
+  const { t } = useTranslation();
   const router = useRouter();
   const params = useLocalSearchParams();
   const email = params.email as string;
