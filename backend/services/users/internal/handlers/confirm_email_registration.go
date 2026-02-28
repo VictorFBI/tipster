@@ -2,17 +2,13 @@ package handlers
 
 import (
 	"encoding/json"
-	"errors"
 	"net/http"
+	"errors"
 
 	api "tipster/backend/auth/internal/generated"
 	jwttokensservice "tipster/backend/auth/internal/services/jwttokens"
-	registrationconfirmationservice "tipster/backend/auth/internal/services/registrationconfirmation"
 	usersservice "tipster/backend/auth/internal/services/users"
-
-	kafkadb "tipster/backend/auth/internal/db/kafka"
-
-	kafka "github.com/segmentio/kafka-go"
+	registrationconfirmationservice "tipster/backend/auth/internal/services/registrationconfirmation"
 )
 
 func ConfirmEmailRegistration(w http.ResponseWriter, r *http.Request) {
@@ -105,24 +101,6 @@ func ConfirmEmailRegistration(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(api.ErrorResponse{Message: "Failed to confirm user email"})
-		return
-	}
-
-	kafkaClient, err := kafkadb.Connect(r.Context())
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(api.ErrorResponse{Message: "Failed to connect to Kafka"})
-		return
-	}
-	defer kafkaClient.Close()
-
-	err = kafkaClient.NewWriter("auth.user.created").WriteMessages(r.Context(), kafka.Message{
-		Key:   []byte(user.Id),
-	})
-
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(api.ErrorResponse{Message: "Failed to write to Kafka: " + err.Error()})
 		return
 	}
 

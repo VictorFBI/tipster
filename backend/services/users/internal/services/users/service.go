@@ -19,6 +19,7 @@ type User struct {
 	Id              string
 	Email           string
 	Password        string
+	Username        string
 	IsEmailVerified bool
 	CreatedAt       *string
 }
@@ -41,9 +42,9 @@ func New(ctx context.Context) *UsersService {
 func (us *UsersService) GetUserById(ctx context.Context, id string) (*User, error) {
 	var user User
 	err := us.postgres.QueryRow(ctx,
-		"SELECT id, email, password, is_email_verified, created_at::text FROM users WHERE id = $1",
+		"SELECT id, email, password, username, is_email_verified, created_at::text FROM users WHERE id = $1",
 		id,
-	).Scan(&user.Id, &user.Email, &user.Password, &user.IsEmailVerified, &user.CreatedAt)
+	).Scan(&user.Id, &user.Email, &user.Password, &user.Username, &user.IsEmailVerified, &user.CreatedAt)
 
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
@@ -58,9 +59,9 @@ func (us *UsersService) GetUserById(ctx context.Context, id string) (*User, erro
 func (us *UsersService) GetUserByEmail(ctx context.Context, email string) (*User, error) {
 	var user User
 	err := us.postgres.QueryRow(ctx,
-		"SELECT id, email, password, is_email_verified, created_at::text FROM users WHERE email = $1",
+		"SELECT id, email, password, username, is_email_verified, created_at::text FROM users WHERE email = $1",
 		email,
-	).Scan(&user.Id, &user.Email, &user.Password, &user.IsEmailVerified, &user.CreatedAt)
+	).Scan(&user.Id, &user.Email, &user.Password, &user.Username, &user.IsEmailVerified, &user.CreatedAt)
 
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
@@ -72,7 +73,7 @@ func (us *UsersService) GetUserByEmail(ctx context.Context, email string) (*User
 	return &user, nil
 }
 
-// ValidateCredentials checks if email and password are correct and returns the user if successful
+// ValidateCredentials checks if username and password are correct and returns the user if successful
 func (us *UsersService) ValidateCredentials(ctx context.Context, email, password string) (*User, error) {
 	user, err := us.GetUserByEmail(ctx, email)
 	if err != nil {
@@ -95,16 +96,16 @@ func (us *UsersService) ValidateCredentials(ctx context.Context, email, password
 }
 
 // AddUser adds a new user to the database
-func (us *UsersService) AddUser(ctx context.Context, email, password string) (string, error) {
+func (us *UsersService) AddUser(ctx context.Context, email, password, username string) (string, error) {
 	var id string
 	err := us.postgres.QueryRow(ctx,
-		"INSERT INTO users (email, password) VALUES ($1, $2) ON CONFLICT DO NOTHING RETURNING id",
-		email, password,
+		"INSERT INTO users (email, password, username) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING RETURNING id",
+		email, password, username,
 	).Scan(&id)
 
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			// No rows returned means ON CONFLICT triggered (email already exists)
+			// No rows returned means ON CONFLICT triggered (email or username already exists)
 			return "", ErrUserAlreadyExists
 		}
 		return "", err

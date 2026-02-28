@@ -5,7 +5,7 @@ info:
   description: API for authentication service
 
 paths:
-  /auth/register:
+  /users/account:
     post:
       summary: Register a new user
       requestBody:
@@ -308,9 +308,12 @@ components:
           type: string
         password:
           type: string
+        username:
+          type: string
       required:
         - email
         - password
+        - username
 
     SendEmailRequest:
       type: object

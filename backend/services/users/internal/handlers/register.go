@@ -22,9 +22,9 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Validate required fields
-	if registerReq.Email == "" || registerReq.Password == "" {
+	if registerReq.Email == "" || registerReq.Password == "" || registerReq.Username == "" {
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(api.ErrorResponse{Message: "Email and password are required"})
+		json.NewEncoder(w).Encode(api.ErrorResponse{Message: "Email, password and username are required"})
 		return
 	}
 
@@ -56,7 +56,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Add user to database
-	userId, err := usersService.AddUser(r.Context(), registerReq.Email, string(hashedPassword))
+	userId, err := usersService.AddUser(r.Context(), registerReq.Email, string(hashedPassword), registerReq.Username)
 	if err != nil {
 		if errors.Is(err, usersservice.ErrUserAlreadyExists) {
 			w.WriteHeader(http.StatusBadRequest)

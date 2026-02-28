@@ -30,7 +30,7 @@ func init() {
 }
 
 type JWTClaims struct {
-	Email string `json:"email"`
+	Email string `json:"username"`
 	jwt.RegisteredClaims
 }
 

@@ -10,7 +10,6 @@ import (
 
 	"tipster/backend/auth/internal/db/postgresql"
 	"tipster/backend/auth/internal/db/redis"
-	"tipster/backend/auth/internal/db/kafka"
 	"tipster/backend/auth/internal/handlers"
 
 	httpSwagger "github.com/swaggo/http-swagger"
@@ -46,28 +45,11 @@ func checkRedisConnection(ctx context.Context) {
 	log.Println("Redis connection is OK")
 }
 
-func checkKafkaConnection(ctx context.Context) {
-	log.Println("Checking Kafka connection...")
-
-	kafkaConn, err := kafka.Connect(ctx)
-	if err != nil {
-		log.Fatalf("Failed to connect to Kafka: %v", err)
-	}
-
-	err = kafkaConn.Close()
-	if err != nil {
-		log.Fatalf("Failed to close Kafka connection: %v", err)
-	}
-
-	log.Println("Kafka connection is OK")
-}
-
 func main() {
 	ctx := context.Background()
 
 	checkPostgreSQLConnection(ctx)
 	checkRedisConnection(ctx)
-	checkKafkaConnection(ctx)
 
 	// Setup router
 	r := chi.NewRouter()
