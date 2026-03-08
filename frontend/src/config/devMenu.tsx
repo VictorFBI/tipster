@@ -1,23 +1,24 @@
 import { useEffect } from "react";
-import { DevSettings } from "react-native";
-import { router } from "expo-router";
+import { Platform } from "react-native";
+import { useRouter } from "expo-router";
 import { ENABLE_STORYBOOK } from "./storybook";
 
-/**
- * Hook to add Storybook to React Native Dev Menu
- * Only works in development mode
- */
 export function useStorybookDevMenu() {
-  useEffect(() => {
-    if (__DEV__ && ENABLE_STORYBOOK) {
-      // Add "Open Storybook" option to dev menu
-      DevSettings.addMenuItem("Open Storybook", () => {
-        router.push("/storybook");
-      });
+  const router = useRouter();
 
-      return () => {
-        // Cleanup is not available in DevSettings API
-      };
+  useEffect(() => {
+    if (__DEV__ && ENABLE_STORYBOOK && Platform.OS !== "web") {
+      // Add Storybook option to dev menu
+      const DevMenu = require("expo-dev-menu");
+
+      DevMenu.registerDevMenuItems([
+        {
+          name: "Open Storybook",
+          callback: () => {
+            router.push("/storybook");
+          },
+        },
+      ]);
     }
-  }, []);
+  }, [router]);
 }

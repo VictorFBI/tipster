@@ -15,12 +15,12 @@ i18n
   .use(initReactI18next)
   .init({
     resources,
-    lng: 'ru', 
+    lng: 'ru',
     fallbackLng: 'ru',
     interpolation: {
       escapeValue: false
     },
-    compatibilityJSON: 'v4', 
+    compatibilityJSON: 'v3',
   });
 
 

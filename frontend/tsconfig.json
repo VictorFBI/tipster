@@ -2,18 +2,19 @@
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
     "strict": true,
-    "jsx": "react-native",
+    "jsx": "react-jsx",
     "paths": {
-      "@/*": [
-        "./*"
-      ],
-      "tamagui": ["./node_modules/tamagui"]
+      "@/*": ["./*"],
+      "@tamagui/core": ["./node_modules/@tamagui/core"],
+      "@tamagui/config": ["./node_modules/@tamagui/config"]
     }
   },
   "include": [
     "**/*.ts",
     "**/*.tsx",
     ".expo/types/**/*.ts",
-    "expo-env.d.ts"
+    "expo-env.d.ts",
+    ".storybook/*",
+    ".rnstorybook/*"
   ]
 }
