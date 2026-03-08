@@ -54,15 +54,7 @@ export function BalanceBlock({ balance }: BalanceBlockProps) {
   };
 
   return (
-    <YStack
-      borderRadius="$4"
-      padding="$4"
-      gap="$3"
-      style={{
-        background: "linear-gradient(135deg, #F97316 0%, #FB923C 100%)",
-      }}
-      backgroundColor="$accent"
-    >
+    <YStack borderRadius="$4" padding="$4" gap="$3" backgroundColor="$accent">
       <Text color="white" fontSize={16} fontWeight="500">
         {t("settings.tokenBalance")}
       </Text>
