@@ -7,7 +7,8 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "storybook-generate": "sb-rn-get-stories"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
@@ -49,7 +50,17 @@
     "react-native-screens": "~4.16.0",
     "react-native-web": "~0.21.0",
     "react-native-worklets": "0.5.1",
-    "tamagui": "^1.144.1"
+    "tamagui": "^1.144.1",
+    "@babel/core": "^7.29.0",
+    "babel-loader": "^8.4.1",
+    "@react-native-community/datetimepicker": "^8.6.0",
+    "@react-native-community/slider": "^5.1.2",
+    "@gorhom/bottom-sheet": "^5.2.8",
+    "react-native-svg": "^15.15.3",
+    "@storybook/addon-ondevice-controls": "^10.2.3",
+    "@storybook/addon-ondevice-actions": "^10.2.3",
+    "@storybook/react-native": "^10.2.3",
+    "storybook": "^10.2.16"
   },
   "devDependencies": {
     "@types/react": "~19.1.0",

@@ -57,3 +57,5 @@ coverage/
 
 # Cache
 .cache/
+*storybook.log
+storybook-static

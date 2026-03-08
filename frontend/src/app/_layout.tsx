@@ -14,9 +14,14 @@ import {
   ThemeProvider as CustomThemeProvider,
   useTheme,
 } from "../core/contexts/ThemeContext";
+import { ENABLE_STORYBOOK } from "../config/storybook";
+import { useStorybookDevMenu } from "../config/devMenu";
 
 function RootLayoutContent() {
   const { theme } = useTheme();
+
+  // Add Storybook to dev menu if enabled
+  useStorybookDevMenu();
 
   const [loaded] = useFonts({
     Inter: require("@tamagui/font-inter/otf/Inter-Medium.otf"),
@@ -36,6 +41,9 @@ function RootLayoutContent() {
               headerShown: false,
             }}
           >
+            {ENABLE_STORYBOOK && (
+              <Stack.Screen name="storybook" options={{ headerShown: false }} />
+            )}
             <Stack.Screen name="(auth)" options={{ headerShown: false }} />
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           </Stack>
