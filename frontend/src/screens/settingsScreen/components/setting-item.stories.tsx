@@ -1,10 +1,12 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { useState } from "react";
 import { SettingItem } from "./setting-item";
+import { withTheme } from "@/src/shared/storybook/decorators";
 
 const meta = {
   title: "Screens/Settings/SettingItem",
   component: SettingItem,
+  decorators: [withTheme],
   argTypes: {
     icon: {
       control: "text",
@@ -28,7 +30,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const NotificationsEnabled: Story = {
+export const NotificationsEnabledDark: Story = {
   args: {
     icon: "notifications-outline",
     title: "Push Notifications",
@@ -36,9 +38,26 @@ export const NotificationsEnabled: Story = {
     checked: true,
     onCheckedChange: (checked) => console.log("Checked:", checked),
   },
+  parameters: {
+    backgrounds: { default: "dark" },
+  },
 };
 
-export const NotificationsDisabled: Story = {
+export const NotificationsEnabledLight: Story = {
+  args: {
+    icon: "notifications-outline",
+    title: "Push Notifications",
+    description: "Receive notifications about new posts and comments",
+    checked: true,
+    onCheckedChange: (checked) => console.log("Checked:", checked),
+  },
+  parameters: {
+    backgrounds: { default: "light" },
+    theme: "light",
+  },
+};
+
+export const NotificationsDisabledDark: Story = {
   args: {
     icon: "notifications-outline",
     title: "Push Notifications",
@@ -46,9 +65,26 @@ export const NotificationsDisabled: Story = {
     checked: false,
     onCheckedChange: (checked) => console.log("Checked:", checked),
   },
+  parameters: {
+    backgrounds: { default: "dark" },
+  },
 };
 
-export const PrivateAccount: Story = {
+export const NotificationsDisabledLight: Story = {
+  args: {
+    icon: "notifications-outline",
+    title: "Push Notifications",
+    description: "Receive notifications about new posts and comments",
+    checked: false,
+    onCheckedChange: (checked) => console.log("Checked:", checked),
+  },
+  parameters: {
+    backgrounds: { default: "light" },
+    theme: "light",
+  },
+};
+
+export const PrivateAccountDark: Story = {
   args: {
     icon: "lock-closed-outline",
     title: "Private Account",
@@ -56,27 +92,21 @@ export const PrivateAccount: Story = {
     checked: false,
     onCheckedChange: (checked) => console.log("Checked:", checked),
   },
-};
-
-export const DarkTheme: Story = {
-  args: {
-    icon: "moon-outline",
-    title: "Dark Theme",
-    description: "Use dark color scheme",
-    checked: true,
-    onCheckedChange: (checked) => console.log("Checked:", checked),
+  parameters: {
+    backgrounds: { default: "dark" },
   },
 };
 
-export const Interactive = () => {
-  const [checked, setChecked] = useState(false);
-  return (
-    <SettingItem
-      icon="notifications-outline"
-      title="Push Notifications"
-      description="Receive notifications about new posts and comments"
-      checked={checked}
-      onCheckedChange={setChecked}
-    />
-  );
+export const PrivateAccountLight: Story = {
+  args: {
+    icon: "lock-closed-outline",
+    title: "Private Account",
+    description: "Only approved followers can see your posts",
+    checked: false,
+    onCheckedChange: (checked) => console.log("Checked:", checked),
+  },
+  parameters: {
+    backgrounds: { default: "light" },
+    theme: "light",
+  },
 };
