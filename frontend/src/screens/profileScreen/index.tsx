@@ -5,7 +5,7 @@ import { Header } from "../../shared/components/header";
 import { ProfileHeader } from "./components/profile-header";
 import { PostsList } from "../../modules/posts";
 import { Tabs } from "./components/tabs";
-import { ProfileOnboarding } from "./components/profile-onboarding";
+import { ProfileOnboarding } from "../registrationScreen/components/profile-onboarding";
 import { useTranslation } from "react-i18next";
 
 interface Post {

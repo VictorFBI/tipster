@@ -11,7 +11,7 @@ interface EmailInputProps {
 export function EmailInput({ control, errors, message }: EmailInputProps) {
   const { t } = useTranslation();
   return (
-    <YStack space="$2">
+    <YStack gap="$2">
       <Text fontSize="$3" fontWeight="800" color="$text">
         {t("auth.email")}
       </Text>

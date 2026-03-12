@@ -1,8 +1,9 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
-import { TouchableOpacity, ScrollView } from "react-native";
+import { TouchableOpacity, ScrollView, Alert } from "react-native";
 import { Avatar, YStack, Text, Input, TextArea, Button } from "tamagui";
 import { useTranslation } from "react-i18next";
+import * as ImagePicker from "expo-image-picker";
 
 interface ProfileOnboardingProps {
   onComplete: (data: {
@@ -35,9 +36,39 @@ export function ProfileOnboarding({
     }
   };
 
-  const handleAddAvatar = () => {
-    // Placeholder for image picker functionality
-    setAvatar("https://i.pravatar.cc/150?img=12");
+  const handleAddAvatar = async () => {
+    try {
+      // Request permission
+      const permissionResult =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+      if (permissionResult.granted === false) {
+        Alert.alert(
+          t("profile.onboarding.permissionTitle") || "Permission Required",
+          t("profile.onboarding.permissionMessage") ||
+            "Permission to access camera roll is required!",
+        );
+        return;
+      }
+
+      // Launch image picker
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+      });
+
+      if (!result.canceled && result.assets[0]) {
+        setAvatar(result.assets[0].uri);
+      }
+    } catch (error) {
+      console.error("Error picking image:", error);
+      Alert.alert(
+        t("profile.onboarding.errorTitle") || "Error",
+        t("profile.onboarding.errorMessage") || "Failed to pick image",
+      );
+    }
   };
 
   const isFormValid = displayName.trim();
@@ -45,17 +76,17 @@ export function ProfileOnboarding({
   return (
     <ScrollView
       style={{ flex: 1 }}
-      contentContainerStyle={{ paddingBottom: 120 }}
+      contentContainerStyle={{ paddingBottom: 40 }}
       showsVerticalScrollIndicator={false}
     >
-      <YStack paddingHorizontal="$4" paddingTop="$4" gap="$5">
+      <YStack paddingHorizontal="$4" paddingTop="$12" gap="$4">
         {/* Welcome Header */}
-        <YStack alignItems="center" gap="$2">
-          <Text fontSize={28} fontWeight="700" color="$text" textAlign="center">
+        <YStack alignItems="center" gap="$1.5">
+          <Text fontSize={24} fontWeight="700" color="$text" textAlign="center">
             {t("profile.onboarding.welcome")}
           </Text>
           <Text
-            fontSize={16}
+            fontSize={14}
             color="#8E8E93"
             textAlign="center"
             paddingHorizontal="$2"
@@ -64,9 +95,9 @@ export function ProfileOnboarding({
           </Text>
         </YStack>
 
-        <YStack alignItems="center" gap="$2.5">
+        <YStack alignItems="center" gap="$2">
           <TouchableOpacity onPress={handleAddAvatar}>
-            <Avatar circular size="$12" backgroundColor="#2C2C3E">
+            <Avatar circular size="$10" backgroundColor="#2C2C3E">
               {avatar ? (
                 <Avatar.Image src={avatar} />
               ) : (
@@ -93,10 +124,12 @@ export function ProfileOnboarding({
             placeholder={t("profile.onboarding.displayNamePlaceholder")}
             value={displayName}
             onChangeText={setDisplayName}
-            backgroundColor="#1C1C28"
-            borderWidth={0}
-            color="$text"
-            placeholderTextColor="#8E8E93"
+            backgroundColor="#2C2C3E"
+            borderWidth={1}
+            borderColor="#3C3C4E"
+            color="#FFFFFF"
+            // @ts-ignore - custom color
+            placeholderTextColor="#9E9EA7"
             fontSize={16}
             paddingVertical="$3"
             paddingHorizontal="$4"
@@ -120,15 +153,17 @@ export function ProfileOnboarding({
                 setBio(text);
               }
             }}
-            backgroundColor="#1C1C28"
-            borderWidth={0}
-            color="$text"
-            placeholderTextColor="#8E8E93"
+            backgroundColor="#2C2C3E"
+            borderWidth={1}
+            borderColor="#3C3C4E"
+            color="#FFFFFF"
+            // @ts-ignore - custom color
+            placeholderTextColor="#9E9EA7"
             fontSize={16}
             paddingVertical="$3"
             paddingHorizontal="$4"
             numberOfLines={4}
-            minHeight={120}
+            minHeight={100}
             borderRadius={12}
             maxLength={maxBioLength}
           />
@@ -138,32 +173,37 @@ export function ProfileOnboarding({
         </YStack>
 
         <YStack
-          backgroundColor="#1C1C28"
+          backgroundColor="#2C2C3E"
           borderRadius={12}
-          padding="$4"
+          padding="$3.5"
           borderWidth={1}
-          borderColor="#2C2C3E"
+          borderColor="#3C3C4E"
         >
-          <Text fontSize={15} fontWeight="600" color="$text" marginBottom="$2">
-            {t("profile.onboarding.tipTitle")}
+          <Text
+            fontSize={14}
+            fontWeight="600"
+            color="$text"
+            marginBottom="$1.5"
+          >
+            💡 {t("profile.onboarding.tipTitle")}
           </Text>
-          <Text fontSize={14} color="#8E8E93" lineHeight={20}>
+          <Text fontSize={13} color="#9E9EA7" lineHeight={18}>
             {t("profile.onboarding.tipText")}
           </Text>
         </YStack>
 
         <Button
           backgroundColor="#8B5CF6"
-          color="white"
-          fontSize={16}
-          fontWeight="600"
           borderRadius={12}
           onPress={handleSave}
           disabled={!isFormValid}
           opacity={!isFormValid ? 0.5 : 1}
-          marginTop="$2"
+          marginTop="$1"
+          pressStyle={{ opacity: 0.8 }}
         >
-          {t("profile.onboarding.createProfile")}
+          <Text color="white" fontSize={16} fontWeight="600">
+            {t("profile.onboarding.createProfile")}
+          </Text>
         </Button>
       </YStack>
     </ScrollView>

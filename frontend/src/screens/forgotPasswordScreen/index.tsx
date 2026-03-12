@@ -54,7 +54,7 @@ export function ForgotPassword() {
           paddingHorizontal="$6"
           paddingTop="$12"
           paddingBottom="$8"
-          space="$4"
+          gap="$4"
         >
           <YStack alignItems="center">
             <YStack
@@ -82,7 +82,7 @@ export function ForgotPassword() {
             {t("auth.enterEmail")}
           </Text>
 
-          <YStack space="$4" width="100%" marginTop="$6">
+          <YStack gap="$4" width="100%" marginTop="$6">
             <EmailInput
               control={control}
               errors={errors.email}
@@ -99,7 +99,7 @@ export function ForgotPassword() {
             <XStack
               justifyContent="center"
               alignItems="center"
-              space="$2"
+              gap="$2"
               marginTop="$4"
             >
               <TouchableOpacity onPress={() => router.back()}>

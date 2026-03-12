@@ -53,7 +53,7 @@ export function Login() {
           paddingHorizontal="$6"
           paddingTop="$12"
           paddingBottom="$8"
-          space="$4"
+          gap="$4"
         >
           <YStack alignItems="center">
             <YStack
@@ -87,8 +87,8 @@ export function Login() {
             {t("auth.earnCrypto")}
           </Text>
 
-          <YStack space="$4" width="100%">
-            <YStack space="$2">
+          <YStack gap="$4" width="100%">
+            <YStack gap="$2">
               <EmailInput
                 control={control}
                 errors={errors.email}
@@ -138,7 +138,7 @@ export function Login() {
               {t("auth.or")}
             </Text>
 
-            <XStack justifyContent="center" alignItems="center" space="$2">
+            <XStack justifyContent="center" alignItems="center" gap="$2">
               <Text fontSize="$3" color="$text" opacity={0.7}>
                 {t("auth.dontHaveAccount")}
               </Text>

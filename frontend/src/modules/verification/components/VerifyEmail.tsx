@@ -14,7 +14,11 @@ export function VerifyEmail() {
     console.log("Verifying code:", code);
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
-    router.replace("/(tabs)");
+    // router.replace("/(tabs)");
+    router.push({
+      pathname: "/profile-filling",
+      // params: { email: data.email },
+    });
   };
 
   const handleResendCode = async () => {

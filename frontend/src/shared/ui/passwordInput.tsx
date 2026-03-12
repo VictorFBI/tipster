@@ -43,7 +43,7 @@ export function PasswordInput({
   };
 
   return (
-    <YStack space="$2">
+    <YStack gap="$2">
       <Text fontSize="$3" fontWeight="800" color="$text">
         {label}
       </Text>

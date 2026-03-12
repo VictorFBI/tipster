@@ -115,7 +115,12 @@
       "bioCounter": "{{count}}/160",
       "tipTitle": "💡 Tip",
       "tipText": "A complete profile gets more followers and activity, which increases your future airdrop!",
-      "createProfile": "Create Profile"
+      "createProfile": "Create Profile",
+      "skipForNow": "Skip for now",
+      "permissionTitle": "Permission Required",
+      "permissionMessage": "Permission to access camera roll is required!",
+      "errorTitle": "Error",
+      "errorMessage": "Failed to pick image"
     }
   },
   "settings": {

@@ -46,6 +46,12 @@ export default function AuthLayout() {
           headerShown: false,
         }}
       />
+      <Stack.Screen
+        name="profile-filling"
+        options={{
+          headerShown: false,
+        }}
+      />
     </Stack>
   );
 }

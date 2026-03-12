@@ -116,7 +116,12 @@
       "bioCounter": "{{count}}/160",
       "tipTitle": "💡 Совет",
       "tipText": "Заполненный профиль получает больше подписчиков и активности, что увеличивает ваш будущий airdrop!",
-      "createProfile": "Создать профиль"
+      "createProfile": "Создать профиль",
+      "skipForNow": "Пропустить",
+      "permissionTitle": "Требуется разрешение",
+      "permissionMessage": "Необходимо разрешение на доступ к галерее!",
+      "errorTitle": "Ошибка",
+      "errorMessage": "Не удалось выбрать изображение"
     }
   },
   "settings": {

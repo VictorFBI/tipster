@@ -70,8 +70,8 @@ export function UserCard({ user }: { user: User }) {
       users.map((user) =>
         user.id === userId
           ? { ...user, isSubscribed: !user.isSubscribed }
-          : user
-      )
+          : user,
+      ),
     );
   };
 

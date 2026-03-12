@@ -66,7 +66,7 @@ export function Registration() {
           paddingHorizontal="$6"
           paddingTop="$12"
           paddingBottom="$8"
-          space="$4"
+          gap="$4"
         >
           <YStack alignItems="center">
             <YStack
@@ -93,48 +93,7 @@ export function Registration() {
             {t("auth.joinTipster")}
           </Text>
 
-          <YStack space="$4" width="100%">
-            <YStack space="$2">
-              <Text fontSize="$3" fontWeight="800" color="$text">
-                {t("auth.username")}
-              </Text>
-              <Controller
-                control={control}
-                name="username"
-                rules={{
-                  required: t("auth.usernameRequired"),
-                  minLength: {
-                    value: 3,
-                    message: t("auth.minLength3"),
-                  },
-                  pattern: {
-                    value: /^[a-zA-Z0-9_]+$/,
-                    message: t("auth.usernamePattern"),
-                  },
-                }}
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <Input
-                    placeholder="username"
-                    value={value}
-                    onChangeText={onChange}
-                    onBlur={onBlur}
-                    autoCapitalize="none"
-                    autoComplete="username"
-                    size="$5"
-                    backgroundColor="$background2"
-                    borderColor={errors.username ? "$error" : "$border"}
-                    color="$text"
-                    placeholderTextColor="$placeholder"
-                  />
-                )}
-              />
-              {errors.username && (
-                <Text fontSize="$2" color="$error">
-                  {errors.username.message}
-                </Text>
-              )}
-            </YStack>
-
+          <YStack gap="$4" width="100%">
             <EmailInput
               control={control}
               errors={errors.email}
@@ -189,7 +148,7 @@ export function Registration() {
               {t("auth.or")}
             </Text>
 
-            <XStack justifyContent="center" alignItems="center" space="$2">
+            <XStack justifyContent="center" alignItems="center" gap="$2">
               <Text fontSize="$3" color="$text" opacity={0.7}>
                 {t("auth.alreadyHaveAccount")}
               </Text>

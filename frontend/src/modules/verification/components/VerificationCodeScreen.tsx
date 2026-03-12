@@ -123,7 +123,7 @@ export function VerificationCodeScreen({
           paddingHorizontal="$6"
           paddingTop="$12"
           paddingBottom="$8"
-          space="$4"
+          gap="$4"
         >
           <YStack alignItems="center">
             <YStack
@@ -160,7 +160,7 @@ export function VerificationCodeScreen({
             {email}
           </Text>
 
-          <YStack space="$4" width="100%" marginTop="$6">
+          <YStack gap="$4" width="100%" marginTop="$6">
             <Text
               fontSize="$3"
               fontWeight="800"
@@ -170,7 +170,7 @@ export function VerificationCodeScreen({
               {finalCodeInputLabel}
             </Text>
 
-            <XStack justifyContent="center" space="$3">
+            <XStack justifyContent="center" gap="$3">
               {code.map((digit, index) => (
                 <YStack
                   key={index}
@@ -239,7 +239,7 @@ export function VerificationCodeScreen({
               </Button>
             )}
 
-            <YStack space="$2" marginTop="$4">
+            <YStack gap="$2" marginTop="$4">
               <Text
                 fontSize="$3"
                 color="$text"
@@ -263,7 +263,7 @@ export function VerificationCodeScreen({
             <XStack
               justifyContent="center"
               alignItems="center"
-              space="$2"
+              gap="$2"
               marginTop="$4"
             >
               <TouchableOpacity onPress={() => router.back()}>
