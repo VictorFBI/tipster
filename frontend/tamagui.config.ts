@@ -18,6 +18,7 @@ const tamaguiConfig = createTamagui({
       surfaceSecondary: themes.light.surfaceSecondary,
       placeholder: themes.light.placeholder,
       error: themes.light.error,
+      input: themes.light.input,
     },
     dark: {
       ...config.themes.dark,
@@ -31,6 +32,7 @@ const tamaguiConfig = createTamagui({
       surfaceSecondary: themes.dark.surfaceSecondary,
       placeholder: themes.dark.placeholder,
       error: themes.dark.error,
+      input: themes.dark.input,
     },
   },
 });

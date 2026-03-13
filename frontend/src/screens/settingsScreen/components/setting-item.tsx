@@ -1,4 +1,6 @@
 import { tokens } from "@/src/core/theme/tokens";
+import { themes } from "@/src/core/theme/themes";
+import { useTheme } from "@/src/core/contexts/ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
 import { XStack, YStack, Text, Switch } from "tamagui";
 
@@ -17,6 +19,9 @@ export function SettingItem({
   checked,
   onCheckedChange,
 }: SettingItemProps) {
+  const { theme } = useTheme();
+  const currentTheme = themes[theme];
+
   return (
     <XStack justifyContent="space-between" alignItems="center">
       <XStack gap="$3" alignItems="center" flex={1}>
@@ -34,9 +39,11 @@ export function SettingItem({
         size="$3"
         checked={checked}
         onCheckedChange={onCheckedChange}
-        backgroundColor={checked ? "$accent" : "$border"}
+        style={{
+          backgroundColor: checked ? currentTheme.accent : currentTheme.border,
+        }}
       >
-        <Switch.Thumb animation="quick" backgroundColor="white" />
+        <Switch.Thumb backgroundColor="white" />
       </Switch>
     </XStack>
   );

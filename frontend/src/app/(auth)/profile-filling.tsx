@@ -1,4 +1,4 @@
-import { ProfileOnboarding } from "@/src/screens/registrationScreen/components/profile-onboarding";
+import { ProfileFillingScreen } from "@/src/screens/registrationScreen/components/profile-filling";
 import { useRouter } from "expo-router";
 import React from "react";
 
@@ -22,5 +22,7 @@ export default function ProfileFilling() {
     router.replace("/(tabs)");
   };
 
-  return <ProfileOnboarding onComplete={handleComplete} onSkip={handleSkip} />;
+  return (
+    <ProfileFillingScreen onComplete={handleComplete} onSkip={handleSkip} />
+  );
 }

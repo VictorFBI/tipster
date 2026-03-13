@@ -16,6 +16,8 @@ const light = {
   placeholder: tokens.color.gray5,
 
   error: tokens.color.error,
+
+  input: tokens.color.lightInput
 }
 
 const dark = {
@@ -33,6 +35,8 @@ const dark = {
   placeholder: tokens.color.darkPlaceholder,
 
   error: tokens.color.error,
+
+  input: tokens.color.darkInput,
 }
 
 

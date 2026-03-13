@@ -5,7 +5,6 @@ import { Header } from "../../shared/components/header";
 import { ProfileHeader } from "./components/profile-header";
 import { PostsList } from "../../modules/posts";
 import { Tabs } from "./components/tabs";
-import { ProfileOnboarding } from "../registrationScreen/components/profile-onboarding";
 import { useTranslation } from "react-i18next";
 
 interface Post {
@@ -70,44 +69,6 @@ export default function Profile() {
   ];
   const [activeTab, setActiveTab] = useState<"posts" | "liked">("posts");
 
-  const handleCompleteProfile = (data: {
-    username: string;
-    displayName: string;
-    bio: string;
-    avatar: string | null;
-  }) => {
-    // In a real app, this would save to backend/API
-    setUserProfile({
-      name: data.displayName,
-      username: `@${data.username}`,
-      description: data.bio,
-      avatar: data.avatar || "https://i.pravatar.cc/150?img=12",
-      postsCount: 0,
-      followersCount: 0,
-      followingCount: 0,
-    });
-    setIsProfileComplete(true);
-  };
-
-  const handleSkipOnboarding = () => {
-    // User skips profile setup, show default profile
-    setIsProfileComplete(true);
-  };
-
-  // Show onboarding if profile is not complete
-  if (!isProfileComplete) {
-    return (
-      <YStack flex={1} backgroundColor={"$background"}>
-        <Header headerText={t("profile.title")} />
-        <ProfileOnboarding
-          onComplete={handleCompleteProfile}
-          onSkip={handleSkipOnboarding}
-        />
-      </YStack>
-    );
-  }
-
-  // Show regular profile view
   return (
     <YStack flex={1} backgroundColor={"$background"}>
       <Header headerText={t("profile.title")} />

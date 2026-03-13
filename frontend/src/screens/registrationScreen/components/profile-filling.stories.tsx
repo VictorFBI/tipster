@@ -1,16 +1,16 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { ProfileOnboarding } from "./profile-onboarding";
+import { ProfileFillingScreen } from "./profile-filling";
 import { withTheme } from "@/src/shared/storybook/decorators";
 
 const meta = {
-  title: "Screens/Profile/ProfileOnboarding",
-  component: ProfileOnboarding,
+  title: "Screens/Profile/ProfileFilling",
+  component: ProfileFillingScreen,
   decorators: [withTheme],
   argTypes: {
     onComplete: { action: "completed" },
     onSkip: { action: "skipped" },
   },
-} satisfies Meta<typeof ProfileOnboarding>;
+} satisfies Meta<typeof ProfileFillingScreen>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

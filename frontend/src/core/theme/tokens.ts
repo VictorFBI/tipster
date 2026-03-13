@@ -3,7 +3,7 @@ export const tokens = {
   color: {
     darkBg: '#0A0A0F',
     darkBg2: '#0A0E27',
-    darkInput: '#1A1F3A',
+    darkInput: '#1C1C23', 
     darkBorder: '#2D3548',
     darkPlaceholder: '#4A5568',
     darkSecondary: '#9CA3AF',
@@ -11,11 +11,9 @@ export const tokens = {
     lightBg: '#FFFFFF',
     lightInput: '#F3F4F6',
     lightBorder: '#E5E7EB',
-    
 
     white: '#FFFFFF',
     accent: '#8B5CF6',
-    
 
     gray: "#1C1C28",
     gray3: '#E5E7EB',

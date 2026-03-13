@@ -5,7 +5,7 @@ import { Avatar, YStack, Text, Input, TextArea, Button } from "tamagui";
 import { useTranslation } from "react-i18next";
 import * as ImagePicker from "expo-image-picker";
 
-interface ProfileOnboardingProps {
+interface ProfileFillingProps {
   onComplete: (data: {
     displayName: string;
     bio: string;
@@ -14,10 +14,10 @@ interface ProfileOnboardingProps {
   onSkip: () => void;
 }
 
-export function ProfileOnboarding({
+export function ProfileFillingScreen({
   onComplete,
   onSkip,
-}: ProfileOnboardingProps) {
+}: ProfileFillingProps) {
   const { t } = useTranslation();
 
   const [displayName, setDisplayName] = useState("");
@@ -44,8 +44,8 @@ export function ProfileOnboarding({
 
       if (permissionResult.granted === false) {
         Alert.alert(
-          t("profile.onboarding.permissionTitle") || "Permission Required",
-          t("profile.onboarding.permissionMessage") ||
+          t("profile.filling.permissionTitle") || "Permission Required",
+          t("profile.filling.permissionMessage") ||
             "Permission to access camera roll is required!",
         );
         return;
@@ -65,8 +65,8 @@ export function ProfileOnboarding({
     } catch (error) {
       console.error("Error picking image:", error);
       Alert.alert(
-        t("profile.onboarding.errorTitle") || "Error",
-        t("profile.onboarding.errorMessage") || "Failed to pick image",
+        t("profile.filling.errorTitle") || "Error",
+        t("profile.filling.errorMessage") || "Failed to pick image",
       );
     }
   };
@@ -83,7 +83,7 @@ export function ProfileOnboarding({
         {/* Welcome Header */}
         <YStack alignItems="center" gap="$1.5">
           <Text fontSize={24} fontWeight="700" color="$text" textAlign="center">
-            {t("profile.onboarding.welcome")}
+            {t("profile.filling.welcome")}
           </Text>
           <Text
             fontSize={14}
@@ -91,7 +91,7 @@ export function ProfileOnboarding({
             textAlign="center"
             paddingHorizontal="$2"
           >
-            {t("profile.onboarding.completeProfile")}
+            {t("profile.filling.completeProfile")}
           </Text>
         </YStack>
 
@@ -112,16 +112,16 @@ export function ProfileOnboarding({
             </Avatar>
           </TouchableOpacity>
           <Text fontSize={14} color="#8E8E93">
-            {t("profile.onboarding.addAvatar")}
+            {t("profile.filling.addAvatar")}
           </Text>
         </YStack>
 
         <YStack gap="$2">
           <Text fontSize={16} fontWeight="600" color="$text">
-            {t("profile.onboarding.displayName")}
+            {t("profile.filling.displayName")}
           </Text>
           <Input
-            placeholder={t("profile.onboarding.displayNamePlaceholder")}
+            placeholder={t("profile.filling.displayNamePlaceholder")}
             value={displayName}
             onChangeText={setDisplayName}
             backgroundColor="#2C2C3E"
@@ -136,17 +136,17 @@ export function ProfileOnboarding({
             borderRadius={12}
           />
           <Text fontSize={13} color="#8E8E93" lineHeight={18}>
-            {t("profile.onboarding.displayNameHint")}
+            {t("profile.filling.displayNameHint")}
           </Text>
         </YStack>
 
         {/* Bio Input */}
         <YStack gap="$2">
           <Text fontSize={16} fontWeight="600" color="$text">
-            {t("profile.onboarding.bio")}
+            {t("profile.filling.bio")}
           </Text>
           <TextArea
-            placeholder={t("profile.onboarding.bioPlaceholder")}
+            placeholder={t("profile.filling.bioPlaceholder")}
             value={bio}
             onChangeText={(text) => {
               if (text.length <= maxBioLength) {
@@ -168,7 +168,7 @@ export function ProfileOnboarding({
             maxLength={maxBioLength}
           />
           <Text fontSize={13} color="#8E8E93" textAlign="right">
-            {t("profile.onboarding.bioCounter", { count: bio.length })}
+            {t("profile.filling.bioCounter", { count: bio.length })}
           </Text>
         </YStack>
 
@@ -185,10 +185,10 @@ export function ProfileOnboarding({
             color="$text"
             marginBottom="$1.5"
           >
-            💡 {t("profile.onboarding.tipTitle")}
+            💡 {t("profile.filling.tipTitle")}
           </Text>
           <Text fontSize={13} color="#9E9EA7" lineHeight={18}>
-            {t("profile.onboarding.tipText")}
+            {t("profile.filling.tipText")}
           </Text>
         </YStack>
 
@@ -202,7 +202,7 @@ export function ProfileOnboarding({
           pressStyle={{ opacity: 0.8 }}
         >
           <Text color="white" fontSize={16} fontWeight="600">
-            {t("profile.onboarding.createProfile")}
+            {t("profile.filling.createProfile")}
           </Text>
         </Button>
       </YStack>
