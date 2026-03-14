@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Platform, KeyboardAvoidingView, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
@@ -6,7 +6,10 @@ import { useForm } from "react-hook-form";
 import { YStack, XStack, Text, ScrollView } from "tamagui";
 import { ConfirmButton } from "../../shared/ui/confirmButton";
 import { EmailInput } from "../../shared/ui/emailInput";
+import { ErrorMessage } from "../../shared/ui/errorMessage";
 import { useTranslation } from "react-i18next";
+import { useSendEmailResetPassword } from "../../modules/auth/hooks";
+import { getErrorMessage } from "../../core/utils/errorHandler";
 
 type ForgotPasswordFormData = {
   email: string;
@@ -15,11 +18,14 @@ type ForgotPasswordFormData = {
 export function ForgotPassword() {
   const { t } = useTranslation();
   const router = useRouter();
+  const [error, setError] = useState<string>("");
+
+  const sendEmailMutation = useSendEmailResetPassword();
 
   const {
     control,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<ForgotPasswordFormData>({
     defaultValues: {
       email: "",
@@ -28,17 +34,16 @@ export function ForgotPassword() {
 
   const onSubmit = async (data: ForgotPasswordFormData) => {
     try {
-      console.log("Forgot password:", data);
+      setError("");
 
-      // TODO: Call forgot password API
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await sendEmailMutation.mutateAsync({ email: data.email });
 
       router.push({
         pathname: "/forgot-password-verify",
         params: { email: data.email },
       });
-    } catch (error) {
-      console.error("Forgot password error:", error);
+    } catch (err) {
+      setError(getErrorMessage(err));
     }
   };
 
@@ -89,11 +94,17 @@ export function ForgotPassword() {
               message={errors.email?.message}
             />
 
+            {error && <ErrorMessage message={error} />}
+
             <ConfirmButton
               onPress={handleSubmit(onSubmit)}
-              disabled={isSubmitting}
-              opacity={isSubmitting ? 0.5 : 1}
-              text={isSubmitting ? t("auth.sending") : t("auth.sendCode")}
+              disabled={sendEmailMutation.isPending}
+              opacity={sendEmailMutation.isPending ? 0.5 : 1}
+              text={
+                sendEmailMutation.isPending
+                  ? t("auth.sending")
+                  : t("auth.sendCode")
+              }
             />
 
             <XStack

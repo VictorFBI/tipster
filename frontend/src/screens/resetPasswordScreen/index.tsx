@@ -1,12 +1,15 @@
-import React from "react";
-import { Platform, KeyboardAvoidingView } from "react-native";
+import React, { useState } from "react";
+import { Platform, KeyboardAvoidingView, Alert } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useForm } from "react-hook-form";
 import { YStack, Text, ScrollView } from "tamagui";
 import { ConfirmButton } from "../../shared/ui/confirmButton";
 import { PasswordInput } from "../../shared/ui/passwordInput";
+import { ErrorMessage } from "../../shared/ui/errorMessage";
 import { useTranslation } from "react-i18next";
+import { useResetPassword } from "../../modules/auth/hooks";
+import { getErrorMessage } from "../../core/utils/errorHandler";
 
 type ResetPasswordFormData = {
   password: string;
@@ -19,12 +22,15 @@ export function ResetPassword() {
   const params = useLocalSearchParams();
   const email = params.email as string;
   const code = params.code as string;
+  const [error, setError] = useState<string>("");
+
+  const resetPasswordMutation = useResetPassword();
 
   const {
     control,
     handleSubmit,
     watch,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<ResetPasswordFormData>({
     defaultValues: {
       password: "",
@@ -36,18 +42,21 @@ export function ResetPassword() {
 
   const onSubmit = async (data: ResetPasswordFormData) => {
     try {
-      console.log("Reset password:", {
+      setError("");
+
+      await resetPasswordMutation.mutateAsync({
         email,
-        code,
-        newPassword: data.password,
+        password: data.password,
       });
 
-      // TODO: Call reset password API
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      router.replace("/login");
-    } catch (error) {
-      console.error("Reset password error:", error);
+      Alert.alert(t("auth.success"), t("auth.passwordResetSuccess"), [
+        {
+          text: "OK",
+          onPress: () => router.replace("/login"),
+        },
+      ]);
+    } catch (err) {
+      setError(getErrorMessage(err));
     }
   };
 
@@ -119,11 +128,17 @@ export function ResetPassword() {
               controlName="confirmPassword"
             />
 
+            {error && <ErrorMessage message={error} />}
+
             <ConfirmButton
               onPress={handleSubmit(onSubmit)}
-              disabled={isSubmitting}
-              opacity={isSubmitting ? 0.5 : 1}
-              text={isSubmitting ? t("auth.saving") : t("auth.savePassword")}
+              disabled={resetPasswordMutation.isPending}
+              opacity={resetPasswordMutation.isPending ? 0.5 : 1}
+              text={
+                resetPasswordMutation.isPending
+                  ? t("auth.saving")
+                  : t("auth.savePassword")
+              }
             />
           </YStack>
         </YStack>
