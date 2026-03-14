@@ -43,13 +43,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
 
     patch:
-      summary: Partial update of account profile
-      parameters:
-        - name: account_id
-          in: query
-          required: true
-          schema:
-            type: string
+      summary: Partial update of account profile (only sent fields are updated)
       security:
         - bearerAuth: []
       requestBody:

@@ -3,7 +3,9 @@ package accountsservice
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
+	"strings"
 
 	"tipster/backend/accounts/internal/db/postgresql"
 
@@ -75,6 +77,28 @@ func (as *AccountsService) CreateAccount(ctx context.Context, id string) error {
 
 	// If we got here, Account was successfully inserted (id was returned)
 	return nil
+}
+
+
+// PartialEditAccount updates only fields present in patch (PATCH semantics).
+// Keys in patch = fields to update. patch["last_name"] = nil means set last_name to NULL.
+func (as *AccountsService) PartialEditAccount(ctx context.Context, accountId string, patch map[string]*string) error {
+	var set []string
+	var args []interface{}
+	pos := 1
+	for col, v := range patch {
+		set = append(set, col+" = $"+fmt.Sprint(pos))
+		args = append(args, v)
+		pos++
+	}
+	if len(set) == 0 {
+		return nil
+	}
+	set = append(set, "updated_at = CURRENT_TIMESTAMP")
+	args = append(args, accountId)
+	q := "UPDATE accounts SET " + strings.Join(set, ", ") + " WHERE id = $" + fmt.Sprint(pos)
+	_, err := as.postgres.Exec(ctx, q, args...)
+	return err
 }
 
 // Close closes the PostgreSQL postgresection
