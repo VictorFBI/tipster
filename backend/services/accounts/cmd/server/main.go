@@ -8,13 +8,14 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 
-	"tipster/backend/auth/internal/db/postgresql"
-	"tipster/backend/auth/internal/db/redis"
-	"tipster/backend/auth/internal/db/kafka"
-	"tipster/backend/auth/internal/handlers"
+	"tipster/backend/accounts/internal/consumers"
+	"tipster/backend/accounts/internal/db/kafka"
+	"tipster/backend/accounts/internal/db/postgresql"
+	"tipster/backend/accounts/internal/handlers"
+	middlewares "tipster/backend/accounts/internal/middlewares"
 
-	httpSwagger "github.com/swaggo/http-swagger"
 	"github.com/joho/godotenv"
+	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 func init() {
@@ -26,7 +27,7 @@ func init() {
 
 func checkPostgreSQLConnection(ctx context.Context) {
 	log.Println("Checking PostgreSQL connection...")
-	
+
 	pgConn, err := postgresql.Connect(ctx)
 	if err != nil {
 		log.Fatalf("Failed to connect to PostgreSQL: %v", err)
@@ -36,22 +37,6 @@ func checkPostgreSQLConnection(ctx context.Context) {
 		log.Fatalf("Failed to close PostgreSQL connection: %v", err)
 	}
 	log.Println("PostgreSQL connection is OK")
-}
-
-func checkRedisConnection(ctx context.Context) {
-	log.Println("Checking Redis connection...")
-
-	redisConn, err := redis.Connect(ctx)
-	if err != nil {
-		log.Fatalf("Failed to connect to Redis: %v", err)
-	}
-
-	err = redisConn.Close()
-	if err != nil {
-		log.Fatalf("Failed to close Redis connection: %v", err)
-	}
-
-	log.Println("Redis connection is OK")
 }
 
 func checkKafkaConnection(ctx context.Context) {
@@ -74,8 +59,13 @@ func main() {
 	ctx := context.Background()
 
 	checkPostgreSQLConnection(ctx)
-	checkRedisConnection(ctx)
 	checkKafkaConnection(ctx)
+
+	kafkaClient, err := kafka.Connect(ctx)
+	if err != nil {
+		log.Fatalf("Failed to connect to Kafka for consumer: %v", err)
+	}
+	go consumers.RunAuthUserCreated(ctx, kafkaClient)
 
 	// Setup router
 	r := chi.NewRouter()
@@ -88,19 +78,11 @@ func main() {
 		httpSwagger.URL("/swagger/doc.json"),
 	))
 
-	// Auth routes
-	r.Post("/auth/login", handlers.Login)
-	r.Post("/auth/logout", handlers.Logout)
-	r.Post("/auth/register", handlers.Register)
-	r.Post("/auth/refresh", handlers.Refresh)
-	r.Post("/auth/send-email/registration", handlers.SendEmailRegistration)
-	r.Post("/auth/send-email/reset-password", handlers.SendEmailResetPassword)
-	r.Post("/auth/confirm-email/registration", handlers.ConfirmEmailRegistration)
-	r.Post("/auth/confirm-email/reset-password", handlers.ConfirmEmailResetPassword)
-	r.Post("/auth/reset-password", handlers.ResetPassword)
+	// Accounts routes (protected by access token)
+	r.With(middlewares.RequireAccessToken).Get("/accounts/profile", handlers.GetAccountProfile)
 
-	log.Println("Server is running on port 8080")
-	err := http.ListenAndServe(":8080", r)
+	log.Println("Server is running on port 8081")
+	err = http.ListenAndServe(":8081", r)
 	if err != nil {
 		log.Fatalf("Failed to start server: %v", err)
 	}

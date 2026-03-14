@@ -51,7 +51,7 @@ func Refresh(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Generate tokens
-	tokens, err := jwttokensService.GenerateTokens(user.Email)
+	tokens, err := jwttokensService.GenerateTokens(user.Id)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(api.ErrorResponse{Message: "Failed to generate tokens"})

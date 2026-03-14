@@ -14,23 +14,14 @@ import (
 	redisdb "tipster/backend/auth/internal/db/redis"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/joho/godotenv"
 	"github.com/redis/go-redis/v9"
 )
 
 var (
-	ErrRefreshTokenNotFound = errors.New("refresh token not found")
+	ErrRefreshTokenNotFound = errors.New("refresh token noqt found")
 )
 
-func init() {
-	err := godotenv.Load("../../.env")
-	if err != nil {
-		panic(err)
-	}
-}
-
 type JWTClaims struct {
-	Email string `json:"email"`
 	jwt.RegisteredClaims
 }
 
@@ -102,9 +93,9 @@ func (jts *JwtTokensService) GetRefreshTokenClaims(ctx context.Context, refreshT
 }
 
 // Creates a JWT access and refresh tokens for user
-func (jts *JwtTokensService) GenerateTokens(email string) (Tokens, error) {
+func (jts *JwtTokensService) GenerateTokens(userId string) (Tokens, error) {
 	// Generate access token (short-lived, 15 minutes)
-	accessToken, err := jts.generateAccessToken(email, 15*time.Minute)
+	accessToken, err := jts.generateAccessToken(userId, 15*time.Minute)
 	if err != nil {
 		return Tokens{}, err
 	}
@@ -122,12 +113,12 @@ func (jts *JwtTokensService) GenerateTokens(email string) (Tokens, error) {
 }
 
 // generateAccessToken creates a JWT token with specified expiration time
-func (jts *JwtTokensService) generateAccessToken(email string, expirationTime time.Duration) (string, error) {
+func (jts *JwtTokensService) generateAccessToken(userId string, expirationTime time.Duration) (string, error) {
 	expiration := time.Now().Add(expirationTime)
 
 	claims := &JWTClaims{
-		Email: email,
 		RegisteredClaims: jwt.RegisteredClaims{
+			Subject:   userId,
 			ExpiresAt: jwt.NewNumericDate(expiration),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 			NotBefore: jwt.NewNumericDate(time.Now()),

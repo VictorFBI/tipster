@@ -1,4 +1,5 @@
 version: "3.9"
+name: tipster-auth
 
 services:
   postgres:
@@ -21,8 +22,8 @@ services:
 
   redis:
     image: redis:7.2
-    container_name: auth_redis
     restart: unless-stopped
+    container_name: auth_redis
     ports:
       - "6379:6379"
     volumes:

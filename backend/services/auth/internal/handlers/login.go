@@ -42,7 +42,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Generate token
-	tokens, err := jwttokensService.GenerateTokens(loginReq.Email)
+	tokens, err := jwttokensService.GenerateTokens(user.Id)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(api.ErrorResponse{Message: "Failed to generate tokens"})

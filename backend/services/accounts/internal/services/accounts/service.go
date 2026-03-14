@@ -1,0 +1,83 @@
+package accountsservice
+
+import (
+	"context"
+	"errors"
+	"log"
+
+	"tipster/backend/accounts/internal/db/postgresql"
+
+	"github.com/jackc/pgx/v5"
+)
+
+var (
+	ErrAccountAlreadyExists  = errors.New("Account already exists")
+)
+
+type Account struct {
+	Id              string
+	FirstName        *string
+	LastName         *string
+	Username         *string
+	AvatarUrl        *string
+	Bio              *string
+	WalletAddress *string
+	CreatedAt     *string
+	UpdatedAt     *string
+}
+
+type AccountsService struct {
+	postgres *pgx.Conn
+}
+
+func New(ctx context.Context) *AccountsService {
+	postgres, err := postgresql.Connect(ctx)
+	if err != nil {
+		panic(err)
+	}
+	return &AccountsService{
+		postgres: postgres,
+	}
+}
+
+// GetAccountById retrieves a Account by id
+func (as *AccountsService) GetAccountById(ctx context.Context, id string) (*Account, error) {
+	var Account Account
+	err := as.postgres.QueryRow(ctx,
+		"SELECT id, first_name, last_name, username, avatar_url, bio, wallet_address, created_at::text, updated_at::text FROM accounts WHERE id = $1",
+		id,
+	).Scan(&Account.Id, &Account.FirstName, &Account.LastName, &Account.Username, &Account.AvatarUrl, &Account.Bio, &Account.WalletAddress, &Account.CreatedAt, &Account.UpdatedAt)
+
+	if err != nil {
+		log.Println("Error getting account by id:", err)
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return &Account, nil
+}
+
+// AddAccount adds a new Account to the database
+func (as *AccountsService) CreateAccount(ctx context.Context, id string) error {
+	err := as.postgres.QueryRow(ctx,
+		"INSERT INTO accounts (id) VALUES ($1) ON CONFLICT DO NOTHING RETURNING id",
+		id,
+	).Scan(&id)
+
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			// No rows returned means ON CONFLICT triggered (email already exists)
+			return ErrAccountAlreadyExists
+		}
+		return err
+	}
+
+	// If we got here, Account was successfully inserted (id was returned)
+	return nil
+}
+
+// Close closes the PostgreSQL postgresection
+func (as *AccountsService) Close(ctx context.Context) error {
+	return as.postgres.Close(ctx)
+}
