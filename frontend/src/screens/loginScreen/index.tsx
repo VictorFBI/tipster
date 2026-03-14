@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Platform, KeyboardAvoidingView, TouchableOpacity } from "react-native";
 import { Link, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
@@ -8,6 +8,9 @@ import { useTranslation } from "react-i18next";
 import { ConfirmButton } from "../../shared/ui/confirmButton";
 import { PasswordInput } from "../../shared/ui/passwordInput";
 import { EmailInput } from "../../shared/ui/emailInput";
+import { ErrorMessage } from "../../shared/ui/errorMessage";
+import { useLogin } from "../../modules/auth/hooks";
+import { getErrorMessage } from "../../core/utils";
 
 type LoginFormData = {
   email: string;
@@ -17,6 +20,7 @@ type LoginFormData = {
 export function Login() {
   const { t } = useTranslation();
   const router = useRouter();
+  const [errorMsg, setErrorMsg] = useState<string>("");
 
   const {
     control,
@@ -29,14 +33,22 @@ export function Login() {
     },
   });
 
-  // TODO: Implement login logic
+  const loginMutation = useLogin();
+
   const onSubmit = async (data: LoginFormData) => {
     try {
-      console.log("Login:", data);
-      // TODO: Add actual authentication logic here
-      // For now, just navigate to tabs
+      setErrorMsg("");
+
+      await loginMutation.mutateAsync({
+        email: data.email,
+        password: data.password,
+      });
+
       router.replace("/(tabs)");
     } catch (error) {
+      const errorMessage = getErrorMessage(error);
+      console.log("fa", errorMessage);
+      setErrorMsg(errorMessage);
       console.error("Login error:", error);
     }
   };
@@ -121,11 +133,17 @@ export function Login() {
               </XStack>
             </YStack>
 
+            <ErrorMessage message={errorMsg} visible={!!errorMsg} />
+
             <ConfirmButton
               onPress={handleSubmit(onSubmit)}
-              disabled={isSubmitting}
-              opacity={isSubmitting ? 0.5 : 1}
-              text={isSubmitting ? t("auth.loggingIn") : t("auth.login")}
+              disabled={isSubmitting || loginMutation.isPending}
+              opacity={isSubmitting || loginMutation.isPending ? 0.5 : 1}
+              text={
+                isSubmitting || loginMutation.isPending
+                  ? t("auth.loggingIn")
+                  : t("auth.login")
+              }
             />
 
             <Text

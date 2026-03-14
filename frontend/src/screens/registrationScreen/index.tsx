@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Platform, KeyboardAvoidingView, TouchableOpacity } from "react-native";
 import { Link, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
@@ -7,7 +7,13 @@ import { YStack, XStack, Text, Input, ScrollView } from "tamagui";
 import { ConfirmButton } from "../../shared/ui/confirmButton";
 import { PasswordInput } from "../../shared/ui/passwordInput";
 import { EmailInput } from "../../shared/ui/emailInput";
+import { ErrorMessage } from "../../shared/ui/errorMessage";
 import { useTranslation } from "react-i18next";
+import {
+  useRegister,
+  useSendEmailRegistration,
+} from "../../modules/auth/hooks";
+import { getErrorMessage } from "../../core/utils";
 
 type RegisterFormData = {
   username: string;
@@ -19,6 +25,8 @@ type RegisterFormData = {
 export function Registration() {
   const { t } = useTranslation();
   const router = useRouter();
+  const [errorMsg, setErrorMsg] = useState<string>("");
+
   const {
     control,
     handleSubmit,
@@ -35,21 +43,29 @@ export function Registration() {
 
   const password = watch("password");
 
-  // TODO: Implement registration logic
+  const registerMutation = useRegister();
+  const sendEmailMutation = useSendEmailRegistration();
+
   const onSubmit = async (data: RegisterFormData) => {
     try {
-      console.log("Register:", data);
+      setErrorMsg("");
 
-      // TODO: Call registration API
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await registerMutation.mutateAsync({
+        email: data.email,
+        password: data.password,
+      });
 
-      // Navigate to verify-email screen with email parameter
+      await sendEmailMutation.mutateAsync({
+        email: data.email,
+      });
+
       router.push({
         pathname: "/verify-email",
         params: { email: data.email },
       });
     } catch (error) {
+      const errorMessage = getErrorMessage(error);
+      setErrorMsg(errorMessage);
       console.error("Registration error:", error);
     }
   };
@@ -129,10 +145,28 @@ export function Registration() {
 
             <ConfirmButton
               onPress={handleSubmit(onSubmit)}
-              disabled={isSubmitting}
-              opacity={isSubmitting ? 0.5 : 1}
-              text={isSubmitting ? t("auth.sendingCode") : t("auth.continue")}
+              disabled={
+                isSubmitting ||
+                registerMutation.isPending ||
+                sendEmailMutation.isPending
+              }
+              opacity={
+                isSubmitting ||
+                registerMutation.isPending ||
+                sendEmailMutation.isPending
+                  ? 0.5
+                  : 1
+              }
+              text={
+                isSubmitting ||
+                registerMutation.isPending ||
+                sendEmailMutation.isPending
+                  ? t("auth.sendingCode")
+                  : t("auth.continue")
+              }
             />
+
+            <ErrorMessage message={errorMsg} visible={!!errorMsg} />
 
             <Text
               fontSize="$2"

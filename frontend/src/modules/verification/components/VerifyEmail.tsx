@@ -1,7 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { VerificationCodeScreen } from "./VerificationCodeScreen";
 import { useTranslation } from "react-i18next";
+import {
+  useConfirmEmailRegistration,
+  useSendEmailRegistration,
+} from "../../auth/hooks";
+import { getErrorMessage } from "../../../core/utils";
+import { Alert } from "react-native";
 
 export function VerifyEmail() {
   const { t } = useTranslation();
@@ -9,21 +15,38 @@ export function VerifyEmail() {
   const params = useLocalSearchParams();
   const email = params.email as string;
 
-  const handleVerifySuccess = async (code: string) => {
-    // TODO: Implement verification API call
-    console.log("Verifying code:", code);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+  const confirmEmailMutation = useConfirmEmailRegistration();
+  const resendCodeMutation = useSendEmailRegistration();
 
-    // router.replace("/(tabs)");
-    router.push({
-      pathname: "/profile-filling",
-      // params: { email: data.email },
-    });
+  const handleVerifySuccess = async (code: string) => {
+    try {
+      await confirmEmailMutation.mutateAsync({
+        email,
+        code,
+      });
+
+      router.push({
+        pathname: "/profile-filling",
+      });
+    } catch (error) {
+      const errorMessage = getErrorMessage(error);
+      Alert.alert(t("auth.error") || "Ошибка", errorMessage);
+      console.error("Email verification error:", error);
+    }
   };
 
   const handleResendCode = async () => {
-    // TODO: Implement resend code API call
-    console.log("Resending code to:", email);
+    try {
+      await resendCodeMutation.mutateAsync({ email });
+      Alert.alert(
+        t("auth.success") || "Успешно",
+        t("auth.codeSent") || "Код отправлен на ваш email",
+      );
+    } catch (error) {
+      const errorMessage = getErrorMessage(error);
+      Alert.alert(t("auth.error") || "Ошибка", errorMessage);
+      console.error("Resend code error:", error);
+    }
   };
 
   return (

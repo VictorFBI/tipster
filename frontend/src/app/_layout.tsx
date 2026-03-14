@@ -14,6 +14,7 @@ import {
   ThemeProvider as CustomThemeProvider,
   useTheme,
 } from "../core/contexts/ThemeContext";
+import { QueryProvider } from "../core/providers/QueryProvider";
 import { ENABLE_STORYBOOK } from "../config/storybook";
 import { useStorybookDevMenu } from "../config/devMenu";
 
@@ -56,8 +57,10 @@ function RootLayoutContent() {
 
 export default function RootLayout() {
   return (
-    <CustomThemeProvider>
-      <RootLayoutContent />
-    </CustomThemeProvider>
+    <QueryProvider>
+      <CustomThemeProvider>
+        <RootLayoutContent />
+      </CustomThemeProvider>
+    </QueryProvider>
   );
 }
