@@ -1,59 +1,135 @@
-import type { Meta, StoryObj } from "@storybook/react-native";
-import { View } from "react-native";
-import { useForm } from "react-hook-form";
+import type { Meta, StoryObj } from "@storybook/react";
 import { EmailInput } from "./emailInput";
+import { withTheme } from "@/src/shared/storybook/decorators";
+import { useForm } from "react-hook-form";
 
 // Wrapper component to provide form context
-const EmailInputWrapper = (args: any) => {
+function EmailInputWrapper(props: {
+  hasError?: boolean;
+  errorMessage?: string;
+}) {
   const {
     control,
     formState: { errors },
   } = useForm({
     defaultValues: {
-      email: args.defaultValue || "",
+      email: "",
     },
   });
+
+  // Simulate error state if needed
+  const simulatedErrors = props.hasError
+    ? { type: "manual", message: props.errorMessage }
+    : undefined;
 
   return (
     <EmailInput
       control={control}
-      errors={errors.email as any}
-      message={errors.email?.message as string}
+      errors={simulatedErrors as any}
+      message={props.errorMessage}
     />
   );
-};
+}
 
 const meta = {
-  title: "UI/EmailInput",
+  title: "Modules/Auth/EmailInput",
   component: EmailInputWrapper,
-  decorators: [
-    (Story) => (
-      <View style={{ flex: 1, padding: 16 }}>
-        <Story />
-      </View>
-    ),
-  ],
-  tags: ["autodocs"],
+  decorators: [withTheme],
+  argTypes: {
+    hasError: {
+      control: "boolean",
+      description: "Whether to show error state",
+    },
+    errorMessage: {
+      control: "text",
+      description: "Error message to display",
+    },
+  },
 } satisfies Meta<typeof EmailInputWrapper>;
 
 export default meta;
-
 type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {
+export const DefaultDark: Story = {
   args: {
-    defaultValue: "",
+    hasError: false,
+  },
+  parameters: {
+    backgrounds: { default: "dark" },
   },
 };
 
-export const WithValue: Story = {
+export const DefaultLight: Story = {
   args: {
-    defaultValue: "user@example.com",
+    hasError: false,
+  },
+  parameters: {
+    backgrounds: { default: "light" },
+    theme: "light",
   },
 };
 
-export const Empty: Story = {
+export const WithErrorDark: Story = {
   args: {
-    defaultValue: "",
+    hasError: true,
+    errorMessage: "Email is required",
+  },
+  parameters: {
+    backgrounds: { default: "dark" },
+  },
+};
+
+export const WithErrorLight: Story = {
+  args: {
+    hasError: true,
+    errorMessage: "Email is required",
+  },
+  parameters: {
+    backgrounds: { default: "light" },
+    theme: "light",
+  },
+};
+
+export const InvalidEmailErrorDark: Story = {
+  args: {
+    hasError: true,
+    errorMessage: "Please enter a valid email address",
+  },
+  parameters: {
+    backgrounds: { default: "dark" },
+  },
+};
+
+export const InvalidEmailErrorLight: Story = {
+  args: {
+    hasError: true,
+    errorMessage: "Please enter a valid email address",
+  },
+  parameters: {
+    backgrounds: { default: "light" },
+    theme: "light",
+  },
+};
+
+export const LongErrorMessageDark: Story = {
+  args: {
+    hasError: true,
+    errorMessage:
+      "The email address you entered is not valid. Please check and try again with a properly formatted email address.",
+  },
+  parameters: {
+    backgrounds: { default: "dark" },
+  },
+};
+
+export const LongErrorMessageLight: Story = {
+  args: {
+    hasError: true,
+    errorMessage:
+      "The email address you entered is not valid. Please check and try again with a properly formatted email address.",
+  },
+  parameters: {
+    backgrounds: { default: "light" },
+    theme: "light",
   },
 };

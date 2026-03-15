@@ -1,53 +1,130 @@
-import type { Meta, StoryObj } from "@storybook/react-native";
-import { View } from "react-native";
-import { fn } from "storybook/test";
+import type { Meta, StoryObj } from "@storybook/react";
 import { ConfirmButton } from "./confirmButton";
+import { withTheme } from "@/src/shared/storybook/decorators";
 
 const meta = {
-  title: "UI/ConfirmButton",
+  title: "Shared/UI/ConfirmButton",
   component: ConfirmButton,
-  decorators: [
-    (Story) => (
-      <View style={{ flex: 1, padding: 16 }}>
-        <Story />
-      </View>
-    ),
-  ],
-  tags: ["autodocs"],
-  args: { onPress: fn() },
+  decorators: [withTheme],
+  argTypes: {
+    text: {
+      control: "text",
+      description: "Button text",
+    },
+    disabled: {
+      control: "boolean",
+      description: "Whether the button is disabled",
+    },
+    opacity: {
+      control: { type: "range", min: 0, max: 1, step: 0.1 },
+      description: "Button opacity",
+    },
+    onPress: {
+      action: "pressed",
+      description: "Function called when button is pressed",
+    },
+  },
 } satisfies Meta<typeof ConfirmButton>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {
+export const DefaultDark: Story = {
   args: {
     text: "Confirm",
     disabled: false,
     opacity: 1,
+    onPress: () => console.log("Button pressed"),
+  },
+  parameters: {
+    backgrounds: { default: "dark" },
   },
 };
 
-export const Disabled: Story = {
+export const DefaultLight: Story = {
+  args: {
+    text: "Confirm",
+    disabled: false,
+    opacity: 1,
+    onPress: () => console.log("Button pressed"),
+  },
+  parameters: {
+    backgrounds: { default: "light" },
+    theme: "light",
+  },
+};
+
+export const DisabledDark: Story = {
   args: {
     text: "Confirm",
     disabled: true,
     opacity: 0.5,
+    onPress: () => console.log("Button pressed"),
+  },
+  parameters: {
+    backgrounds: { default: "dark" },
   },
 };
 
-export const LowOpacity: Story = {
+export const DisabledLight: Story = {
   args: {
     text: "Confirm",
-    disabled: false,
-    opacity: 0.3,
+    disabled: true,
+    opacity: 0.5,
+    onPress: () => console.log("Button pressed"),
+  },
+  parameters: {
+    backgrounds: { default: "light" },
+    theme: "light",
   },
 };
 
-export const LongText: Story = {
+export const CustomTextDark: Story = {
   args: {
-    text: "Confirm Registration",
+    text: "Continue",
     disabled: false,
     opacity: 1,
+    onPress: () => console.log("Button pressed"),
+  },
+  parameters: {
+    backgrounds: { default: "dark" },
+  },
+};
+
+export const CustomTextLight: Story = {
+  args: {
+    text: "Continue",
+    disabled: false,
+    opacity: 1,
+    onPress: () => console.log("Button pressed"),
+  },
+  parameters: {
+    backgrounds: { default: "light" },
+    theme: "light",
+  },
+};
+
+export const LowOpacityDark: Story = {
+  args: {
+    text: "Submit",
+    disabled: false,
+    opacity: 0.3,
+    onPress: () => console.log("Button pressed"),
+  },
+  parameters: {
+    backgrounds: { default: "dark" },
+  },
+};
+
+export const LowOpacityLight: Story = {
+  args: {
+    text: "Submit",
+    disabled: false,
+    opacity: 0.3,
+    onPress: () => console.log("Button pressed"),
+  },
+  parameters: {
+    backgrounds: { default: "light" },
+    theme: "light",
   },
 };

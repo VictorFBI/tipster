@@ -1,80 +1,165 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { UserCard } from "./user-card";
+import { withTheme } from "@/src/shared/storybook/decorators";
 
 const meta = {
-  title: "Shared/UserCard",
+  title: "Modules/User/UserCard",
   component: UserCard,
+  decorators: [withTheme],
+  argTypes: {
+    user: {
+      control: "object",
+      description: "User data object",
+    },
+  },
 } satisfies Meta<typeof UserCard>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {
+const mockUser = {
+  id: "1",
+  username: "CryptoKing",
+  avatar: "https://i.pravatar.cc/150?img=1",
+  tipBalance: 12450,
+  subscribers: 2340,
+  weeklyGrowth: 15,
+  isSubscribed: false,
+};
+
+export const DefaultDark: Story = {
   args: {
-    user: {
-      id: "1",
-      username: "CryptoKing",
-      avatar: "https://i.pravatar.cc/150?img=1",
-      tipBalance: 12450,
-      subscribers: 2340,
-      weeklyGrowth: 15,
-      isSubscribed: false,
-    },
+    user: mockUser,
+  },
+  parameters: {
+    backgrounds: { default: "dark" },
   },
 };
 
-export const Subscribed: Story = {
+export const DefaultLight: Story = {
+  args: {
+    user: mockUser,
+  },
+  parameters: {
+    backgrounds: { default: "light" },
+    theme: "light",
+  },
+};
+
+export const SubscribedDark: Story = {
   args: {
     user: {
-      id: "2",
-      username: "TokenHunter",
-      avatar: "https://i.pravatar.cc/150?img=2",
-      tipBalance: 8920,
-      subscribers: 1567,
-      weeklyGrowth: 8,
+      ...mockUser,
       isSubscribed: true,
     },
   },
-};
-
-export const HighBalance: Story = {
-  args: {
-    user: {
-      id: "3",
-      username: "AirdropMaster",
-      avatar: "https://i.pravatar.cc/150?img=3",
-      tipBalance: 25300,
-      subscribers: 4521,
-      weeklyGrowth: 12,
-      isSubscribed: false,
-    },
+  parameters: {
+    backgrounds: { default: "dark" },
   },
 };
 
-export const LowSubscribers: Story = {
+export const SubscribedLight: Story = {
   args: {
     user: {
-      id: "5",
+      ...mockUser,
+      isSubscribed: true,
+    },
+  },
+  parameters: {
+    backgrounds: { default: "light" },
+    theme: "light",
+  },
+};
+
+export const HighSubscribersDark: Story = {
+  args: {
+    user: {
+      ...mockUser,
       username: "CryptoWhale",
       avatar: "https://i.pravatar.cc/150?img=5",
-      tipBalance: 7650,
-      subscribers: 982,
-      weeklyGrowth: 5,
-      isSubscribed: true,
+      subscribers: 125340,
+      tipBalance: 89750,
+      weeklyGrowth: 25,
     },
+  },
+  parameters: {
+    backgrounds: { default: "dark" },
   },
 };
 
-export const NewUser: Story = {
+export const HighSubscribersLight: Story = {
   args: {
     user: {
-      id: "6",
-      username: "NewCryptoFan",
-      avatar: "https://i.pravatar.cc/150?img=6",
-      tipBalance: 150,
-      subscribers: 12,
-      weeklyGrowth: 100,
-      isSubscribed: false,
+      ...mockUser,
+      username: "CryptoWhale",
+      avatar: "https://i.pravatar.cc/150?img=5",
+      subscribers: 125340,
+      tipBalance: 89750,
+      weeklyGrowth: 25,
     },
+  },
+  parameters: {
+    backgrounds: { default: "light" },
+    theme: "light",
+  },
+};
+
+export const LowSubscribersDark: Story = {
+  args: {
+    user: {
+      ...mockUser,
+      username: "NewTrader",
+      avatar: "https://i.pravatar.cc/150?img=8",
+      subscribers: 42,
+      tipBalance: 150,
+      weeklyGrowth: 2,
+    },
+  },
+  parameters: {
+    backgrounds: { default: "dark" },
+  },
+};
+
+export const LowSubscribersLight: Story = {
+  args: {
+    user: {
+      ...mockUser,
+      username: "NewTrader",
+      avatar: "https://i.pravatar.cc/150?img=8",
+      subscribers: 42,
+      tipBalance: 150,
+      weeklyGrowth: 2,
+    },
+  },
+  parameters: {
+    backgrounds: { default: "light" },
+    theme: "light",
+  },
+};
+
+export const LongUsernameDark: Story = {
+  args: {
+    user: {
+      ...mockUser,
+      username: "TheCryptoMasterTrader2024",
+      subscribers: 5678,
+    },
+  },
+  parameters: {
+    backgrounds: { default: "dark" },
+  },
+};
+
+export const LongUsernameLight: Story = {
+  args: {
+    user: {
+      ...mockUser,
+      username: "TheCryptoMasterTrader2024",
+      subscribers: 5678,
+    },
+  },
+  parameters: {
+    backgrounds: { default: "light" },
+    theme: "light",
   },
 };

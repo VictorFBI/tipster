@@ -1,12 +1,12 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { ForgotPasswordVerify } from "./forgot-password-verify";
 import { withTheme } from "@/src/shared/storybook/decorators";
+import { LanguageSelector } from "./language-selector";
 
 const meta = {
-  title: "Modules/Verification/ForgotPasswordVerify",
-  component: ForgotPasswordVerify,
+  title: "Screens/Settings/LanguageSelector",
+  component: LanguageSelector,
   decorators: [withTheme],
-} satisfies Meta<typeof ForgotPasswordVerify>;
+} satisfies Meta<typeof LanguageSelector>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

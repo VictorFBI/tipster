@@ -1,36 +1,114 @@
-import type { Meta, StoryObj } from "@storybook/react-native";
-import { View, Text } from "react-native";
+import type { Meta, StoryObj } from "@storybook/react";
 import { Divider } from "./divider";
+import { withTheme } from "@/src/shared/storybook/decorators";
+import { YStack, Text } from "tamagui";
 
 const meta = {
-  title: "UI/Divider",
+  title: "Shared/UI/Divider",
   component: Divider,
-  decorators: [
-    (Story) => (
-      <View style={{ flex: 1, padding: 16 }}>
-        <Story />
-      </View>
-    ),
-  ],
-  tags: ["autodocs"],
+  decorators: [withTheme],
 } satisfies Meta<typeof Divider>;
 
 export default meta;
-
 type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {};
+export const DefaultDark: Story = {
+  parameters: {
+    backgrounds: { default: "dark" },
+  },
+};
 
-export const WithContent: Story = {
-  decorators: [
-    (Story) => (
-      <View style={{ flex: 1, padding: 16 }}>
-        <View style={{ padding: 16, backgroundColor: "#f0f0f0" }}>
-          <Text style={{ fontSize: 16, marginBottom: 8 }}>Content Above</Text>
-          <Story />
-          <Text style={{ fontSize: 16, marginTop: 8 }}>Content Below</Text>
-        </View>
-      </View>
-    ),
-  ],
+export const DefaultLight: Story = {
+  parameters: {
+    backgrounds: { default: "light" },
+    theme: "light",
+  },
+};
+
+export const BetweenContentDark: Story = {
+  render: () => (
+    <YStack gap="$4" padding="$4">
+      <Text fontSize="$5" fontWeight="600">
+        Section 1
+      </Text>
+      <Text>This is some content in the first section.</Text>
+      <Divider />
+      <Text fontSize="$5" fontWeight="600">
+        Section 2
+      </Text>
+      <Text>This is some content in the second section.</Text>
+      <Divider />
+      <Text fontSize="$5" fontWeight="600">
+        Section 3
+      </Text>
+      <Text>This is some content in the third section.</Text>
+    </YStack>
+  ),
+  parameters: {
+    backgrounds: { default: "dark" },
+  },
+};
+
+export const BetweenContentLight: Story = {
+  render: () => (
+    <YStack gap="$4" padding="$4">
+      <Text fontSize="$5" fontWeight="600">
+        Section 1
+      </Text>
+      <Text>This is some content in the first section.</Text>
+      <Divider />
+      <Text fontSize="$5" fontWeight="600">
+        Section 2
+      </Text>
+      <Text>This is some content in the second section.</Text>
+      <Divider />
+      <Text fontSize="$5" fontWeight="600">
+        Section 3
+      </Text>
+      <Text>This is some content in the third section.</Text>
+    </YStack>
+  ),
+  parameters: {
+    backgrounds: { default: "light" },
+    theme: "light",
+  },
+};
+
+export const InListDark: Story = {
+  render: () => (
+    <YStack padding="$4">
+      <Text padding="$3">List Item 1</Text>
+      <Divider />
+      <Text padding="$3">List Item 2</Text>
+      <Divider />
+      <Text padding="$3">List Item 3</Text>
+      <Divider />
+      <Text padding="$3">List Item 4</Text>
+      <Divider />
+      <Text padding="$3">List Item 5</Text>
+    </YStack>
+  ),
+  parameters: {
+    backgrounds: { default: "dark" },
+  },
+};
+
+export const InListLight: Story = {
+  render: () => (
+    <YStack padding="$4">
+      <Text padding="$3">List Item 1</Text>
+      <Divider />
+      <Text padding="$3">List Item 2</Text>
+      <Divider />
+      <Text padding="$3">List Item 3</Text>
+      <Divider />
+      <Text padding="$3">List Item 4</Text>
+      <Divider />
+      <Text padding="$3">List Item 5</Text>
+    </YStack>
+  ),
+  parameters: {
+    backgrounds: { default: "light" },
+    theme: "light",
+  },
 };

@@ -1,71 +1,232 @@
-import type { Meta, StoryObj } from "@storybook/react-native";
-import { View } from "react-native";
-import { useForm } from "react-hook-form";
+import type { Meta, StoryObj } from "@storybook/react";
 import { PasswordInput } from "./passwordInput";
+import { withTheme } from "@/src/shared/storybook/decorators";
+import { useForm } from "react-hook-form";
 
 // Wrapper component to provide form context
-const PasswordInputWrapper = (args: any) => {
-  const {
-    control,
-    formState: { errors },
-  } = useForm({
+function PasswordInputWrapper(props: {
+  label?: string;
+  hasError?: boolean;
+  errorMessage?: string;
+  controlName?: string;
+}) {
+  const { control } = useForm({
     defaultValues: {
-      password: args.defaultValue || "",
+      password: "",
+      confirmPassword: "",
     },
   });
 
+  // Simulate error state if needed
+  const simulatedErrors = props.hasError
+    ? { type: "manual", message: props.errorMessage }
+    : undefined;
+
   return (
     <PasswordInput
-      label={args.label}
+      label={props.label || "Password"}
       control={control}
-      errors={errors.password as any}
-      message={errors.password?.message as string}
-      controlName="password"
+      errors={simulatedErrors as any}
+      message={props.errorMessage}
+      controlName={props.controlName || "password"}
     />
   );
-};
+}
 
 const meta = {
-  title: "UI/PasswordInput",
+  title: "Modules/Auth/PasswordInput",
   component: PasswordInputWrapper,
-  decorators: [
-    (Story) => (
-      <View style={{ flex: 1, padding: 16 }}>
-        <Story />
-      </View>
-    ),
-  ],
-  tags: ["autodocs"],
+  decorators: [withTheme],
+  argTypes: {
+    label: {
+      control: "text",
+      description: "Label text for the password field",
+    },
+    hasError: {
+      control: "boolean",
+      description: "Whether to show error state",
+    },
+    errorMessage: {
+      control: "text",
+      description: "Error message to display",
+    },
+    controlName: {
+      control: "text",
+      description: "Form control name",
+    },
+  },
 } satisfies Meta<typeof PasswordInputWrapper>;
 
 export default meta;
-
 type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {
+export const DefaultDark: Story = {
   args: {
     label: "Password",
-    defaultValue: "",
+    hasError: false,
+    controlName: "password",
+  },
+  parameters: {
+    backgrounds: { default: "dark" },
   },
 };
 
-export const WithValue: Story = {
+export const DefaultLight: Story = {
   args: {
     label: "Password",
-    defaultValue: "mypassword123",
+    hasError: false,
+    controlName: "password",
+  },
+  parameters: {
+    backgrounds: { default: "light" },
+    theme: "light",
   },
 };
 
-export const ConfirmPassword: Story = {
+export const ConfirmPasswordDark: Story = {
   args: {
     label: "Confirm Password",
-    defaultValue: "",
+    hasError: false,
+    controlName: "confirmPassword",
+  },
+  parameters: {
+    backgrounds: { default: "dark" },
   },
 };
 
-export const NewPassword: Story = {
+export const ConfirmPasswordLight: Story = {
+  args: {
+    label: "Confirm Password",
+    hasError: false,
+    controlName: "confirmPassword",
+  },
+  parameters: {
+    backgrounds: { default: "light" },
+    theme: "light",
+  },
+};
+
+export const WithErrorDark: Story = {
+  args: {
+    label: "Password",
+    hasError: true,
+    errorMessage: "Password is required",
+    controlName: "password",
+  },
+  parameters: {
+    backgrounds: { default: "dark" },
+  },
+};
+
+export const WithErrorLight: Story = {
+  args: {
+    label: "Password",
+    hasError: true,
+    errorMessage: "Password is required",
+    controlName: "password",
+  },
+  parameters: {
+    backgrounds: { default: "light" },
+    theme: "light",
+  },
+};
+
+export const MinLengthErrorDark: Story = {
+  args: {
+    label: "Password",
+    hasError: true,
+    errorMessage: "Password must be at least 6 characters",
+    controlName: "password",
+  },
+  parameters: {
+    backgrounds: { default: "dark" },
+  },
+};
+
+export const MinLengthErrorLight: Story = {
+  args: {
+    label: "Password",
+    hasError: true,
+    errorMessage: "Password must be at least 6 characters",
+    controlName: "password",
+  },
+  parameters: {
+    backgrounds: { default: "light" },
+    theme: "light",
+  },
+};
+
+export const PasswordMismatchDark: Story = {
+  args: {
+    label: "Confirm Password",
+    hasError: true,
+    errorMessage: "Passwords do not match",
+    controlName: "confirmPassword",
+  },
+  parameters: {
+    backgrounds: { default: "dark" },
+  },
+};
+
+export const PasswordMismatchLight: Story = {
+  args: {
+    label: "Confirm Password",
+    hasError: true,
+    errorMessage: "Passwords do not match",
+    controlName: "confirmPassword",
+  },
+  parameters: {
+    backgrounds: { default: "light" },
+    theme: "light",
+  },
+};
+
+export const NewPasswordDark: Story = {
   args: {
     label: "New Password",
-    defaultValue: "",
+    hasError: false,
+    controlName: "password",
+  },
+  parameters: {
+    backgrounds: { default: "dark" },
+  },
+};
+
+export const NewPasswordLight: Story = {
+  args: {
+    label: "New Password",
+    hasError: false,
+    controlName: "password",
+  },
+  parameters: {
+    backgrounds: { default: "light" },
+    theme: "light",
+  },
+};
+
+export const LongErrorMessageDark: Story = {
+  args: {
+    label: "Password",
+    hasError: true,
+    errorMessage:
+      "Your password must be at least 6 characters long and contain a mix of letters, numbers, and special characters for security.",
+    controlName: "password",
+  },
+  parameters: {
+    backgrounds: { default: "dark" },
+  },
+};
+
+export const LongErrorMessageLight: Story = {
+  args: {
+    label: "Password",
+    hasError: true,
+    errorMessage:
+      "Your password must be at least 6 characters long and contain a mix of letters, numbers, and special characters for security.",
+    controlName: "password",
+  },
+  parameters: {
+    backgrounds: { default: "light" },
+    theme: "light",
   },
 };

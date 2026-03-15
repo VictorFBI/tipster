@@ -13,7 +13,8 @@
     "storybook-generate": "sb-rn-get-stories",
     "storybook": "cross-env EXPO_PUBLIC_STORYBOOK_ENABLED='true' expo start --localhost",
     "storybook:ios": "cross-env EXPO_PUBLIC_STORYBOOK_ENABLED='true' expo start --ios",
-    "storybook:android": "cross-env EXPO_PUBLIC_STORYBOOK_ENABLED='true' expo start --android"
+    "storybook:android": "cross-env EXPO_PUBLIC_STORYBOOK_ENABLED='true' expo start --android",
+    "chromatic": "npx chromatic --project-token=chpt_30420f5b19bcbf0"
   },
   "dependencies": {
     "@gorhom/bottom-sheet": "^5.2.6",

@@ -4,9 +4,8 @@ import { TouchableOpacity, Alert } from "react-native";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Header } from "../../shared/components/header/header";
-import { BalanceBlock } from "./components/balance-block";
-import { ReferalBlock } from "./components/referal-block";
-import { SettingsBlock } from "./components/settings-block";
+import { BalanceBlock } from "./components/balanceBlock/balance-block";
+import { SettingsBlock } from "./components/settingsBlock/settings-block";
 import { InfoBlock } from "../../shared/components/infoBlock/info-block";
 import { useTranslation } from "react-i18next";
 import { tokens } from "@/src/core/theme/tokens";
@@ -14,6 +13,7 @@ import { useLogout } from "@/src/modules/auth";
 import { useAuthStore } from "../../modules/auth/store/authStore";
 import { STORAGE_KEYS } from "../../modules/auth/api/client";
 import { getErrorMessage } from "../../core/utils";
+import { ReferalBlock } from "./components/referalBlock/referal-block";
 
 export default function Settings() {
   const { t } = useTranslation();
