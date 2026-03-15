@@ -1,3 +1,3 @@
-export { CreatePostButton } from './components/create-post-button';
-export { CreatePost } from './components/create-post';
-export { PostsList } from './components/posts-list'
+export { CreatePostButton } from './components/createPostButton/create-post-button';
+export { CreatePost } from './components/createPost/create-post';
+export { PostsList } from './components/postsList/posts-list'

@@ -1,5 +1,5 @@
-import { PostCard } from "@/src/shared/components/post-card";
 import { ScrollView, YStack } from "tamagui";
+import { PostCard } from "../postsCard/post-card";
 
 interface Post {
   id: string;

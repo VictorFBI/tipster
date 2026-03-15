@@ -5,7 +5,7 @@ import { SettingItem } from "./setting-item";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "@/src/core/contexts/ThemeContext";
 import { LanguageSelector } from "./language-selector";
-import { Divider } from "@/src/shared/ui/divider";
+import { Divider } from "@/src/shared/ui/divider/divider";
 
 export function SettingsBlock() {
   const { t } = useTranslation();

@@ -8,7 +8,7 @@ import {
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { YStack, XStack, Text, Button, ScrollView } from "tamagui";
-import { ConfirmButton } from "../../../shared/ui/confirmButton";
+import { ConfirmButton } from "../../../shared/ui/confirmButton/confirmButton";
 import { useTranslation } from "react-i18next";
 
 interface VerificationCodeScreenProps {

@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { PostsList } from "./posts-list";
+import { PostsList } from "../postsList/posts-list";
 import { withTheme } from "@/src/shared/storybook/decorators";
 
 const meta = {

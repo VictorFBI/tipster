@@ -4,10 +4,10 @@ import { Link, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useForm, Controller } from "react-hook-form";
 import { YStack, XStack, Text, Input, ScrollView } from "tamagui";
-import { ConfirmButton } from "../../shared/ui/confirmButton";
-import { PasswordInput } from "../../shared/ui/passwordInput";
-import { EmailInput } from "../../shared/ui/emailInput";
-import { ErrorMessage } from "../../shared/ui/errorMessage";
+import { ConfirmButton } from "../../shared/ui/confirmButton/confirmButton";
+import { PasswordInput } from "../../shared/ui/passwordInput/passwordInput";
+import { EmailInput } from "../../shared/ui/emailInput/emailInput";
+import { ErrorMessage } from "../../shared/ui/errorMessage/errorMessage";
 import { useTranslation } from "react-i18next";
 import {
   useRegister,
