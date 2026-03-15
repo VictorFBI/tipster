@@ -95,12 +95,12 @@
     "following": "Подписки",
     "followingLabel": "Подписок",
     "liked": "Понравилось",
-    "edit": "Редактировать профиль",
     "follow": "Подписаться",
     "unfollow": "Отписаться",
     "subscribe": "Подписаться",
     "unsubscribe": "Отписаться",
     "noPosts": "Постов пока нет",
+    "username": "Имя пользователя",
     "filling": {
       "welcome": "Настройте свой профиль",
       "completeProfile": "Расскажите о себе сообществу Tipster",
@@ -122,6 +122,16 @@
       "permissionMessage": "Необходимо разрешение на доступ к галерее!",
       "errorTitle": "Ошибка",
       "errorMessage": "Не удалось выбрать изображение"
+    },
+    "editProfile": "Редактировать профиль",
+    "edit": {
+      "title": "Редактировать профиль",
+      "changeAvatar": "Изменить фото",
+      "username": "Имя пользователя",
+      "usernameHint": "Используйте только буквы, цифры и подчеркивания",
+      "save": "Сохранить",
+      "successTitle": "Успешно",
+      "successMessage": "Профиль обновлен"
     }
   },
   "settings": {

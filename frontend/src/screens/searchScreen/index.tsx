@@ -3,6 +3,8 @@ import { Header } from "../../shared/components/header/header";
 import { UserCard } from "../../modules/user/components/userCard/user-card";
 import { SearchInput } from "./components/search-input";
 import { useTranslation } from "react-i18next";
+import { Pressable } from "react-native";
+import { useRouter } from "expo-router";
 
 interface User {
   id: string;
@@ -64,6 +66,11 @@ const mockUsers: User[] = [
 
 export default function Search() {
   const { t } = useTranslation();
+  const router = useRouter();
+
+  const handleUserPress = (userId: string) => {
+    router.push(`/user-profile?userId=${userId}`);
+  };
 
   return (
     <YStack flex={1} backgroundColor={"$background"}>
@@ -72,14 +79,11 @@ export default function Search() {
       <ScrollView showsVerticalScrollIndicator={false}>
         <YStack paddingHorizontal="$4" paddingBottom="$6" gap="$3">
           {mockUsers.map((user) => (
-            <YStack
-              key={user.id}
-              backgroundColor="$surface"
-              borderRadius="$4"
-              padding="$4"
-            >
-              <UserCard user={user} />
-            </YStack>
+            <Pressable key={user.id} onPress={() => handleUserPress(user.id)}>
+              <YStack backgroundColor="$surface" borderRadius="$4" padding="$4">
+                <UserCard user={user} />
+              </YStack>
+            </Pressable>
           ))}
         </YStack>
       </ScrollView>

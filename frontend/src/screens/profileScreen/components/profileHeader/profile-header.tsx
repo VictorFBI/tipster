@@ -1,12 +1,27 @@
-import { Avatar, YStack, Text, XStack, Spinner } from "tamagui";
+import { Avatar, YStack, Text, XStack, Spinner, Button } from "tamagui";
 import { useTranslation } from "react-i18next";
-import { useAccountProfile } from "../../../modules/user";
-import { useAuthStore } from "../../../modules/auth/store/authStore";
+import { useAccountProfile } from "../../../../modules/user";
+import { useAuthStore } from "../../../../modules/auth/store/authStore";
 import { Ionicons } from "@expo/vector-icons";
+import { Pressable } from "react-native";
+import { useRouter } from "expo-router";
 
 export function ProfileHeader() {
   const { t } = useTranslation();
+  const router = useRouter();
   // const user = useAuthStore((state) => state.user);
+
+  const handleFollowersPress = () => {
+    router.push("/users-list?type=followers");
+  };
+
+  const handleFollowingPress = () => {
+    router.push("/users-list?type=following");
+  };
+
+  const handleEditProfile = () => {
+    router.push("/edit-profile");
+  };
 
   // const {
   //   data: profile,
@@ -98,7 +113,28 @@ export function ProfileHeader() {
         Активный участник Tipster. Заработал свой первый airdrop! 🚀
       </Text>
 
-      <XStack gap="$8" marginTop="$2">
+      <Button
+        backgroundColor="$surface"
+        borderRadius="$3"
+        paddingHorizontal="$4"
+        paddingVertical="$2"
+        marginTop="$3"
+        onPress={handleEditProfile}
+        pressStyle={{
+          opacity: 0.8,
+        }}
+        width="90%"
+        maxWidth={400}
+      >
+        <XStack alignItems="center" gap="$2">
+          <Ionicons name="create-outline" size={18} color="white" />
+          <Text fontSize={15} fontWeight="600" color="$text">
+            {t("profile.edit.title")}
+          </Text>
+        </XStack>
+      </Button>
+
+      <XStack gap="$8" marginTop="$4">
         <YStack alignItems="center" gap="$1">
           <Text fontSize={20} fontWeight="700" color="$text">
             28
@@ -107,22 +143,26 @@ export function ProfileHeader() {
             {t("profile.postsLabel")}
           </Text>
         </YStack>
-        <YStack alignItems="center" gap="$1">
-          <Text fontSize={20} fontWeight="700" color="$text">
-            145
-          </Text>
-          <Text fontSize={14} color="#8E8E93">
-            {t("profile.followersLabel")}
-          </Text>
-        </YStack>
-        <YStack alignItems="center" gap="$1">
-          <Text fontSize={20} fontWeight="700" color="$text">
-            89
-          </Text>
-          <Text fontSize={14} color="#8E8E93">
-            {t("profile.followingLabel")}
-          </Text>
-        </YStack>
+        <Pressable onPress={handleFollowersPress}>
+          <YStack alignItems="center" gap="$1">
+            <Text fontSize={20} fontWeight="700" color="$text">
+              145
+            </Text>
+            <Text fontSize={14} color="#8E8E93">
+              {t("profile.followersLabel")}
+            </Text>
+          </YStack>
+        </Pressable>
+        <Pressable onPress={handleFollowingPress}>
+          <YStack alignItems="center" gap="$1">
+            <Text fontSize={20} fontWeight="700" color="$text">
+              89
+            </Text>
+            <Text fontSize={14} color="#8E8E93">
+              {t("profile.followingLabel")}
+            </Text>
+          </YStack>
+        </Pressable>
       </XStack>
     </YStack>
   );

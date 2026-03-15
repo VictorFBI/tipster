@@ -94,7 +94,6 @@
     "following": "Following",
     "followingLabel": "Following",
     "liked": "Liked",
-    "edit": "Edit Profile",
     "follow": "Follow",
     "unfollow": "Unfollow",
     "subscribe": "Subscribe",
@@ -121,6 +120,16 @@
       "permissionMessage": "Permission to access camera roll is required!",
       "errorTitle": "Error",
       "errorMessage": "Failed to pick image"
+    },
+    "editProfile": "Edit Profile",
+    "edit": {
+      "title": "Edit Profile",
+      "changeAvatar": "Change Photo",
+      "username": "Username",
+      "usernameHint": "Use only letters, numbers and underscores",
+      "save": "Save",
+      "successTitle": "Success",
+      "successMessage": "Profile updated"
     }
   },
   "settings": {

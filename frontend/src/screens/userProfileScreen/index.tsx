@@ -2,9 +2,10 @@ import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
 import { YStack, Text } from "tamagui";
 import { Header } from "../../shared/components/header/header";
-import { ProfileHeader } from "./components/profileHeader/profile-header";
+import { ProfileHeader } from "../profileScreen/components/profileHeader/profile-header";
 import { PostsList } from "../../modules/posts";
-import { Tabs } from "./components/tabs/tabs";
+import { Tabs } from "../profileScreen/components/tabs/tabs";
+import { useLocalSearchParams } from "expo-router";
 import { useTranslation } from "react-i18next";
 
 interface Post {
@@ -20,31 +21,20 @@ interface Post {
   comments: number;
 }
 
-interface UserProfile {
-  name: string;
-  username: string;
-  description: string;
-  avatar: string;
-  postsCount: number;
-  followersCount: number;
-  followingCount: number;
-}
-
-export default function Profile() {
+export default function UserProfileScreen() {
   const { t } = useTranslation();
+  const params = useLocalSearchParams();
+  const userId = params.userId as string;
 
-  // State to track if user has completed their profile
-  // In a real app, this would come from user data/API
-  // TODO refactor
-  const [isProfileComplete, setIsProfileComplete] = useState(false);
-  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  // TODO: Fetch user data based on userId
+  // For now, we'll use mock data
 
   const mockUserPosts: Post[] = [
     {
       id: "1",
       author: {
-        name: t("common.you"),
-        avatar: "https://i.pravatar.cc/150?img=12",
+        name: "CryptoKing",
+        avatar: "https://i.pravatar.cc/150?img=1",
       },
       timestamp: "2ч назад",
       content:
@@ -56,8 +46,8 @@ export default function Profile() {
     {
       id: "2",
       author: {
-        name: t("common.you"),
-        avatar: "https://i.pravatar.cc/150?img=12",
+        name: "CryptoKing",
+        avatar: "https://i.pravatar.cc/150?img=1",
       },
       timestamp: "1 день назад",
       content:
@@ -67,11 +57,12 @@ export default function Profile() {
       comments: 32,
     },
   ];
+
   const [activeTab, setActiveTab] = useState<"posts" | "liked">("posts");
 
   return (
-    <YStack flex={1} backgroundColor={"$background"}>
-      <Header headerText={t("profile.title")} />
+    <YStack flex={1} backgroundColor="$background">
+      <Header headerText="" showBackButton />
       <ProfileHeader />
 
       <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
