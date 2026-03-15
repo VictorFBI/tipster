@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { VerificationCodeScreen } from "./VerificationCodeScreen";
+import { VerificationCodeScreen } from "./verification-code-screen";
 import { withTheme } from "@/src/shared/storybook/decorators";
 
 const meta = {

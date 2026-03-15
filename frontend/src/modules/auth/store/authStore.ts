@@ -2,8 +2,10 @@ import { create } from 'zustand';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { STORAGE_KEYS } from '../api/client';
 
+
 interface User {
   email: string;
+  accountId?: string;
   // Add other user properties as needed
 }
 
@@ -43,11 +45,13 @@ export const useAuthStore = create<AuthState>((set) => ({
       const accessToken = await AsyncStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
 
       if (accessToken) {
-        // In a real app, you might want to validate the token or fetch user data
-        // For now, we'll just set a basic user object
-        // You can extend this to fetch user profile from an API
+      
+        
         set({
-          user: { email: '' }, // Placeholder - fetch actual user data
+          user: {
+            email: '', // TODO: extract from token if needed
+            //accountId: accountId || undefined,
+          },
           isAuthenticated: true,
         });
       } else {

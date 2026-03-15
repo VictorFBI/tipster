@@ -3,13 +3,14 @@ import { YStack } from "tamagui";
 import { SettingSection } from "./setting-section";
 import { SettingItem } from "./setting-item";
 import { useTranslation } from "react-i18next";
-import { useTheme } from "@/src/core/contexts/ThemeContext";
+import { useThemeStore } from "@/src/core/store/themeStore";
 import { LanguageSelector } from "./language-selector";
 import { Divider } from "@/src/shared/ui/divider/divider";
 
 export function SettingsBlock() {
   const { t } = useTranslation();
-  const { theme, setTheme } = useTheme();
+  const theme = useThemeStore((state) => state.theme);
+  const setTheme = useThemeStore((state) => state.setTheme);
   const [pushEnabled, setPushEnabled] = useState(true);
   const [privateAccount, setPrivateAccount] = useState(false);
 

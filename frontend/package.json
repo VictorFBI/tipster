@@ -37,6 +37,7 @@
     "expo-splash-screen": "~31.0.10",
     "expo-status-bar": "~3.0.8",
     "i18next": "^23.4.0",
+    "jwt-decode": "^4.0.0",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-hook-form": "^7.71.2",

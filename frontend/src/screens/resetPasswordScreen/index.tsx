@@ -5,10 +5,10 @@ import { StatusBar } from "expo-status-bar";
 import { useForm } from "react-hook-form";
 import { YStack, Text, ScrollView } from "tamagui";
 import { ConfirmButton } from "../../shared/ui/confirmButton/confirmButton";
-import { PasswordInput } from "../../shared/ui/passwordInput/passwordInput";
+import { PasswordInput } from "../../modules/auth/components/passwordInput/passwordInput";
 import { ErrorMessage } from "../../shared/ui/errorMessage/errorMessage";
 import { useTranslation } from "react-i18next";
-import { useResetPassword } from "../../modules/auth/hooks";
+import { useResetPassword } from "@/src/modules/auth";
 import { getErrorMessage } from "../../core/utils/errorHandler";
 
 type ResetPasswordFormData = {

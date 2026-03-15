@@ -6,11 +6,11 @@ import { useForm } from "react-hook-form";
 import { YStack, XStack, Text, View } from "tamagui";
 import { useTranslation } from "react-i18next";
 import { ConfirmButton } from "../../shared/ui/confirmButton/confirmButton";
-import { PasswordInput } from "../../shared/ui/passwordInput/passwordInput";
-import { EmailInput } from "../../shared/ui/emailInput/emailInput";
+import { PasswordInput } from "../../modules/auth/components/passwordInput/passwordInput";
+import { EmailInput } from "../../modules/auth/components/emailInput/emailInput";
 import { ErrorMessage } from "../../shared/ui/errorMessage/errorMessage";
-import { useLogin } from "../../modules/auth/hooks";
 import { getErrorMessage } from "../../core/utils";
+import { useLogin } from "@/src/modules/auth";
 
 type LoginFormData = {
   email: string;

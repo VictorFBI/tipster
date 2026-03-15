@@ -39,8 +39,14 @@ export const useLogin = (): UseMutationResult<
     onSuccess: async (data) => {
       // Save tokens to storage
       await setAuthTokens(data.access_token, data.refresh_token);
-      // Update Zustand store
-      await useAuthStore.getState().checkAuth();
+      
+    
+      
+      // Update Zustand store with user data including accountId
+      useAuthStore.getState().setUser({
+        email: '', // TODO: extract from token or get from API
+        //accountId: accountId || undefined,
+      });
     },
     onError: (error) => {
       console.error('Login error:', error.response?.data?.message || error.message);

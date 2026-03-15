@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import { useRouter, useLocalSearchParams } from "expo-router";
-import { VerificationCodeScreen } from "./VerificationCodeScreen";
 import { useTranslation } from "react-i18next";
 import {
   useConfirmEmailRegistration,
   useSendEmailRegistration,
-} from "../../auth/hooks";
-import { getErrorMessage } from "../../../core/utils";
+} from "@/src/modules/auth";
+import { getErrorMessage } from "../../../../core/utils";
 import { Alert } from "react-native";
+import { VerificationCodeScreen } from "../verificationCodeScreen/verification-code-screen";
 
 export function VerifyEmail() {
   const { t } = useTranslation();

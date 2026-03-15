@@ -4,6 +4,8 @@ import { TouchableOpacity, ScrollView, Alert } from "react-native";
 import { Avatar, YStack, Text, Input, TextArea, Button } from "tamagui";
 import { useTranslation } from "react-i18next";
 import * as ImagePicker from "expo-image-picker";
+import { useUpdateAccountProfile } from "../../../modules/user";
+import { useAuthStore } from "../../../modules/auth/store/authStore";
 
 interface ProfileFillingProps {
   onComplete: (data: {
@@ -19,6 +21,7 @@ export function ProfileFillingScreen({
   onSkip,
 }: ProfileFillingProps) {
   const { t } = useTranslation();
+  const user = useAuthStore((state) => state.user);
 
   const [displayName, setDisplayName] = useState("");
   const [bio, setBio] = useState("");
@@ -26,13 +29,38 @@ export function ProfileFillingScreen({
 
   const maxBioLength = 160;
 
+  console.log(displayName, bio, avatar);
+
+  const isPending = undefined;
+  // const { mutate: updateProfile, isPending } = useUpdateAccountProfile({
+  //   onSuccess: () => {
+  //     onComplete({
+  //       displayName: displayName.trim(),
+  //       bio: bio.trim(),
+  //       avatar,
+  //     });
+  //   },
+  //   onError: (error) => {
+  //     Alert.alert(
+  //       t("profile.filling.errorTitle") || "Error",
+  //       error.message ||
+  //         t("profile.filling.updateError") ||
+  //         "Failed to update profile",
+  //     );
+  //   },
+  // });
+
   const handleSave = () => {
     if (displayName.trim()) {
-      onComplete({
-        displayName: displayName.trim(),
-        bio: bio.trim(),
-        avatar,
-      });
+      // Update profile via API
+      // updateProfile({
+      //   username: displayName.trim(),
+      //   bio: bio.trim(),
+      //   avatar_url: avatar || undefined,
+      //   // first_name: "test",
+      //   // last_name: "teset",
+      //   // wallet_address: "test",
+      // });
     }
   };
 
@@ -196,13 +224,15 @@ export function ProfileFillingScreen({
           backgroundColor="#8B5CF6"
           borderRadius={12}
           onPress={handleSave}
-          disabled={!isFormValid}
-          opacity={!isFormValid ? 0.5 : 1}
+          disabled={!isFormValid || isPending}
+          opacity={!isFormValid || isPending ? 0.5 : 1}
           marginTop="$1"
           pressStyle={{ opacity: 0.8 }}
         >
           <Text color="white" fontSize={16} fontWeight="600">
-            {t("profile.filling.createProfile")}
+            {isPending
+              ? t("common.loading") || "Loading..."
+              : t("profile.filling.createProfile")}
           </Text>
         </Button>
       </YStack>

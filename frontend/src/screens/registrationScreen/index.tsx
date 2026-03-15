@@ -5,15 +5,12 @@ import { StatusBar } from "expo-status-bar";
 import { useForm, Controller } from "react-hook-form";
 import { YStack, XStack, Text, Input, ScrollView } from "tamagui";
 import { ConfirmButton } from "../../shared/ui/confirmButton/confirmButton";
-import { PasswordInput } from "../../shared/ui/passwordInput/passwordInput";
-import { EmailInput } from "../../shared/ui/emailInput/emailInput";
+import { PasswordInput } from "../../modules/auth/components/passwordInput/passwordInput";
+import { EmailInput } from "../../modules/auth/components/emailInput/emailInput";
 import { ErrorMessage } from "../../shared/ui/errorMessage/errorMessage";
 import { useTranslation } from "react-i18next";
-import {
-  useRegister,
-  useSendEmailRegistration,
-} from "../../modules/auth/hooks";
 import { getErrorMessage } from "../../core/utils";
+import { useRegister, useSendEmailRegistration } from "@/src/modules/auth";
 
 type RegisterFormData = {
   username: string;

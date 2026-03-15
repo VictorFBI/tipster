@@ -1,6 +1,6 @@
 import { tokens } from "@/src/core/theme/tokens";
 import { themes } from "@/src/core/theme/themes";
-import { useTheme } from "@/src/core/contexts/ThemeContext";
+import { useThemeStore } from "@/src/core/store/themeStore";
 import { Ionicons } from "@expo/vector-icons";
 import { XStack, YStack, Text, Switch } from "tamagui";
 
@@ -19,7 +19,7 @@ export function SettingItem({
   checked,
   onCheckedChange,
 }: SettingItemProps) {
-  const { theme } = useTheme();
+  const theme = useThemeStore((state) => state.theme);
   const currentTheme = themes[theme];
 
   return (

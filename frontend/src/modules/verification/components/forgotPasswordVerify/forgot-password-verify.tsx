@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import { useRouter, useLocalSearchParams } from "expo-router";
-import { VerificationCodeScreen } from "./VerificationCodeScreen";
 import { useTranslation } from "react-i18next";
 import {
   useConfirmEmailResetPassword,
   useSendEmailResetPassword,
-} from "../../auth/hooks";
-import { getErrorMessage } from "../../../core/utils/errorHandler";
+} from "@/src/modules/auth";
 import { Alert } from "react-native";
+import { getErrorMessage } from "@/src/core/utils";
+import { VerificationCodeScreen } from "../verificationCodeScreen/verification-code-screen";
 
 export function ForgotPasswordVerify() {
   const { t } = useTranslation();

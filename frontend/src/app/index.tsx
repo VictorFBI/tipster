@@ -1,5 +1,5 @@
 import { Redirect } from "expo-router";
-import { ENABLE_STORYBOOK } from "../config/storybook";
+import { ENABLE_STORYBOOK } from "../core/config/storybook";
 
 export default function Index() {
   // Redirect to Storybook if enabled, otherwise to login

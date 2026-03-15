@@ -1,12 +1,12 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { VerifyEmail } from "./VerifyEmail";
+import { ForgotPasswordVerify } from "./forgot-password-verify";
 import { withTheme } from "@/src/shared/storybook/decorators";
 
 const meta = {
-  title: "Modules/Verification/VerifyEmail",
-  component: VerifyEmail,
+  title: "Modules/Verification/ForgotPasswordVerify",
+  component: ForgotPasswordVerify,
   decorators: [withTheme],
-} satisfies Meta<typeof VerifyEmail>;
+} satisfies Meta<typeof ForgotPasswordVerify>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

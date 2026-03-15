@@ -10,7 +10,7 @@ import { SettingsBlock } from "./components/settings-block";
 import { InfoBlock } from "../../shared/components/infoBlock/info-block";
 import { useTranslation } from "react-i18next";
 import { tokens } from "@/src/core/theme/tokens";
-import { useLogout } from "../../modules/auth/hooks";
+import { useLogout } from "@/src/modules/auth";
 import { useAuthStore } from "../../modules/auth/store/authStore";
 import { STORAGE_KEYS } from "../../modules/auth/api/client";
 import { getErrorMessage } from "../../core/utils";

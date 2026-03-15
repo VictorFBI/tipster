@@ -1,2 +1,2 @@
-export { ForgotPasswordVerify } from './components/ForgotPasswordVerify';
-export { VerifyEmail } from './components/VerifyEmail';
+export { ForgotPasswordVerify } from './components/forgotPasswordVerify/forgot-password-verify';
+export { VerifyEmail } from './components/verifyEmail/verify-email';

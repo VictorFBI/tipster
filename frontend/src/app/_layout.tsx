@@ -10,16 +10,14 @@ import { TamaguiProvider, PortalProvider } from "tamagui";
 import tamaguiConfig from "../../tamagui.config";
 import { useFonts } from "expo-font";
 import "../core/utils/i18n";
-import {
-  ThemeProvider as CustomThemeProvider,
-  useTheme,
-} from "../core/contexts/ThemeContext";
+import { useThemeStore } from "../core/store/themeStore";
 import { QueryProvider } from "../core/providers/QueryProvider";
-import { ENABLE_STORYBOOK } from "../config/storybook";
-import { useStorybookDevMenu } from "../config/devMenu";
+import { ENABLE_STORYBOOK } from "../core/config/storybook";
+import { useStorybookDevMenu } from "../core/config/devMenu";
 
 function RootLayoutContent() {
-  const { theme } = useTheme();
+  const theme = useThemeStore((state) => state.theme);
+  const isLoading = useThemeStore((state) => state.isLoading);
 
   // Add Storybook to dev menu if enabled
   useStorybookDevMenu();
@@ -29,7 +27,7 @@ function RootLayoutContent() {
     InterBold: require("@tamagui/font-inter/otf/Inter-Bold.otf"),
   });
 
-  if (!loaded) {
+  if (!loaded || isLoading) {
     return null;
   }
 
@@ -58,9 +56,7 @@ function RootLayoutContent() {
 export default function RootLayout() {
   return (
     <QueryProvider>
-      <CustomThemeProvider>
-        <RootLayoutContent />
-      </CustomThemeProvider>
+      <RootLayoutContent />
     </QueryProvider>
   );
 }
