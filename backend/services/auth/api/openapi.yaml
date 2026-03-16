@@ -5,6 +5,25 @@ info:
   description: API for authentication service
 
 paths:
+  /auth/me:
+    get:
+      summary: Get user information
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserId'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /auth/register:
     post:
       summary: Register a new user
@@ -240,6 +259,12 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
 
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT access token from auth service
   schemas:
     ResetPasswordRequest:
       type: object
@@ -330,6 +355,10 @@ components:
       required:
         - email
         - code
+
+    UserId:
+      type: string
+      description: User ID
         
     ErrorResponse:
       type: object

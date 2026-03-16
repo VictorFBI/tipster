@@ -89,6 +89,7 @@ func main() {
 	))
 
 	// Auth routes
+	r.Get("/auth/me", handlers.Me)
 	r.Post("/auth/login", handlers.Login)
 	r.Post("/auth/logout", handlers.Logout)
 	r.Post("/auth/register", handlers.Register)
