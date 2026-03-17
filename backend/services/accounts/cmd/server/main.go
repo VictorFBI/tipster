@@ -81,6 +81,7 @@ func main() {
 	// Accounts routes (protected by access token)
 	r.With(middlewares.RequireAccessToken).Get("/accounts/profile", handlers.GetAccountProfile)
 	r.With(middlewares.RequireAccessToken).Patch("/accounts/profile", handlers.PatchAccountProfile)
+	r.With(middlewares.RequireAccessToken).Get("/accounts/profile/me", handlers.GetAccountProfileMe)
 
 	log.Println("Server is running on port 8081")
 	err = http.ListenAndServe(":8081", r)

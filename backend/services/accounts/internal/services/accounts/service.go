@@ -10,22 +10,33 @@ import (
 	"tipster/backend/accounts/internal/db/postgresql"
 
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 )
 
 var (
 	ErrAccountAlreadyExists  = errors.New("Account already exists")
+	ErrAccountNotFound       = errors.New("Account not found")
+	ErrInvalidAccountID      = errors.New("Invalid account ID")
 )
 
-type Account struct {
+type AccountBase struct {
 	Id              string
 	FirstName        *string
 	LastName         *string
 	Username         *string
 	AvatarUrl        *string
 	Bio              *string
-	WalletAddress *string
 	CreatedAt     *string
 	UpdatedAt     *string
+}
+
+type AccountWithSecureClaims struct {
+	AccountBase
+	WalletAddress *string
+}
+
+type Account struct {
+	AccountBase
 }
 
 type AccountsService struct {
@@ -46,6 +57,29 @@ func New(ctx context.Context) *AccountsService {
 func (as *AccountsService) GetAccountById(ctx context.Context, id string) (*Account, error) {
 	var Account Account
 	err := as.postgres.QueryRow(ctx,
+		"SELECT id, first_name, last_name, username, avatar_url, bio, created_at::text, updated_at::text FROM accounts WHERE id = $1",
+		id,
+	).Scan(&Account.Id, &Account.FirstName, &Account.LastName, &Account.Username, &Account.AvatarUrl, &Account.Bio, &Account.CreatedAt, &Account.UpdatedAt)
+
+	if err != nil {
+		log.Println("Error getting account by id:", err)
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, ErrAccountNotFound
+		}
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) && pgErr.Code == "22P02" {
+			return nil, ErrInvalidAccountID
+		}
+		return nil, err
+	}
+
+	return &Account, nil
+}
+
+// GetAccountByIdWithSecureClaims retrieves a Account by id with secure claims
+func (as *AccountsService) GetAccountByIdWithSecureClaims(ctx context.Context, id string) (*AccountWithSecureClaims, error) {
+	var Account AccountWithSecureClaims
+	err := as.postgres.QueryRow(ctx,
 		"SELECT id, first_name, last_name, username, avatar_url, bio, wallet_address, created_at::text, updated_at::text FROM accounts WHERE id = $1",
 		id,
 	).Scan(&Account.Id, &Account.FirstName, &Account.LastName, &Account.Username, &Account.AvatarUrl, &Account.Bio, &Account.WalletAddress, &Account.CreatedAt, &Account.UpdatedAt)
@@ -53,10 +87,15 @@ func (as *AccountsService) GetAccountById(ctx context.Context, id string) (*Acco
 	if err != nil {
 		log.Println("Error getting account by id:", err)
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, nil
+			return nil, ErrAccountNotFound
+		}
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) && pgErr.Code == "22P02" {
+			return nil, ErrInvalidAccountID
 		}
 		return nil, err
 	}
+
 	return &Account, nil
 }
 

@@ -9,6 +9,15 @@ const (
 
 // AccountProfileClaims defines model for AccountProfileClaims.
 type AccountProfileClaims struct {
+	AvatarUrl *string `json:"avatar_url,omitempty"`
+	Bio       *string `json:"bio,omitempty"`
+	FirstName *string `json:"first_name,omitempty"`
+	LastName  *string `json:"last_name,omitempty"`
+	Username  *string `json:"username,omitempty"`
+}
+
+// AccountProfileClaimsWithSecureClaims defines model for AccountProfileClaimsWithSecureClaims.
+type AccountProfileClaimsWithSecureClaims struct {
 	AvatarUrl     *string `json:"avatar_url,omitempty"`
 	Bio           *string `json:"bio,omitempty"`
 	FirstName     *string `json:"first_name,omitempty"`
@@ -24,11 +33,6 @@ type ErrorResponse struct {
 
 // GetAccountsProfileParams defines parameters for GetAccountsProfile.
 type GetAccountsProfileParams struct {
-	AccountId string `form:"account_id" json:"account_id"`
-}
-
-// PatchAccountsProfileParams defines parameters for PatchAccountsProfile.
-type PatchAccountsProfileParams struct {
 	AccountId string `form:"account_id" json:"account_id"`
 }
 

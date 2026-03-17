@@ -5,9 +5,34 @@ info:
   description: API for authentication service
 
 paths:
+  /accounts/profile/me:
+    get:
+      summary: Read my account profile. Returns account profile with secure claims (wallet address). Should be used to read my own profile
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountProfileClaimsWithSecureClaims'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /accounts/profile:
     get:
-      summary: Read account profile
+      summary: Read account profile. Returns account profile without secure claims (wallet address). Should be used to read other accounts profiles
       parameters:
         - name: account_id
           in: query
@@ -51,7 +76,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AccountProfileClaims'
+              $ref: '#/components/schemas/AccountProfileClaimsWithSecureClaims'
       responses:
         '200':
           description: Success
@@ -82,7 +107,7 @@ components:
       bearerFormat: JWT
       description: JWT access token from auth service
   schemas:
-    AccountProfileClaims:
+    AccountProfileClaimsWithSecureClaims:
       type: object
       properties:
         first_name:
@@ -96,6 +121,20 @@ components:
         avatar_url:
           type: string
         wallet_address:
+          type: string
+
+    AccountProfileClaims:
+      type: object
+      properties:
+        first_name:
+          type: string
+        last_name:
+          type: string
+        username:
+          type: string
+        bio:
+          type: string
+        avatar_url:
           type: string
 
     ErrorResponse:

@@ -7,19 +7,20 @@ import (
 
 	api "tipster/backend/accounts/internal/generated"
 	accountsservice "tipster/backend/accounts/internal/services/accounts"
+	middlewares "tipster/backend/accounts/internal/middlewares"
 )
 
-func GetAccountProfile(w http.ResponseWriter, r *http.Request) {
-	accountId := r.URL.Query().Get("account_id")
+func GetAccountProfileMe(w http.ResponseWriter, r *http.Request) {
+	accountId, _ := r.Context().Value(middlewares.AccountIDContextKey).(string)
 	if accountId == "" {
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(api.ErrorResponse{Message: "Account ID is required"})
+		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
+
 	svc := accountsservice.New(r.Context())
 	defer svc.Close(r.Context())
 
-	account, err := svc.GetAccountById(r.Context(), accountId)
+	account, err := svc.GetAccountByIdWithSecureClaims(r.Context(), accountId)
 	if err != nil {
 		if errors.Is(err, accountsservice.ErrInvalidAccountID) {
 			w.WriteHeader(http.StatusBadRequest)
