@@ -44,10 +44,11 @@ export function ResetPassword() {
     try {
       setError("");
 
-      await resetPasswordMutation.mutateAsync({
-        email,
-        password: data.password,
-      });
+      // TODO API
+      // await resetPasswordMutation.mutateAsync({
+      //   email,
+      //   password: data.password,
+      // });
 
       Alert.alert(t("auth.success"), t("auth.passwordResetSuccess"), [
         {

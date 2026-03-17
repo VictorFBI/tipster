@@ -6,6 +6,9 @@ export default function ProfileFilling() {
   const router = useRouter();
 
   const handleComplete = (data: {
+    username: string;
+    firstName: string;
+    lastName: string;
     displayName: string;
     bio: string;
     avatar: string | null;

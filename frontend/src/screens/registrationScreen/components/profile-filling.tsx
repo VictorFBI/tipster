@@ -9,7 +9,9 @@ import { useAuthStore } from "../../../modules/auth/store/authStore";
 
 interface ProfileFillingProps {
   onComplete: (data: {
-    displayName: string;
+    username: string;
+    firstName: string;
+    lastName: string;
     bio: string;
     avatar: string | null;
   }) => void;
@@ -23,13 +25,15 @@ export function ProfileFillingScreen({
   const { t } = useTranslation();
   const user = useAuthStore((state) => state.user);
 
-  const [displayName, setDisplayName] = useState("");
+  const [username, setUsername] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [bio, setBio] = useState("");
   const [avatar, setAvatar] = useState<string | null>(null);
 
   const maxBioLength = 160;
 
-  console.log(displayName, bio, avatar);
+  console.log(username, firstName, lastName, bio, avatar);
 
   const isPending = undefined;
   // const { mutate: updateProfile, isPending } = useUpdateAccountProfile({
@@ -51,15 +55,21 @@ export function ProfileFillingScreen({
   // });
 
   const handleSave = () => {
-    if (displayName.trim()) {
+    if (username.trim()) {
+      onComplete({
+        username: username.trim(),
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        bio: bio.trim(),
+        avatar,
+      });
       // Update profile via API
       // updateProfile({
-      //   username: displayName.trim(),
+      //   username: username.trim(),
+      //   first_name: firstName.trim(),
+      //   last_name: lastName.trim(),
       //   bio: bio.trim(),
       //   avatar_url: avatar || undefined,
-      //   // first_name: "test",
-      //   // last_name: "teset",
-      //   // wallet_address: "test",
       // });
     }
   };
@@ -99,7 +109,7 @@ export function ProfileFillingScreen({
     }
   };
 
-  const isFormValid = displayName.trim();
+  const isFormValid = username.trim();
 
   return (
     <ScrollView
@@ -146,12 +156,37 @@ export function ProfileFillingScreen({
 
         <YStack gap="$2">
           <Text fontSize={16} fontWeight="600" color="$text">
-            {t("profile.filling.displayName")}
+            {t("profile.filling.username")}
           </Text>
           <Input
-            placeholder={t("profile.filling.displayNamePlaceholder")}
-            value={displayName}
-            onChangeText={setDisplayName}
+            placeholder={t("profile.filling.usernamePlaceholder")}
+            value={username}
+            onChangeText={setUsername}
+            backgroundColor="#2C2C3E"
+            borderWidth={1}
+            borderColor="#3C3C4E"
+            color="#FFFFFF"
+            // @ts-ignore - custom color
+            placeholderTextColor="#9E9EA7"
+            fontSize={16}
+            paddingVertical="$3"
+            paddingHorizontal="$4"
+            borderRadius={12}
+            autoCapitalize="none"
+          />
+          <Text fontSize={13} color="#8E8E93" lineHeight={18}>
+            {t("profile.filling.usernameHint")}
+          </Text>
+        </YStack>
+
+        <YStack gap="$2">
+          <Text fontSize={16} fontWeight="600" color="$text">
+            {t("profile.filling.firstName")}
+          </Text>
+          <Input
+            placeholder={t("profile.filling.firstNamePlaceholder")}
+            value={firstName}
+            onChangeText={setFirstName}
             backgroundColor="#2C2C3E"
             borderWidth={1}
             borderColor="#3C3C4E"
@@ -163,12 +198,29 @@ export function ProfileFillingScreen({
             paddingHorizontal="$4"
             borderRadius={12}
           />
-          <Text fontSize={13} color="#8E8E93" lineHeight={18}>
-            {t("profile.filling.displayNameHint")}
-          </Text>
         </YStack>
 
-        {/* Bio Input */}
+        <YStack gap="$2">
+          <Text fontSize={16} fontWeight="600" color="$text">
+            {t("profile.filling.lastName")}
+          </Text>
+          <Input
+            placeholder={t("profile.filling.lastNamePlaceholder")}
+            value={lastName}
+            onChangeText={setLastName}
+            backgroundColor="#2C2C3E"
+            borderWidth={1}
+            borderColor="#3C3C4E"
+            color="#FFFFFF"
+            // @ts-ignore - custom color
+            placeholderTextColor="#9E9EA7"
+            fontSize={16}
+            paddingVertical="$3"
+            paddingHorizontal="$4"
+            borderRadius={12}
+          />
+        </YStack>
+
         <YStack gap="$2">
           <Text fontSize={16} fontWeight="600" color="$text">
             {t("profile.filling.bio")}
@@ -197,26 +249,6 @@ export function ProfileFillingScreen({
           />
           <Text fontSize={13} color="#8E8E93" textAlign="right">
             {t("profile.filling.bioCounter", { count: bio.length })}
-          </Text>
-        </YStack>
-
-        <YStack
-          backgroundColor="#2C2C3E"
-          borderRadius={12}
-          padding="$3.5"
-          borderWidth={1}
-          borderColor="#3C3C4E"
-        >
-          <Text
-            fontSize={14}
-            fontWeight="600"
-            color="$text"
-            marginBottom="$1.5"
-          >
-            💡 {t("profile.filling.tipTitle")}
-          </Text>
-          <Text fontSize={13} color="#9E9EA7" lineHeight={18}>
-            {t("profile.filling.tipText")}
           </Text>
         </YStack>
 

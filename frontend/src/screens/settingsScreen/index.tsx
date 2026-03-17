@@ -57,12 +57,12 @@ export default function Settings() {
 
           <SettingsBlock />
 
-          <ReferalBlock
+          {/* <ReferalBlock
             referralCode={referralCode}
             totalReferrals={totalReferrals}
             earnedFromReferrals={earnedFromReferrals}
             activeReferrals={activeReferrals}
-          />
+          /> */}
 
           <TouchableOpacity
             onPress={handleLogout}

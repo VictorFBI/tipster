@@ -36,7 +36,8 @@ export function ForgotPassword() {
     try {
       setError("");
 
-      await sendEmailMutation.mutateAsync({ email: data.email });
+      //TODO API
+      // await sendEmailMutation.mutateAsync({ email: data.email });
 
       router.push({
         pathname: "/forgot-password-verify",

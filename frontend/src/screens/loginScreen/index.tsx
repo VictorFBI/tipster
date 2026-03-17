@@ -39,10 +39,11 @@ export function Login() {
     try {
       setErrorMsg("");
 
-      await loginMutation.mutateAsync({
-        email: data.email,
-        password: data.password,
-      });
+      // TODO API
+      // await loginMutation.mutateAsync({
+      //   email: data.email,
+      //   password: data.password,
+      // });
 
       router.replace("/(tabs)");
     } catch (error) {

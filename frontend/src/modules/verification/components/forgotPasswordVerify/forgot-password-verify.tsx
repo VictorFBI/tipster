@@ -23,10 +23,11 @@ export function ForgotPasswordVerify() {
     try {
       setError("");
 
-      await confirmEmailMutation.mutateAsync({
-        email,
-        code,
-      });
+      // TODO API
+      // await confirmEmailMutation.mutateAsync({
+      //   email,
+      //   code,
+      // });
 
       router.push({
         pathname: "/reset-password",
@@ -42,7 +43,8 @@ export function ForgotPasswordVerify() {
   const handleResendCode = async () => {
     try {
       setError("");
-      await sendEmailMutation.mutateAsync({ email });
+      // TODO API
+      // await sendEmailMutation.mutateAsync({ email });
       Alert.alert(t("auth.success"), t("auth.codeSent"));
     } catch (err) {
       const errorMessage = getErrorMessage(err);

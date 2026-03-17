@@ -21,7 +21,10 @@ export function LanguageSelector() {
   const { i18n, t } = useTranslation();
   const [open, setOpen] = useState(false);
 
-  const currentLanguage = languages.find((lang) => lang.code === i18n.language);
+  const normalizedLanguage = i18n.language.split("-")[0];
+
+  const currentLanguage =
+    languages.find((lang) => lang.code === normalizedLanguage) || languages[0];
 
   const handleLanguageChange = async (langCode: string) => {
     await changeLanguage(langCode);
@@ -39,7 +42,7 @@ export function LanguageSelector() {
                 {t("settings.language")}
               </Text>
               <Text color={tokens.color.darkSecondary} fontSize={13}>
-                {currentLanguage?.nativeName || "Русский"}
+                {currentLanguage.nativeName}
               </Text>
             </YStack>
           </XStack>
@@ -92,7 +95,7 @@ export function LanguageSelector() {
                     <XStack
                       padding="$4"
                       backgroundColor={
-                        i18n.language === lang.code
+                        normalizedLanguage === lang.code
                           ? "$accent"
                           : "$surfaceSecondary"
                       }
@@ -104,12 +107,12 @@ export function LanguageSelector() {
                         fontSize={16}
                         fontWeight="600"
                         color={
-                          i18n.language === lang.code ? "white" : "#E5E5E7"
+                          normalizedLanguage === lang.code ? "white" : "#E5E5E7"
                         }
                       >
                         {lang.nativeName}
                       </Text>
-                      {i18n.language === lang.code && (
+                      {normalizedLanguage === lang.code && (
                         <Ionicons
                           name="checkmark-circle"
                           size={24}
