@@ -1,0 +1,158 @@
+openapi: 3.0.0
+info:
+  title: Media API
+  version: 1.0.0
+  description: API for media service
+
+paths:
+  /media/presigned-url:
+    post:
+      summary: Get presigned URLs for media upload
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PresignedUploadRequest'
+      responses:
+        '200':
+          description: Presigned upload URLs generated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PresignedUploadResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /media/commit:
+    post:
+      summary: Commit media-file that is stored in the temp bucket to the permanent bucket
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommitMediaRequest'
+      responses:
+        '200':
+          description: Media committed successfully
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Media not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT access token from auth service
+  schemas:
+    PresignedUploadFile:
+      type: object
+      properties:
+        content_type:
+          type: string
+          example: image/jpeg
+        size_bytes:
+          type: integer
+          format: int64
+          example: 5242880
+      required:
+        - content_type
+        - size_bytes
+
+    PresignedUploadRequest:
+      type: object
+      properties:
+        files:
+          type: array
+          items:
+            $ref: '#/components/schemas/PresignedUploadFile'
+        purpose:
+          type: string
+          example: post_images
+      required:
+        - files
+        - purpose
+
+    PresignedUploadItem:
+      type: object
+      properties:
+        object_key:
+          type: string
+          example: uuid1.jpg
+        upload_url:
+          type: string
+          format: uri
+          example: https://example.com/upload
+      required:
+        - object_key
+        - upload_url
+
+    PresignedUploadResponse:
+      type: object
+      properties:
+        uploads:
+          type: array
+          items:
+            $ref: '#/components/schemas/PresignedUploadItem'
+      required:
+        - uploads
+
+    CommitMediaRequest:
+      type: object
+      properties:
+        object_keys:
+          type: array
+          items:
+            type: string
+          example: ["uuid1.jpg", "uuid2.jpg"]
+      required:
+        - object_keys
+
+    CommitMediaResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+      required:
+        - success
+
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+      required:
+        - message

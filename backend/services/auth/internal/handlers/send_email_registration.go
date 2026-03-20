@@ -58,7 +58,7 @@ func SendEmailRegistration(w http.ResponseWriter, r *http.Request) {
 	err = registrationConfirmationService.SendEmailConfirmationCode(r.Context(), sendEmailRegistrationReq.Email, registrationConfirmationClaims.Code)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(api.ErrorResponse{Message: "Failed to send email verification code"})
+		json.NewEncoder(w).Encode(api.ErrorResponse{Message: "Failed to send email verification code: " + err.Error()})
 		return
 	}
 }
