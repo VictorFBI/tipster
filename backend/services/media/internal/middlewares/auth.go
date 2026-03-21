@@ -2,12 +2,14 @@ package middleware
 
 import (
 	"context"
-	"log"
+	"log/slog"
 	"net/http"
 	"os"
 	"strings"
 
 	"github.com/golang-jwt/jwt/v5"
+
+	"tipster/backend/media/internal/logging"
 )
 
 type contextKey string
@@ -21,6 +23,7 @@ type accessTokenClaims struct {
 // RequireAccessToken validates Bearer JWT and sets account id (sub claim) in context
 func RequireAccessToken(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log := logging.LoggerFromContext(r.Context())
 		auth := r.Header.Get("Authorization")
 		if auth == "" || !strings.HasPrefix(auth, "Bearer ") {
 			w.WriteHeader(http.StatusUnauthorized)
@@ -29,7 +32,7 @@ func RequireAccessToken(next http.Handler) http.Handler {
 		tokenString := strings.TrimPrefix(auth, "Bearer ")
 		secret := os.Getenv("JWT_SECRET")
 		if secret == "" {
-			log.Println("Unauthorized: JWT_SECRET environment variable is not set")
+			log.Error("auth_misconfigured", slog.String("reason", "JWT_SECRET is not set"))
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
@@ -37,13 +40,13 @@ func RequireAccessToken(next http.Handler) http.Handler {
 			return []byte(secret), nil
 		})
 		if err != nil {
-			log.Println("Unauthorized: invalid token")
+			log.Warn("auth_rejected", slog.String("reason", "invalid_token"), slog.String("error", err.Error()))
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
 		claims, ok := token.Claims.(*accessTokenClaims)
 		if !ok || !token.Valid || claims.Subject == "" {
-			log.Println("Unauthorized: invalid token claims")
+			log.Warn("auth_rejected", slog.String("reason", "invalid_token_claims"))
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}

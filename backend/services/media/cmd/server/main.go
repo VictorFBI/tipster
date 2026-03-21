@@ -2,14 +2,16 @@ package main
 
 import (
 	"context"
-	"log"
+	"log/slog"
 	"net/http"
+	"os"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 
 	"tipster/backend/media/internal/db/s3"
 	"tipster/backend/media/internal/handlers"
+	applogging "tipster/backend/media/internal/logging"
 
 	"github.com/joho/godotenv"
 	httpSwagger "github.com/swaggo/http-swagger"
@@ -17,32 +19,35 @@ import (
 )
 
 func init() {
-	err := godotenv.Load("../../.env")
-	if err != nil {
-		panic(err)
-	}
+	_ = godotenv.Load(".env")
+	_ = godotenv.Load("../../.env")
 }
 
 func checkS3Connection(ctx context.Context) {
-	log.Println("Checking S3 connection...")
+	slog.Info("checking_s3_connection")
 
 	_, err := s3.Connect(ctx, "S3_TEMP_BUCKET")
 	if err != nil {
-		log.Fatalf("Failed to connect to S3: %v", err)
+		slog.Error("s3_connection_failed", slog.String("error", err.Error()))
+		os.Exit(1)
 	}
 
-	log.Println("S3 connection is OK")
+	slog.Info("s3_connection_ok")
 }
 
 func main() {
+	h := slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelInfo})
+	slog.SetDefault(slog.New(h))
+
 	ctx := context.Background()
 
 	checkS3Connection(ctx)
 
 	// Setup router
 	r := chi.NewRouter()
-	log.Println("Server is starting...")
-	r.Use(middleware.Logger)
+	slog.Info("server_starting")
+	r.Use(middleware.RequestID)
+	r.Use(applogging.HTTPMiddleware)
 
 	// Swagger routes
 	r.Get("/swagger/doc.json", handlers.OpenAPIDoc)
@@ -55,9 +60,10 @@ func main() {
 	r.With(middlewares.RequireAccessToken).Post("/media/commit", handlers.PostCommit)
 
 
-	log.Println("Server is running on port 8082")
+	slog.Info("server_listening", slog.String("addr", ":8082"))
 	err := http.ListenAndServe(":8082", r)
 	if err != nil {
-		log.Fatalf("Failed to start server: %v", err)
+		slog.Error("server_failed", slog.String("error", err.Error()))
+		os.Exit(1)
 	}
 }

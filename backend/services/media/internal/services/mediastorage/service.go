@@ -87,7 +87,7 @@ func (s *Service) CommitMedia(ctx context.Context, objectKeys []string) error {
 			Object: key,
 		}
 
-		_, err := s.s3Client.CopyObject(ctx, dst, src)
+		_, err := s.s3Client.S3.CopyObject(ctx, dst, src)
 		if err != nil {
 			var resp minio.ErrorResponse
 			if errors.As(err, &resp) && resp.Code == "NoSuchKey" {
@@ -96,7 +96,7 @@ func (s *Service) CommitMedia(ctx context.Context, objectKeys []string) error {
 			return err
 		}
 
-		err = s.s3Client.RemoveObject(ctx, s.s3Client.Bucket, key, minio.RemoveObjectOptions{})
+		err = s.s3Client.S3.RemoveObject(ctx, s.s3Client.Bucket, key, minio.RemoveObjectOptions{})
 		if err != nil {
 			return err
 		}
