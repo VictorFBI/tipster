@@ -20,12 +20,13 @@ func (s *statusRecorder) WriteHeader(code int) {
 
 // HTTPMiddleware expects chi RequestID middleware to run before this. It attaches a JSON-friendly
 // request-scoped logger and emits one structured access log line per request.
-func HTTPMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+func HTTPMiddleware(service string) func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		rid := middleware.GetReqID(r.Context())
 		l := slog.Default().With(
 			slog.String("request_id", rid),
-			slog.String("service", "media"),
+			slog.String("service", service),
 		)
 		ctx := ContextWithLogger(r.Context(), l)
 		sr := &statusRecorder{ResponseWriter: w, status: http.StatusOK}
@@ -37,5 +38,6 @@ func HTTPMiddleware(next http.Handler) http.Handler {
 			slog.Int("status", sr.status),
 			slog.Int64("duration_ms", time.Since(start).Milliseconds()),
 		)
-	})
+		})
+	}
 }

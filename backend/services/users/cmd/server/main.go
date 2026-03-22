@@ -2,8 +2,9 @@ package main
 
 import (
 	"context"
-	"log"
+	"log/slog"
 	"net/http"
+	"os"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -12,6 +13,7 @@ import (
 	"tipster/backend/users/internal/db/kafka"
 	"tipster/backend/users/internal/db/postgresql"
 	"tipster/backend/users/internal/handlers"
+	applogging "tipster/backend/users/internal/logging"
 	middlewares "tipster/backend/users/internal/middlewares"
 
 	"github.com/joho/godotenv"
@@ -19,43 +21,44 @@ import (
 )
 
 func init() {
-	err := godotenv.Load("../../.env")
-	if err != nil {
-		panic(err)
-	}
+	_ = godotenv.Load(".env")
+	_ = godotenv.Load("../../.env")
 }
 
 func checkPostgreSQLConnection(ctx context.Context) {
-	log.Println("Checking PostgreSQL connection...")
-
+	slog.Info("checking_postgresql")
 	pgConn, err := postgresql.Connect(ctx)
 	if err != nil {
-		log.Fatalf("Failed to connect to PostgreSQL: %v", err)
+		slog.Error("postgresql_failed", slog.String("error", err.Error()))
+		os.Exit(1)
 	}
 	err = pgConn.Close(ctx)
 	if err != nil {
-		log.Fatalf("Failed to close PostgreSQL connection: %v", err)
+		slog.Error("postgresql_close_failed", slog.String("error", err.Error()))
+		os.Exit(1)
 	}
-	log.Println("PostgreSQL connection is OK")
+	slog.Info("postgresql_ok")
 }
 
 func checkKafkaConnection(ctx context.Context) {
-	log.Println("Checking Kafka connection...")
-
+	slog.Info("checking_kafka")
 	kafkaConn, err := kafka.Connect(ctx)
 	if err != nil {
-		log.Fatalf("Failed to connect to Kafka: %v", err)
+		slog.Error("kafka_failed", slog.String("error", err.Error()))
+		os.Exit(1)
 	}
-
 	err = kafkaConn.Close()
 	if err != nil {
-		log.Fatalf("Failed to close Kafka connection: %v", err)
+		slog.Error("kafka_close_failed", slog.String("error", err.Error()))
+		os.Exit(1)
 	}
-
-	log.Println("Kafka connection is OK")
+	slog.Info("kafka_ok")
 }
 
 func main() {
+	h := slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelInfo})
+	slog.SetDefault(slog.New(h))
+
 	ctx := context.Background()
 
 	checkPostgreSQLConnection(ctx)
@@ -63,29 +66,29 @@ func main() {
 
 	kafkaClient, err := kafka.Connect(ctx)
 	if err != nil {
-		log.Fatalf("Failed to connect to Kafka for consumer: %v", err)
+		slog.Error("kafka_consumer_connect_failed", slog.String("error", err.Error()))
+		os.Exit(1)
 	}
 	go consumers.RunAuthUserCreated(ctx, kafkaClient)
 
-	// Setup router
 	r := chi.NewRouter()
-	log.Println("Server is starting...")
-	r.Use(middleware.Logger)
+	slog.Info("server_starting")
+	r.Use(middleware.RequestID)
+	r.Use(applogging.HTTPMiddleware("users"))
 
-	// Swagger routes
 	r.Get("/swagger/doc.json", handlers.OpenAPIDoc)
 	r.Get("/swagger/*", httpSwagger.Handler(
 		httpSwagger.URL("/swagger/doc.json"),
 	))
 
-	// Users routes (protected by access token)
 	r.With(middlewares.RequireAccessToken).Get("/users/profile", handlers.GetAccountProfile)
 	r.With(middlewares.RequireAccessToken).Patch("/users/profile", handlers.PatchAccountProfile)
 	r.With(middlewares.RequireAccessToken).Get("/users/profile/me", handlers.GetAccountProfileMe)
 
-	log.Println("Server is running on port 8081")
+	slog.Info("server_listening", slog.String("addr", ":8081"))
 	err = http.ListenAndServe(":8081", r)
 	if err != nil {
-		log.Fatalf("Failed to start server: %v", err)
+		slog.Error("server_failed", slog.String("error", err.Error()))
+		os.Exit(1)
 	}
 }

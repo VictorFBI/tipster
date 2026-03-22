@@ -22,10 +22,8 @@ var (
 )
 
 func init() {
-	err := godotenv.Load("../../.env")
-	if err != nil {
-		panic(err)
-	}
+	_ = godotenv.Load(".env")
+	_ = godotenv.Load("../../.env")
 }
 
 func generate6DigitCode() (string, error) {

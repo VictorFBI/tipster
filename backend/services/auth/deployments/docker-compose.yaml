@@ -34,6 +34,36 @@ services:
       timeout: 5s
       retries: 5
 
+  auth:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    container_name: tipster_auth
+    ports:
+      - "8080:8080"
+    env_file:
+      - ../.env
+    environment:
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_NAME: auth
+      DB_PASSWORD: postgres
+      REDIS_ADDR: redis:6379
+      KAFKA_BROKERS: kafka:29092
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - default
+      - tipster_infra
+
 volumes:
   auth_postgres_data:
   auth_redis_data:
+
+networks:
+  tipster_infra:
+    external: true
+    name: tipster-infra_default

@@ -1,10 +1,12 @@
-# Auth Service
+# Users Service
+
+Structured logs: JSON to stdout via `log/slog` (`service=users`, `request_id`, `handler`, `http_request` per route).
 
 ## Start server
 
-1. Start PostgreSQL and Redis using Docker Compose:
+1. Start PostgreSQL:
 ```bash
-docker-compose -f deployments/docker-compose.yaml up -d
+docker compose -f deployments/docker-compose.yaml up -d postgres
 ```
 
 2. Run codegen:
@@ -17,18 +19,26 @@ go run github.com/deepmap/oapi-codegen/cmd/oapi-codegen@latest -package api -gen
 go run cmd/server/main.go
 ```
 
-## Connect to docker databases
-PostgreSQL
+## Run users in Docker
+
+Kafka must be on network `tipster-infra_default`:
+
+```bash
+cd ../../infra && docker compose up -d zookeeper kafka
+cd ../services/users
+docker compose -f deployments/docker-compose.yaml up -d --build
 ```
-docker exec -it auth_postgres psql -U postgres -d auth
-```  
-Redis
+
+`DB_*` and `KAFKA_BROKERS` are set for compose; add `JWT_SECRET` etc. in `services/users/.env`.
+
+## Connect to docker database
+
 ```
-docker exec -it auth_redis redis-cli
+docker exec -it users_postgres psql -U postgres -d users
 ```
 
 ## Swagger
 
 ```
-http://localhost:8080/swagger/index.html
+http://localhost:8081/swagger/index.html
 ```

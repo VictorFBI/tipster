@@ -20,5 +20,32 @@ services:
       timeout: 5s
       retries: 5
 
+  users:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    container_name: tipster_users
+    ports:
+      - "8081:8081"
+    env_file:
+      - ../.env
+    environment:
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_NAME: users
+      DB_PASSWORD: postgres
+      KAFKA_BROKERS: kafka:29092
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - default
+      - tipster_infra
+
 volumes:
   users_postgres_data:
+
+networks:
+  tipster_infra:
+    external: true
+    name: tipster-infra_default

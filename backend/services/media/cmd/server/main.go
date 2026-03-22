@@ -47,7 +47,7 @@ func main() {
 	r := chi.NewRouter()
 	slog.Info("server_starting")
 	r.Use(middleware.RequestID)
-	r.Use(applogging.HTTPMiddleware)
+	r.Use(applogging.HTTPMiddleware("media"))
 
 	// Swagger routes
 	r.Get("/swagger/doc.json", handlers.OpenAPIDoc)

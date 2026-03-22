@@ -2,22 +2,27 @@ package handlers
 
 import (
 	"encoding/json"
+	"log/slog"
 	"net/http"
 
 	api "tipster/backend/auth/internal/generated"
+	"tipster/backend/auth/internal/logging"
 	jwttokensservice "tipster/backend/auth/internal/services/jwttokens"
 	usersservice "tipster/backend/auth/internal/services/users"
 )
 
 func Login(w http.ResponseWriter, r *http.Request) {
+	log := logging.LoggerFromContext(r.Context()).With(slog.String("handler", "login"))
 	var loginReq api.LoginRequest
 	if err := json.NewDecoder(r.Body).Decode(&loginReq); err != nil {
+		log.Warn("bad_request", slog.String("reason", "invalid_json"), slog.String("error", err.Error()))
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(api.ErrorResponse{Message: "Invalid request body"})
 		return
 	}
 
 	if loginReq.Email == "" || loginReq.Password == "" || r.Header.Get("X-Device-Id") == "" {
+		log.Warn("bad_request", slog.String("reason", "missing_fields"))
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(api.ErrorResponse{Message: "Email, password and device ID are required"})
 		return
@@ -30,20 +35,22 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	user, err := usersService.ValidateCredentials(r.Context(), loginReq.Email, loginReq.Password)
 	if err != nil {
+		log.Warn("login_failed", slog.String("reason", "validate_credentials"), slog.String("error", err.Error()))
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode(api.ErrorResponse{Message: err.Error()})
 		return
 	}
 
 	if user == nil {
+		log.Warn("login_failed", slog.String("reason", "invalid_credentials"))
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode(api.ErrorResponse{Message: "Invalid credentials"})
 		return
 	}
 
-	// Generate token
 	tokens, err := jwttokensService.GenerateTokens(user.Id)
 	if err != nil {
+		log.Error("token_generate_failed", slog.String("error", err.Error()))
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(api.ErrorResponse{Message: "Failed to generate tokens"})
 		return
@@ -51,6 +58,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	err = jwttokensService.SaveRefreshToken(r.Context(), tokens.RefreshToken, user.Id, r.Header.Get("X-Device-Id"))
 	if err != nil {
+		log.Error("refresh_token_save_failed", slog.String("error", err.Error()))
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(api.ErrorResponse{Message: "Failed to save refresh token"})
 		return
@@ -61,6 +69,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		RefreshToken: tokens.RefreshToken,
 	}
 
+	log.Info("login_ok")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(response)
 }

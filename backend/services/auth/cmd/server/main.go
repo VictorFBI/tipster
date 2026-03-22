@@ -2,8 +2,9 @@ package main
 
 import (
 	"context"
-	"log"
+	"log/slog"
 	"net/http"
+	"os"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -12,83 +13,82 @@ import (
 	"tipster/backend/auth/internal/db/redis"
 	"tipster/backend/auth/internal/db/kafka"
 	"tipster/backend/auth/internal/handlers"
+	applogging "tipster/backend/auth/internal/logging"
 
 	httpSwagger "github.com/swaggo/http-swagger"
 	"github.com/joho/godotenv"
 )
 
 func init() {
-	err := godotenv.Load("../../.env")
-	if err != nil {
-		panic(err)
-	}
+	_ = godotenv.Load(".env")
+	_ = godotenv.Load("../../.env")
 }
 
 func checkPostgreSQLConnection(ctx context.Context) {
-	log.Println("Checking PostgreSQL connection...")
-	
+	slog.Info("checking_postgresql")
 	pgConn, err := postgresql.Connect(ctx)
 	if err != nil {
-		log.Fatalf("Failed to connect to PostgreSQL: %v", err)
+		slog.Error("postgresql_failed", slog.String("error", err.Error()))
+		os.Exit(1)
 	}
 	err = pgConn.Close(ctx)
 	if err != nil {
-		log.Fatalf("Failed to close PostgreSQL connection: %v", err)
+		slog.Error("postgresql_close_failed", slog.String("error", err.Error()))
+		os.Exit(1)
 	}
-	log.Println("PostgreSQL connection is OK")
+	slog.Info("postgresql_ok")
 }
 
 func checkRedisConnection(ctx context.Context) {
-	log.Println("Checking Redis connection...")
-
+	slog.Info("checking_redis")
 	redisConn, err := redis.Connect(ctx)
 	if err != nil {
-		log.Fatalf("Failed to connect to Redis: %v", err)
+		slog.Error("redis_failed", slog.String("error", err.Error()))
+		os.Exit(1)
 	}
-
 	err = redisConn.Close()
 	if err != nil {
-		log.Fatalf("Failed to close Redis connection: %v", err)
+		slog.Error("redis_close_failed", slog.String("error", err.Error()))
+		os.Exit(1)
 	}
-
-	log.Println("Redis connection is OK")
+	slog.Info("redis_ok")
 }
 
 func checkKafkaConnection(ctx context.Context) {
-	log.Println("Checking Kafka connection...")
-
+	slog.Info("checking_kafka")
 	kafkaConn, err := kafka.Connect(ctx)
 	if err != nil {
-		log.Fatalf("Failed to connect to Kafka: %v", err)
+		slog.Error("kafka_failed", slog.String("error", err.Error()))
+		os.Exit(1)
 	}
-
 	err = kafkaConn.Close()
 	if err != nil {
-		log.Fatalf("Failed to close Kafka connection: %v", err)
+		slog.Error("kafka_close_failed", slog.String("error", err.Error()))
+		os.Exit(1)
 	}
-
-	log.Println("Kafka connection is OK")
+	slog.Info("kafka_ok")
 }
 
 func main() {
+	h := slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelInfo})
+	slog.SetDefault(slog.New(h))
+
 	ctx := context.Background()
 
 	checkPostgreSQLConnection(ctx)
 	checkRedisConnection(ctx)
 	checkKafkaConnection(ctx)
 
-	// Setup router
 	r := chi.NewRouter()
-	log.Println("Server is starting...")
-	r.Use(middleware.Logger)
+	slog.Info("server_starting")
+	r.Use(middleware.RequestID)
+	r.Use(applogging.HTTPMiddleware("auth"))
 
-	// Swagger routes
 	r.Get("/swagger/doc.json", handlers.OpenAPIDoc)
 	r.Get("/swagger/*", httpSwagger.Handler(
 		httpSwagger.URL("/swagger/doc.json"),
 	))
 
-	// Auth routes
 	r.Get("/auth/me", handlers.Me)
 	r.Post("/auth/login", handlers.Login)
 	r.Post("/auth/logout", handlers.Logout)
@@ -100,9 +100,10 @@ func main() {
 	r.Post("/auth/confirm-email/reset-password", handlers.ConfirmEmailResetPassword)
 	r.Post("/auth/reset-password", handlers.ResetPassword)
 
-	log.Println("Server is running on port 8080")
+	slog.Info("server_listening", slog.String("addr", ":8080"))
 	err := http.ListenAndServe(":8080", r)
 	if err != nil {
-		log.Fatalf("Failed to start server: %v", err)
+		slog.Error("server_failed", slog.String("error", err.Error()))
+		os.Exit(1)
 	}
 }
