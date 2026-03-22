@@ -2,6 +2,8 @@
 
 Structured logs: JSON to stdout via `log/slog` (`service=users`, `request_id`, `handler`, `http_request` per route).
 
+On startup the process runs DB migrations from `migrations/postgresql` (golang-migrate). Override directory with env `MIGRATIONS_PATH` if needed.
+
 ## Start server
 
 1. Start PostgreSQL:

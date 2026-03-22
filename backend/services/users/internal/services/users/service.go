@@ -140,6 +140,22 @@ func (as *UsersService) PartialEditAccount(ctx context.Context, accountId string
 	return err
 }
 
+// DeleteAccountById removes the user row. Id must match JWT subject (caller responsibility).
+func (as *UsersService) DeleteAccountById(ctx context.Context, id string) error {
+	ct, err := as.postgres.Exec(ctx, "DELETE FROM users WHERE id = $1", id)
+	if err != nil {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) && pgErr.Code == "22P02" {
+			return ErrInvalidAccountID
+		}
+		return err
+	}
+	if ct.RowsAffected() == 0 {
+		return ErrAccountNotFound
+	}
+	return nil
+}
+
 // Close closes the PostgreSQL postgresection
 func (as *UsersService) Close(ctx context.Context) error {
 	return as.postgres.Close(ctx)

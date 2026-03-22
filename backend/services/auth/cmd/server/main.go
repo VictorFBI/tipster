@@ -75,6 +75,12 @@ func main() {
 
 	ctx := context.Background()
 
+	if err := postgresql.RunMigrations(); err != nil {
+		slog.Error("migrations_failed", slog.String("error", err.Error()))
+		os.Exit(1)
+	}
+	slog.Info("migrations_ok")
+
 	checkPostgreSQLConnection(ctx)
 	checkRedisConnection(ctx)
 	checkKafkaConnection(ctx)

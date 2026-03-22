@@ -61,6 +61,12 @@ func main() {
 
 	ctx := context.Background()
 
+	if err := postgresql.RunMigrations(); err != nil {
+		slog.Error("migrations_failed", slog.String("error", err.Error()))
+		os.Exit(1)
+	}
+	slog.Info("migrations_ok")
+
 	checkPostgreSQLConnection(ctx)
 	checkKafkaConnection(ctx)
 
@@ -84,6 +90,7 @@ func main() {
 	r.With(middlewares.RequireAccessToken).Get("/users/profile", handlers.GetAccountProfile)
 	r.With(middlewares.RequireAccessToken).Patch("/users/profile", handlers.PatchAccountProfile)
 	r.With(middlewares.RequireAccessToken).Get("/users/profile/me", handlers.GetAccountProfileMe)
+	r.With(middlewares.RequireAccessToken).Delete("/users/profile/me", handlers.DeleteAccountProfileMe)
 
 	slog.Info("server_listening", slog.String("addr", ":8081"))
 	err = http.ListenAndServe(":8081", r)

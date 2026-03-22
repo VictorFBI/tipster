@@ -37,4 +37,4 @@ type GetUsersProfileParams struct {
 }
 
 // PatchUsersProfileJSONRequestBody defines body for PatchUsersProfile for application/json ContentType.
-type PatchUsersProfileJSONRequestBody = AccountProfileClaims
+type PatchUsersProfileJSONRequestBody = AccountProfileClaimsWithSecureClaims
