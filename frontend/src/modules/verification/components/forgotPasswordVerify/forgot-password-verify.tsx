@@ -36,7 +36,6 @@ export function ForgotPasswordVerify() {
     } catch (err) {
       const errorMessage = getErrorMessage(err);
       setError(errorMessage);
-      Alert.alert(t("auth.error"), errorMessage);
     }
   };
 
@@ -45,11 +44,9 @@ export function ForgotPasswordVerify() {
       setError("");
       // TODO API
       // await sendEmailMutation.mutateAsync({ email });
-      Alert.alert(t("auth.success"), t("auth.codeSent"));
     } catch (err) {
       const errorMessage = getErrorMessage(err);
       setError(errorMessage);
-      Alert.alert(t("auth.error"), errorMessage);
     }
   };
 

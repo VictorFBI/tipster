@@ -1,7 +1,15 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
-import { TouchableOpacity, ScrollView, Alert } from "react-native";
-import { Avatar, YStack, Text, Input, TextArea, Button } from "tamagui";
+import { TouchableOpacity, Alert } from "react-native";
+import {
+  Avatar,
+  YStack,
+  Text,
+  Input,
+  TextArea,
+  Button,
+  ScrollView,
+} from "tamagui";
 import { useTranslation } from "react-i18next";
 import * as ImagePicker from "expo-image-picker";
 import { useUpdateAccountProfile } from "../../../modules/user";
@@ -114,8 +122,11 @@ export function ProfileFillingScreen({
   return (
     <ScrollView
       style={{ flex: 1 }}
-      contentContainerStyle={{ paddingBottom: 40 }}
+      contentContainerStyle={{
+        paddingBottom: 40,
+      }}
       showsVerticalScrollIndicator={false}
+      backgroundColor="$background2"
     >
       <YStack paddingHorizontal="$4" paddingTop="$12" gap="$4">
         {/* Welcome Header */}

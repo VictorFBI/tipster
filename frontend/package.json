@@ -14,7 +14,8 @@
     "storybook": "cross-env EXPO_PUBLIC_STORYBOOK_ENABLED='true' expo start --localhost",
     "storybook:ios": "cross-env EXPO_PUBLIC_STORYBOOK_ENABLED='true' expo start --ios",
     "storybook:android": "cross-env EXPO_PUBLIC_STORYBOOK_ENABLED='true' expo start --android",
-    "chromatic": "npx chromatic --project-token=chpt_30420f5b19bcbf0"
+    "chromatic": "npx chromatic --project-token=chpt_30420f5b19bcbf0",
+    "start:prod": "cross-env NODE_ENV=production expo start --no-dev --minify --localhost"
   },
   "dependencies": {
     "@gorhom/bottom-sheet": "^5.2.6",
@@ -44,6 +45,7 @@
     "react-hook-form": "^7.71.2",
     "react-i18next": "^15.2.3",
     "react-native": "0.81.5",
+    "react-native-compat": "^1.0.0",
     "react-native-gesture-handler": "~2.28.0",
     "react-native-reanimated": "~4.1.1",
     "react-native-safe-area-context": "~5.6.0",

@@ -49,13 +49,6 @@ export function ResetPassword() {
       //   email,
       //   password: data.password,
       // });
-
-      Alert.alert(t("auth.success"), t("auth.passwordResetSuccess"), [
-        {
-          text: "OK",
-          onPress: () => router.replace("/login"),
-        },
-      ]);
     } catch (err) {
       setError(getErrorMessage(err));
     }

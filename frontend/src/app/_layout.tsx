@@ -14,6 +14,12 @@ import { useThemeStore } from "../core/store/themeStore";
 import { QueryProvider } from "../core/providers/QueryProvider";
 import { ENABLE_STORYBOOK } from "../core/config/storybook";
 import { useStorybookDevMenu } from "../core/config/devMenu";
+import { LogBox } from "react-native";
+
+LogBox.ignoreLogs([
+  "react-native-compat",
+  "Application module is not available",
+]);
 
 function RootLayoutContent() {
   const theme = useThemeStore((state) => state.theme);
