@@ -1,5 +1,8 @@
 node_modules/
 .expo/
+.expo-shared/
+.rnstorybook/
+.storybook/
 dist/
 storybook-static/
 npm-debug.*
