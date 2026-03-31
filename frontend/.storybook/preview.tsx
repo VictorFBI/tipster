@@ -1,4 +1,5 @@
 import type { Preview } from "@storybook/react-native";
+import "../src/core/utils/i18n";
 
 const preview: Preview = {
   parameters: {

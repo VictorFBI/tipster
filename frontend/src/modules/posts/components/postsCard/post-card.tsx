@@ -113,6 +113,9 @@ export function PostCard({ post }: { post: Post }) {
           flexDirection="row"
           alignItems="center"
           gap="$2"
+          backgroundColor="transparent"
+          borderWidth={0}
+          padding={0}
         >
           <Ionicons
             name={liked ? "heart" : "heart-outline"}
@@ -130,6 +133,9 @@ export function PostCard({ post }: { post: Post }) {
           flexDirection="row"
           alignItems="center"
           gap="$2"
+          backgroundColor="transparent"
+          borderWidth={0}
+          padding={0}
         >
           <Ionicons name="chatbubble-outline" size={20} color="#8E8E93" />
           <Text fontSize={14} color="#8E8E93">

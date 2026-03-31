@@ -98,6 +98,9 @@ export function CommentsSection({
                       onPress={() => startReply(comment.id)}
                       pressStyle={{ opacity: 0.7 }}
                       marginTop="$1"
+                      backgroundColor="transparent"
+                      borderWidth={0}
+                      padding={0}
                     >
                       <Text fontSize={12} color="#8B5CF6" fontWeight="600">
                         {t("comments.reply")}

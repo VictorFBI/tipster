@@ -91,6 +91,9 @@ export function CreatePost() {
             unstyled
             onPress={() => router.back()}
             pressStyle={{ opacity: 0.7 }}
+            backgroundColor="transparent"
+            borderWidth={0}
+            padding={0}
           >
             <Ionicons name="close" size={28} color="#8E8E93" />
           </Button>
