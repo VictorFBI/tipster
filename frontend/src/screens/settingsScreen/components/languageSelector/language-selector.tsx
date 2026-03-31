@@ -4,7 +4,8 @@ import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
 import { Modal, TouchableOpacity, StyleSheet, Pressable } from "react-native";
 import { changeLanguage } from "@/src/core/utils/i18n";
-import { tokens } from "@/src/core/theme/tokens";
+import { useThemeStore } from "@/src/core/store/themeStore";
+import { themes } from "@/src/core/theme/themes";
 
 interface Language {
   code: string;
@@ -19,6 +20,8 @@ const languages: Language[] = [
 
 export function LanguageSelector() {
   const { i18n, t } = useTranslation();
+  const { theme } = useThemeStore();
+  const currentTheme = themes[theme];
   const [open, setOpen] = useState(false);
 
   const normalizedLanguage = i18n.language.split("-")[0];
@@ -36,12 +39,16 @@ export function LanguageSelector() {
       <Pressable onPress={() => setOpen(true)} style={{ flex: 1 }}>
         <XStack justifyContent="space-between" alignItems="center">
           <XStack gap="$3" alignItems="center" flex={1}>
-            <Ionicons name="globe-outline" size={24} color="#8E8E93" />
+            <Ionicons
+              name="globe-outline"
+              size={24}
+              color={currentTheme.muted}
+            />
             <YStack flex={1}>
               <Text color="$text" fontSize={16}>
                 {t("settings.language")}
               </Text>
-              <Text color={tokens.color.darkSecondary} fontSize={13}>
+              <Text color={currentTheme.muted} fontSize={13}>
                 {currentLanguage.nativeName}
               </Text>
             </YStack>
@@ -72,7 +79,7 @@ export function LanguageSelector() {
               <YStack
                 width={40}
                 height={4}
-                backgroundColor="#3C3C43"
+                backgroundColor={currentTheme.separator}
                 borderRadius="$2"
                 alignSelf="center"
                 marginBottom="$4"
@@ -107,7 +114,9 @@ export function LanguageSelector() {
                         fontSize={16}
                         fontWeight="600"
                         color={
-                          normalizedLanguage === lang.code ? "white" : "#E5E5E7"
+                          normalizedLanguage === lang.code
+                            ? "white"
+                            : currentTheme.textLight
                         }
                       >
                         {lang.nativeName}

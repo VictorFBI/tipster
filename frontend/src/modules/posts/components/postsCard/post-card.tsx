@@ -2,6 +2,8 @@ import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
 import { Avatar, XStack, YStack, Text, Button } from "tamagui";
 import { CommentsSection } from "../commentsSection/comments-section";
+import { useThemeStore } from "@/src/core/store/themeStore";
+import { themes } from "@/src/core/theme/themes";
 
 interface Post {
   id: string;
@@ -18,6 +20,8 @@ interface Post {
 }
 
 export function PostCard({ post }: { post: Post }) {
+  const { theme } = useThemeStore();
+  const currentTheme = themes[theme];
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(post.likes);
   const [showComments, setShowComments] = useState(false);
@@ -94,7 +98,7 @@ export function PostCard({ post }: { post: Post }) {
             <Text fontSize={16} fontWeight="600" color="$text">
               {post.author.name}
             </Text>
-            <Text fontSize={12} color="#8E8E93">
+            <Text fontSize={12} color={currentTheme.muted}>
               {post.timestamp}
             </Text>
           </YStack>
@@ -120,9 +124,9 @@ export function PostCard({ post }: { post: Post }) {
           <Ionicons
             name={liked ? "heart" : "heart-outline"}
             size={20}
-            color={liked ? "#8B5CF6" : "#8E8E93"}
+            color={liked ? currentTheme.accent : currentTheme.muted}
           />
-          <Text fontSize={14} color="#8E8E93">
+          <Text fontSize={14} color={currentTheme.muted}>
             {likeCount}
           </Text>
         </Button>
@@ -137,8 +141,12 @@ export function PostCard({ post }: { post: Post }) {
           borderWidth={0}
           padding={0}
         >
-          <Ionicons name="chatbubble-outline" size={20} color="#8E8E93" />
-          <Text fontSize={14} color="#8E8E93">
+          <Ionicons
+            name="chatbubble-outline"
+            size={20}
+            color={currentTheme.muted}
+          />
+          <Text fontSize={14} color={currentTheme.muted}>
             {comments.length}
           </Text>
         </Button>

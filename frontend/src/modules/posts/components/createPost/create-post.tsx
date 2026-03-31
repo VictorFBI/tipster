@@ -13,10 +13,14 @@ import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import { KeyboardAvoidingView, Platform, TouchableOpacity } from "react-native";
 import * as ImagePicker from "expo-image-picker";
+import { useThemeStore } from "@/src/core/store/themeStore";
+import { themes } from "@/src/core/theme/themes";
 
 export function CreatePost() {
   const { t } = useTranslation();
   const router = useRouter();
+  const { theme } = useThemeStore();
+  const currentTheme = themes[theme];
   const [content, setContent] = useState("");
   const [images, setImages] = useState<string[]>([]);
   const [isPosting, setIsPosting] = useState(false);
@@ -95,7 +99,7 @@ export function CreatePost() {
             borderWidth={0}
             padding={0}
           >
-            <Ionicons name="close" size={28} color="#8E8E93" />
+            <Ionicons name="close" size={28} color={currentTheme.muted} />
           </Button>
 
           <Text fontSize={18} fontWeight="600" color="$text">
@@ -114,7 +118,7 @@ export function CreatePost() {
             <Text
               fontSize={16}
               fontWeight="600"
-              color={canPost ? "white" : "#8E8E93"}
+              color={canPost ? "white" : currentTheme.muted}
             >
               {isPosting ? t("createPost.posting") : t("createPost.post")}
             </Text>
@@ -136,7 +140,8 @@ export function CreatePost() {
               maxLength={maxLength}
               multiline
               autoFocus
-              placeholderTextColor="#8E8E93"
+              // @ts-ignore
+              placeholderTextColor={currentTheme.muted}
             />
 
             {images.length > 0 && (
@@ -172,7 +177,11 @@ export function CreatePost() {
             <XStack justifyContent="flex-end">
               <Text
                 fontSize={14}
-                color={remainingChars < 50 ? "#FF3B30" : "#8E8E93"}
+                color={
+                  remainingChars < 50
+                    ? currentTheme.warning
+                    : currentTheme.muted
+                }
               >
                 {remainingChars} {t("createPost.charactersLeft")}
               </Text>
@@ -190,7 +199,11 @@ export function CreatePost() {
                 pressStyle={{ opacity: 0.7 }}
               >
                 <XStack alignItems="center" gap="$2">
-                  <Ionicons name="image-outline" size={24} color="#8B5CF6" />
+                  <Ionicons
+                    name="image-outline"
+                    size={24}
+                    color={currentTheme.accent}
+                  />
                   <Text fontSize={16} color="$text">
                     {t("createPost.addImage")} ({images.length}/{maxImages})
                   </Text>
@@ -206,12 +219,12 @@ export function CreatePost() {
               marginTop="$2"
             >
               <XStack alignItems="center" gap="$2">
-                <Ionicons name="bulb" size={20} color="#8B5CF6" />
+                <Ionicons name="bulb" size={20} color={currentTheme.accent} />
                 <Text fontSize={16} fontWeight="600" color="$text">
                   {t("createPost.tipsTitle")}
                 </Text>
               </XStack>
-              <Text fontSize={14} color="#8E8E93" lineHeight={20}>
+              <Text fontSize={14} color={currentTheme.muted} lineHeight={20}>
                 {t("createPost.tipsText")}
               </Text>
             </YStack>

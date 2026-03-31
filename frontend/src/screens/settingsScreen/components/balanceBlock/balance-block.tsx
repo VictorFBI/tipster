@@ -1,7 +1,8 @@
 import { Ionicons } from "@expo/vector-icons";
 import { XStack, YStack, Text } from "tamagui";
 import { useTranslation } from "react-i18next";
-import { tokens } from "@/src/core/theme/tokens";
+import { useThemeStore } from "@/src/core/store/themeStore";
+import { themes } from "@/src/core/theme/themes";
 import {
   WalletConnectModal,
   useWalletConnectModal,
@@ -26,6 +27,8 @@ const providerMetadata = {
 
 export function BalanceBlock({ balance }: BalanceBlockProps) {
   const { t } = useTranslation();
+  const { theme } = useThemeStore();
+  const currentTheme = themes[theme];
 
   const { open, isConnected, address, provider } = useWalletConnectModal();
 
@@ -106,9 +109,9 @@ export function BalanceBlock({ balance }: BalanceBlockProps) {
           <Ionicons
             name={isConnected ? "wallet" : "wallet-outline"}
             size={20}
-            color="#8B5CF6"
+            color={currentTheme.accent}
           />
-          <Text color={tokens.color.gray11} fontSize={16} fontWeight="600">
+          <Text color={currentTheme.tabActive} fontSize={16} fontWeight="600">
             {isConnected
               ? t("settings.disconnectWallet")
               : t("settings.connectWallet")}

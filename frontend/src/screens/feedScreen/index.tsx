@@ -5,6 +5,8 @@ import { InfoBlock } from "../../shared/components/infoBlock/info-block";
 import { Ionicons } from "@expo/vector-icons";
 
 import { useTranslation } from "react-i18next";
+import { useThemeStore } from "@/src/core/store/themeStore";
+import { themes } from "@/src/core/theme/themes";
 
 interface Post {
   id: string;
@@ -62,13 +64,15 @@ const mockPosts: Post[] = [
 
 export default function Feed() {
   const { t } = useTranslation();
+  const { theme } = useThemeStore();
+  const currentTheme = themes[theme];
 
   return (
     <YStack flex={1} backgroundColor={"$background"}>
       <Header balance={5420} headerText="Tipster" />
       <InfoBlock
         text={t("feed.activityTip")}
-        icon={<Ionicons name="bulb" size={20} color="#8B5CF6" />}
+        icon={<Ionicons name="bulb" size={20} color={currentTheme.accent} />}
         marginHorizontal="$4"
       />
       <CreatePostButton />

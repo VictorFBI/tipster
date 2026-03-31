@@ -7,6 +7,8 @@ import { PostsList } from "../../modules/posts";
 import { Tabs } from "../profileScreen/components/tabs/tabs";
 import { useLocalSearchParams } from "expo-router";
 import { useTranslation } from "react-i18next";
+import { useThemeStore } from "@/src/core/store/themeStore";
+import { themes } from "@/src/core/theme/themes";
 
 interface Post {
   id: string;
@@ -23,6 +25,8 @@ interface Post {
 
 export default function UserProfileScreen() {
   const { t } = useTranslation();
+  const { theme } = useThemeStore();
+  const currentTheme = themes[theme];
   const params = useLocalSearchParams();
   const userId = params.userId as string;
 
@@ -76,10 +80,14 @@ export default function UserProfileScreen() {
             justifyContent="center"
             paddingVertical="$10"
           >
-            <Ionicons name="heart-outline" size={48} color="#8E8E93" />
+            <Ionicons
+              name="heart-outline"
+              size={48}
+              color={currentTheme.muted}
+            />
             <Text
               fontSize={16}
-              color="#8E8E93"
+              color={currentTheme.muted}
               marginTop="$3"
               textAlign="center"
             >

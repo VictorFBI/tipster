@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import { XStack, Text } from "tamagui";
+import { XStack, Text, useTheme } from "tamagui";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Pressable } from "react-native";
 import { useRouter } from "expo-router";
@@ -15,6 +15,7 @@ export function Header({
 }) {
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const theme = useTheme();
 
   return (
     <XStack
@@ -28,7 +29,7 @@ export function Header({
       <XStack alignItems="center" gap="$3" flex={1}>
         {showBackButton && (
           <Pressable onPress={() => router.back()}>
-            <Ionicons name="arrow-back" size={24} color="white" />
+            <Ionicons name="arrow-back" size={24} color={theme.text.val} />
           </Pressable>
         )}
         <Text fontSize={24} fontWeight="bold" color="$text">

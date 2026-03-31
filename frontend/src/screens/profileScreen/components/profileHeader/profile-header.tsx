@@ -5,10 +5,14 @@ import { useAuthStore } from "../../../../modules/auth/store/authStore";
 import { Ionicons } from "@expo/vector-icons";
 import { Pressable } from "react-native";
 import { useRouter } from "expo-router";
+import { useThemeStore } from "@/src/core/store/themeStore";
+import { themes } from "@/src/core/theme/themes";
 
 export function ProfileHeader() {
   const { t } = useTranslation();
   const router = useRouter();
+  const { theme } = useThemeStore();
+  const currentTheme = themes[theme];
   // const user = useAuthStore((state) => state.user);
 
   const handleFollowersPress = () => {
@@ -44,12 +48,12 @@ export function ProfileHeader() {
   // if (isError || !profile) {
   //   return (
   //     <YStack paddingVertical="$2" alignItems="center" gap="$3">
-  //       <Avatar circular size="$10" backgroundColor="#1C1C28">
-  //         <Avatar.Fallback backgroundColor="#1C1C28">
-  //           <Ionicons name="person-outline" size={56} color="#8E8E93" />
+  //       <Avatar circular size="$10" backgroundColor={currentTheme.surface}>
+  //         <Avatar.Fallback backgroundColor={currentTheme.surface}>
+  //           <Ionicons name="person-outline" size={56} color={currentTheme.muted} />
   //         </Avatar.Fallback>
   //       </Avatar>
-  //       <Text fontSize={14} color="#8E8E93">
+  //       <Text fontSize={14} color={currentTheme.muted}>
   //         {t("profile.loadError") || "Failed to load profile"}
   //       </Text>
   //     </YStack>
@@ -67,12 +71,12 @@ export function ProfileHeader() {
         {/* {profile.avatar_url ? (
           <Avatar.Image src={profile.avatar_url} />
         ) : (
-          <Avatar.Fallback backgroundColor="#1C1C28">
-            <Ionicons name="person-outline" size={56} color="#8E8E93" />
+          <Avatar.Fallback backgroundColor={currentTheme.surface}>
+            <Ionicons name="person-outline" size={56} color={currentTheme.muted} />
           </Avatar.Fallback>
         )} */}
         <Avatar.Image src="https://i.pravatar.cc/150?img=12" />
-        <Avatar.Fallback backgroundColor="#1C1C28" />
+        <Avatar.Fallback backgroundColor={currentTheme.surface} />
       </Avatar>
 
       <YStack alignItems="center" gap="$1">
@@ -94,7 +98,7 @@ export function ProfileHeader() {
       {/* {profile.bio && (
         <Text
           fontSize={14}
-          color="#8E8E93"
+          color={currentTheme.muted}
           textAlign="center"
           paddingHorizontal="$6"
           lineHeight={20}
@@ -105,7 +109,7 @@ export function ProfileHeader() {
 
       <Text
         fontSize={14}
-        color="#8E8E93"
+        color={currentTheme.muted}
         textAlign="center"
         paddingHorizontal="$6"
         lineHeight={20}
@@ -127,7 +131,7 @@ export function ProfileHeader() {
         maxWidth={400}
       >
         <XStack alignItems="center" gap="$2">
-          <Ionicons name="create-outline" size={18} color="white" />
+          <Ionicons name="create-outline" size={18} color={currentTheme.text} />
           <Text fontSize={15} fontWeight="600" color="$text">
             {t("profile.edit.title")}
           </Text>
@@ -139,7 +143,7 @@ export function ProfileHeader() {
           <Text fontSize={20} fontWeight="700" color="$text">
             28
           </Text>
-          <Text fontSize={14} color="#8E8E93">
+          <Text fontSize={14} color={currentTheme.muted}>
             {t("profile.postsLabel")}
           </Text>
         </YStack>
@@ -148,7 +152,7 @@ export function ProfileHeader() {
             <Text fontSize={20} fontWeight="700" color="$text">
               145
             </Text>
-            <Text fontSize={14} color="#8E8E93">
+            <Text fontSize={14} color={currentTheme.muted}>
               {t("profile.followersLabel")}
             </Text>
           </YStack>
@@ -158,7 +162,7 @@ export function ProfileHeader() {
             <Text fontSize={20} fontWeight="700" color="$text">
               89
             </Text>
-            <Text fontSize={14} color="#8E8E93">
+            <Text fontSize={14} color={currentTheme.muted}>
               {t("profile.followingLabel")}
             </Text>
           </YStack>

@@ -10,6 +10,8 @@ import { StatusBar } from "expo-status-bar";
 import { YStack, XStack, Text, Button, ScrollView } from "tamagui";
 import { useTranslation } from "react-i18next";
 import { ConfirmButton } from "@/src/shared/ui/confirmButton/confirmButton";
+import { useThemeStore } from "@/src/core/store/themeStore";
+import { themes } from "@/src/core/theme/themes";
 
 interface VerificationCodeScreenProps {
   email: string;
@@ -44,6 +46,8 @@ export function VerificationCodeScreen({
   errorIncompleteCode,
 }: VerificationCodeScreenProps) {
   const { t } = useTranslation();
+  const { theme } = useThemeStore();
+  const currentTheme = themes[theme];
 
   // Set default values using translation
   const finalCodeInputLabel = codeInputLabel || t("auth.enterVerificationCode");
@@ -199,7 +203,7 @@ export function VerificationCodeScreen({
                       textAlign: "center",
                       width: "100%",
                       height: "100%",
-                      color: "#FFFFFF",
+                      color: currentTheme.text,
                     }}
                   />
                 </YStack>

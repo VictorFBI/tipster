@@ -9,6 +9,8 @@ import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { TouchableOpacity } from "react-native";
+import { useThemeStore } from "@/src/core/store/themeStore";
+import { themes } from "@/src/core/theme/themes";
 
 interface PasswordInputProps {
   label: string;
@@ -28,6 +30,8 @@ export function PasswordInput({
   controlName = "password",
 }: PasswordInputProps) {
   const { t } = useTranslation();
+  const { theme } = useThemeStore();
+  const currentTheme = themes[theme];
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
   const defaultRules = {
@@ -78,7 +82,7 @@ export function PasswordInput({
               <Ionicons
                 name={isPasswordVisible ? "eye-off-outline" : "eye-outline"}
                 size={20}
-                color="#999"
+                color={currentTheme.muted}
               />
             </TouchableOpacity>
           </XStack>

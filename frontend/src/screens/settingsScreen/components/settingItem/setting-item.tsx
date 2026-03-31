@@ -1,4 +1,3 @@
-import { tokens } from "@/src/core/theme/tokens";
 import { themes } from "@/src/core/theme/themes";
 import { useThemeStore } from "@/src/core/store/themeStore";
 import { Ionicons } from "@expo/vector-icons";
@@ -25,12 +24,12 @@ export function SettingItem({
   return (
     <XStack justifyContent="space-between" alignItems="center">
       <XStack gap="$3" alignItems="center" flex={1}>
-        <Ionicons name={icon} size={24} color="#8E8E93" />
+        <Ionicons name={icon} size={24} color={currentTheme.muted} />
         <YStack flex={1}>
           <Text color="$text" fontSize={16}>
             {title}
           </Text>
-          <Text color={tokens.color.darkSecondary} fontSize={13}>
+          <Text color={currentTheme.muted} fontSize={13}>
             {description}
           </Text>
         </YStack>

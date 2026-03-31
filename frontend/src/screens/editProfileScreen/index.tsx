@@ -6,10 +6,14 @@ import { useTranslation } from "react-i18next";
 import * as ImagePicker from "expo-image-picker";
 import { Header } from "../../shared/components/header/header";
 import { useRouter } from "expo-router";
+import { useThemeStore } from "@/src/core/store/themeStore";
+import { themes } from "@/src/core/theme/themes";
 
 export default function EditProfileScreen() {
   const { t } = useTranslation();
   const router = useRouter();
+  const { theme } = useThemeStore();
+  const currentTheme = themes[theme];
 
   // TODO: Load current profile data
   const [displayName, setDisplayName] = useState("Павел Дуров");
@@ -86,21 +90,29 @@ export default function EditProfileScreen() {
           {/* Avatar */}
           <YStack alignItems="center" gap="$2">
             <TouchableOpacity onPress={handleAddAvatar}>
-              <Avatar circular size="$10" backgroundColor="#2C2C3E">
+              <Avatar
+                circular
+                size="$10"
+                backgroundColor={currentTheme.avatarBg}
+              >
                 {avatar ? (
                   <Avatar.Image src={avatar} />
                 ) : (
                   <Avatar.Fallback
-                    backgroundColor="#2C2C3E"
+                    backgroundColor={currentTheme.avatarBg}
                     alignItems="center"
                     justifyContent="center"
                   >
-                    <Ionicons name="person-outline" size={56} color="#8E8E93" />
+                    <Ionicons
+                      name="person-outline"
+                      size={56}
+                      color={currentTheme.muted}
+                    />
                   </Avatar.Fallback>
                 )}
               </Avatar>
             </TouchableOpacity>
-            <Text fontSize={14} color="#8E8E93">
+            <Text fontSize={14} color={currentTheme.muted}>
               {t("profile.edit.changeAvatar") || "Изменить фото"}
             </Text>
           </YStack>
@@ -116,12 +128,12 @@ export default function EditProfileScreen() {
               }
               value={displayName}
               onChangeText={setDisplayName}
-              backgroundColor="#2C2C3E"
+              backgroundColor={currentTheme.avatarBg}
               borderWidth={1}
-              borderColor="#3C3C4E"
-              color="#FFFFFF"
+              borderColor={currentTheme.inputBorder}
+              color={currentTheme.text}
               // @ts-ignore
-              placeholderTextColor="#9E9EA7"
+              placeholderTextColor={currentTheme.inputPlaceholder}
               fontSize={16}
               paddingVertical="$3"
               paddingHorizontal="$4"
@@ -138,19 +150,19 @@ export default function EditProfileScreen() {
               placeholder="@username"
               value={username}
               onChangeText={(text) => setUsername(text.toLowerCase())}
-              backgroundColor="#2C2C3E"
+              backgroundColor={currentTheme.avatarBg}
               borderWidth={1}
-              borderColor="#3C3C4E"
-              color="#FFFFFF"
+              borderColor={currentTheme.inputBorder}
+              color={currentTheme.text}
               // @ts-ignore
-              placeholderTextColor="#9E9EA7"
+              placeholderTextColor={currentTheme.inputPlaceholder}
               fontSize={16}
               paddingVertical="$3"
               paddingHorizontal="$4"
               borderRadius={12}
               autoCapitalize="none"
             />
-            <Text fontSize={13} color="#8E8E93" lineHeight={18}>
+            <Text fontSize={13} color={currentTheme.muted} lineHeight={18}>
               {t("profile.edit.usernameHint")}
             </Text>
           </YStack>
@@ -170,12 +182,12 @@ export default function EditProfileScreen() {
                   setBio(text);
                 }
               }}
-              backgroundColor="#2C2C3E"
+              backgroundColor={currentTheme.avatarBg}
               borderWidth={1}
-              borderColor="#3C3C4E"
-              color="#FFFFFF"
+              borderColor={currentTheme.inputBorder}
+              color={currentTheme.text}
               // @ts-ignore
-              placeholderTextColor="#9E9EA7"
+              placeholderTextColor={currentTheme.inputPlaceholder}
               fontSize={16}
               paddingVertical="$3"
               paddingHorizontal="$4"
@@ -184,14 +196,14 @@ export default function EditProfileScreen() {
               borderRadius={12}
               maxLength={maxBioLength}
             />
-            <Text fontSize={13} color="#8E8E93" textAlign="right">
+            <Text fontSize={13} color={currentTheme.muted} textAlign="right">
               {bio.length}/{maxBioLength}
             </Text>
           </YStack>
 
           {/* Save Button */}
           <Button
-            backgroundColor="#8B5CF6"
+            backgroundColor={currentTheme.accent}
             borderRadius={12}
             onPress={handleSave}
             disabled={!isFormValid || isPending}

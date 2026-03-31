@@ -14,6 +14,8 @@ import { useTranslation } from "react-i18next";
 import * as ImagePicker from "expo-image-picker";
 import { useUpdateAccountProfile } from "../../../modules/user";
 import { useAuthStore } from "../../../modules/auth/store/authStore";
+import { useThemeStore } from "@/src/core/store/themeStore";
+import { themes } from "@/src/core/theme/themes";
 
 interface ProfileFillingProps {
   onComplete: (data: {
@@ -31,6 +33,8 @@ export function ProfileFillingScreen({
   onSkip,
 }: ProfileFillingProps) {
   const { t } = useTranslation();
+  const { theme } = useThemeStore();
+  const currentTheme = themes[theme];
   const user = useAuthStore((state) => state.user);
 
   const [username, setUsername] = useState("");
@@ -126,7 +130,7 @@ export function ProfileFillingScreen({
         paddingBottom: 40,
       }}
       showsVerticalScrollIndicator={false}
-      backgroundColor="$background2"
+      backgroundColor="$background"
     >
       <YStack paddingHorizontal="$4" paddingTop="$12" gap="$4">
         {/* Welcome Header */}
@@ -136,7 +140,7 @@ export function ProfileFillingScreen({
           </Text>
           <Text
             fontSize={14}
-            color="#8E8E93"
+            color="$placeholder"
             textAlign="center"
             paddingHorizontal="$2"
           >
@@ -146,21 +150,25 @@ export function ProfileFillingScreen({
 
         <YStack alignItems="center" gap="$2">
           <TouchableOpacity onPress={handleAddAvatar}>
-            <Avatar circular size="$10" backgroundColor="#2C2C3E">
+            <Avatar circular size="$10" backgroundColor="$input">
               {avatar ? (
                 <Avatar.Image src={avatar} />
               ) : (
                 <Avatar.Fallback
-                  backgroundColor="#2C2C3E"
+                  backgroundColor="$input"
                   alignItems="center"
                   justifyContent="center"
                 >
-                  <Ionicons name="person-outline" size={56} color="#8E8E93" />
+                  <Ionicons
+                    name="person-outline"
+                    size={56}
+                    color={currentTheme.muted}
+                  />
                 </Avatar.Fallback>
               )}
             </Avatar>
           </TouchableOpacity>
-          <Text fontSize={14} color="#8E8E93">
+          <Text fontSize={14} color="$placeholder">
             {t("profile.filling.addAvatar")}
           </Text>
         </YStack>
@@ -173,19 +181,18 @@ export function ProfileFillingScreen({
             placeholder={t("profile.filling.usernamePlaceholder")}
             value={username}
             onChangeText={setUsername}
-            backgroundColor="#2C2C3E"
+            backgroundColor="$input"
             borderWidth={1}
-            borderColor="#3C3C4E"
-            color="#FFFFFF"
-            // @ts-ignore - custom color
-            placeholderTextColor="#9E9EA7"
+            borderColor="$border"
+            color="$text"
+            placeholderTextColor="$placeholder"
             fontSize={16}
             paddingVertical="$3"
             paddingHorizontal="$4"
             borderRadius={12}
             autoCapitalize="none"
           />
-          <Text fontSize={13} color="#8E8E93" lineHeight={18}>
+          <Text fontSize={13} color="$placeholder" lineHeight={18}>
             {t("profile.filling.usernameHint")}
           </Text>
         </YStack>
@@ -198,12 +205,11 @@ export function ProfileFillingScreen({
             placeholder={t("profile.filling.firstNamePlaceholder")}
             value={firstName}
             onChangeText={setFirstName}
-            backgroundColor="#2C2C3E"
+            backgroundColor="$input"
             borderWidth={1}
-            borderColor="#3C3C4E"
-            color="#FFFFFF"
-            // @ts-ignore - custom color
-            placeholderTextColor="#9E9EA7"
+            borderColor="$border"
+            color="$text"
+            placeholderTextColor="$placeholder"
             fontSize={16}
             paddingVertical="$3"
             paddingHorizontal="$4"
@@ -219,12 +225,11 @@ export function ProfileFillingScreen({
             placeholder={t("profile.filling.lastNamePlaceholder")}
             value={lastName}
             onChangeText={setLastName}
-            backgroundColor="#2C2C3E"
+            backgroundColor="$input"
             borderWidth={1}
-            borderColor="#3C3C4E"
-            color="#FFFFFF"
-            // @ts-ignore - custom color
-            placeholderTextColor="#9E9EA7"
+            borderColor="$border"
+            color="$text"
+            placeholderTextColor="$placeholder"
             fontSize={16}
             paddingVertical="$3"
             paddingHorizontal="$4"
@@ -244,12 +249,11 @@ export function ProfileFillingScreen({
                 setBio(text);
               }
             }}
-            backgroundColor="#2C2C3E"
+            backgroundColor="$input"
             borderWidth={1}
-            borderColor="#3C3C4E"
-            color="#FFFFFF"
-            // @ts-ignore - custom color
-            placeholderTextColor="#9E9EA7"
+            borderColor="$border"
+            color="$text"
+            placeholderTextColor="$placeholder"
             fontSize={16}
             paddingVertical="$3"
             paddingHorizontal="$4"
@@ -258,13 +262,13 @@ export function ProfileFillingScreen({
             borderRadius={12}
             maxLength={maxBioLength}
           />
-          <Text fontSize={13} color="#8E8E93" textAlign="right">
+          <Text fontSize={13} color="$placeholder" textAlign="right">
             {t("profile.filling.bioCounter", { count: bio.length })}
           </Text>
         </YStack>
 
         <Button
-          backgroundColor="#8B5CF6"
+          backgroundColor="$accent"
           borderRadius={12}
           onPress={handleSave}
           disabled={!isFormValid || isPending}

@@ -12,6 +12,16 @@ const light = {
   placeholder: tokens.color.gray5,
   error: tokens.color.error,
   input: tokens.color.lightInput,
+  muted: tokens.color.lightMuted,
+  avatarBg: tokens.color.lightInput,
+  inputBorder: tokens.color.lightBorder,
+  inputPlaceholder: tokens.color.gray5,
+  danger: tokens.color.danger,
+  warning: tokens.color.warning,
+  separator: tokens.color.lightBorder,
+  textLight: tokens.color.gray7,
+  tabActive: tokens.color.gray11,
+  tabInactive: tokens.color.lightMuted,
 };
 
 const dark = {
@@ -26,6 +36,16 @@ const dark = {
   placeholder: tokens.color.darkPlaceholder,
   error: tokens.color.error,
   input: tokens.color.darkInput,
+  muted: tokens.color.muted,
+  avatarBg: tokens.color.darkSurface2,
+  inputBorder: tokens.color.darkBorder2,
+  inputPlaceholder: tokens.color.darkPlaceholder2,
+  danger: tokens.color.danger,
+  warning: tokens.color.warning,
+  separator: tokens.color.separator,
+  textLight: tokens.color.lightText,
+  tabActive: tokens.color.darkBg,
+  tabInactive: tokens.color.muted,
 };
 
 export const themes = {

@@ -6,6 +6,8 @@ import { ProfileHeader } from "./components/profileHeader/profile-header";
 import { PostsList } from "../../modules/posts";
 import { Tabs } from "./components/tabs/tabs";
 import { useTranslation } from "react-i18next";
+import { useThemeStore } from "@/src/core/store/themeStore";
+import { themes } from "@/src/core/theme/themes";
 
 interface Post {
   id: string;
@@ -32,6 +34,8 @@ interface UserProfile {
 
 export default function Profile() {
   const { t } = useTranslation();
+  const { theme } = useThemeStore();
+  const currentTheme = themes[theme];
 
   // State to track if user has completed their profile
   // In a real app, this would come from user data/API
@@ -85,10 +89,14 @@ export default function Profile() {
             justifyContent="center"
             paddingVertical="$10"
           >
-            <Ionicons name="heart-outline" size={48} color="#8E8E93" />
+            <Ionicons
+              name="heart-outline"
+              size={48}
+              color={currentTheme.muted}
+            />
             <Text
               fontSize={16}
-              color="#8E8E93"
+              color={currentTheme.muted}
               marginTop="$3"
               textAlign="center"
             >

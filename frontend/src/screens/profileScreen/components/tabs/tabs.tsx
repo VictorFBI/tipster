@@ -1,5 +1,7 @@
 import { Button, XStack, Text } from "tamagui";
 import { useTranslation } from "react-i18next";
+import { useThemeStore } from "@/src/core/store/themeStore";
+import { themes } from "@/src/core/theme/themes";
 
 type TabType = "posts" | "liked";
 
@@ -10,6 +12,8 @@ interface TabsProps {
 
 export function Tabs({ activeTab, setActiveTab }: TabsProps) {
   const { t } = useTranslation();
+  const { theme } = useThemeStore();
+  const currentTheme = themes[theme];
   return (
     <XStack
       marginTop="$4"
@@ -30,7 +34,9 @@ export function Tabs({ activeTab, setActiveTab }: TabsProps) {
         <Text
           fontSize={15}
           fontWeight="600"
-          color={activeTab === "posts" ? "#0A0A0F" : "#8E8E93"}
+          color={
+            activeTab === "posts" ? currentTheme.tabActive : currentTheme.muted
+          }
         >
           {t("profile.posts")}
         </Text>
@@ -46,7 +52,9 @@ export function Tabs({ activeTab, setActiveTab }: TabsProps) {
         <Text
           fontSize={15}
           fontWeight="600"
-          color={activeTab === "liked" ? "#0A0A0F" : "#8E8E93"}
+          color={
+            activeTab === "liked" ? currentTheme.tabActive : currentTheme.muted
+          }
         >
           {t("profile.liked")}
         </Text>

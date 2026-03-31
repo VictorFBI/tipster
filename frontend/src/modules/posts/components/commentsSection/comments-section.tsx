@@ -10,6 +10,8 @@ import {
   Input,
   ScrollView,
 } from "tamagui";
+import { useThemeStore } from "@/src/core/store/themeStore";
+import { themes } from "@/src/core/theme/themes";
 
 export interface Comment {
   id: string;
@@ -34,6 +36,8 @@ export function CommentsSection({
   onAddReply,
 }: CommentsSectionProps) {
   const { t } = useTranslation();
+  const { theme } = useThemeStore();
+  const currentTheme = themes[theme];
   const [commentText, setCommentText] = useState("");
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [replyText, setReplyText] = useState("");
@@ -86,7 +90,7 @@ export function CommentsSection({
                       <Text fontSize={14} fontWeight="600" color="$text">
                         {comment.author.name}
                       </Text>
-                      <Text fontSize={12} color="#8E8E93">
+                      <Text fontSize={12} color={currentTheme.muted}>
                         {comment.timestamp}
                       </Text>
                     </XStack>
@@ -102,7 +106,11 @@ export function CommentsSection({
                       borderWidth={0}
                       padding={0}
                     >
-                      <Text fontSize={12} color="#8B5CF6" fontWeight="600">
+                      <Text
+                        fontSize={12}
+                        color={currentTheme.accent}
+                        fontWeight="600"
+                      >
                         {t("comments.reply")}
                       </Text>
                     </Button>
@@ -122,7 +130,7 @@ export function CommentsSection({
                             <Text fontSize={13} fontWeight="600" color="$text">
                               {reply.author.name}
                             </Text>
-                            <Text fontSize={11} color="#8E8E93">
+                            <Text fontSize={11} color={currentTheme.muted}>
                               {reply.timestamp}
                             </Text>
                           </XStack>
@@ -155,7 +163,8 @@ export function CommentsSection({
                       paddingVertical="$2"
                       fontSize={13}
                       color="$text"
-                      placeholderTextColor="#8E8E93"
+                      // @ts-ignore
+                      placeholderTextColor={currentTheme.muted}
                     />
                     <Button
                       onPress={() => handleAddReply(comment.id)}
@@ -177,7 +186,11 @@ export function CommentsSection({
                       paddingVertical="$2"
                       pressStyle={{ opacity: 0.7 }}
                     >
-                      <Ionicons name="close" size={16} color="#8E8E93" />
+                      <Ionicons
+                        name="close"
+                        size={16}
+                        color={currentTheme.muted}
+                      />
                     </Button>
                   </XStack>
                 )}
@@ -186,7 +199,7 @@ export function CommentsSection({
           </ScrollView>
         </YStack>
       ) : (
-        <Text fontSize={14} color="#8E8E93" textAlign="center">
+        <Text fontSize={14} color={currentTheme.muted} textAlign="center">
           {t("comments.noComments")}
         </Text>
       )}
@@ -205,7 +218,8 @@ export function CommentsSection({
           paddingVertical="$2"
           fontSize={14}
           color="$text"
-          placeholderTextColor="#8E8E93"
+          // @ts-ignore
+          placeholderTextColor={currentTheme.muted}
         />
         <Button
           onPress={handleAddComment}

@@ -8,7 +8,8 @@ import { BalanceBlock } from "./components/balanceBlock/balance-block";
 import { SettingsBlock } from "./components/settingsBlock/settings-block";
 import { InfoBlock } from "../../shared/components/infoBlock/info-block";
 import { useTranslation } from "react-i18next";
-import { tokens } from "@/src/core/theme/tokens";
+import { useThemeStore } from "@/src/core/store/themeStore";
+import { themes } from "@/src/core/theme/themes";
 import { useLogout } from "@/src/modules/auth";
 import { useAuthStore } from "../../modules/auth/store/authStore";
 import { STORAGE_KEYS } from "../../modules/auth/api/client";
@@ -18,6 +19,8 @@ import { ReferalBlock } from "./components/referalBlock/referal-block";
 export default function Settings() {
   const { t } = useTranslation();
   const router = useRouter();
+  const { theme } = useThemeStore();
+  const currentTheme = themes[theme];
   const logoutMutation = useLogout();
   const logout = useAuthStore((state) => state.logout);
 
@@ -76,8 +79,16 @@ export default function Settings() {
               opacity={logoutMutation.isPending ? 0.5 : 1}
             >
               <XStack gap="$2" alignItems="center">
-                <Ionicons name="log-out-outline" size={20} color="#EF4444" />
-                <Text color="#EF4444" fontSize={16} fontWeight="600">
+                <Ionicons
+                  name="log-out-outline"
+                  size={20}
+                  color={currentTheme.danger}
+                />
+                <Text
+                  color={currentTheme.danger}
+                  fontSize={16}
+                  fontWeight="600"
+                >
                   {logoutMutation.isPending
                     ? t("settings.loggingOut") || "Выход..."
                     : t("settings.logout")}
@@ -92,7 +103,7 @@ export default function Settings() {
               <Ionicons
                 name="shield-checkmark"
                 size={20}
-                color={tokens.color.accent}
+                color={currentTheme.accent}
               />
             }
             header={t("settings.security")}

@@ -2,9 +2,13 @@ import { Ionicons } from "@expo/vector-icons";
 import { XStack, YStack, Input } from "tamagui";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useThemeStore } from "@/src/core/store/themeStore";
+import { themes } from "@/src/core/theme/themes";
 
 export function SearchInput() {
   const { t } = useTranslation();
+  const { theme } = useThemeStore();
+  const currentTheme = themes[theme];
   const [searchQuery, setSearchQuery] = useState("");
 
   return (
@@ -16,14 +20,15 @@ export function SearchInput() {
         alignItems="center"
         gap="$2"
       >
-        <Ionicons name="search" size={20} color="#8E8E93" />
+        <Ionicons name="search" size={20} color={currentTheme.muted} />
         <Input
           flex={1}
           backgroundColor="transparent"
           borderWidth={0}
           placeholder={t("search.placeholder")}
-          placeholderTextColor="#8E8E93"
-          color="white"
+          // @ts-ignore
+          placeholderTextColor={currentTheme.muted}
+          color={currentTheme.text}
           fontSize={16}
           value={searchQuery}
           onChangeText={setSearchQuery}

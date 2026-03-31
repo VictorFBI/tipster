@@ -3,6 +3,8 @@ import { UserCard } from "../userCard/user-card";
 import { useTranslation } from "react-i18next";
 import { Pressable } from "react-native";
 import { useRouter } from "expo-router";
+import { useThemeStore } from "@/src/core/store/themeStore";
+import { themes } from "@/src/core/theme/themes";
 
 interface User {
   id: string;
@@ -23,6 +25,8 @@ interface UsersListProps {
 export function UsersList({ users, isLoading, emptyMessage }: UsersListProps) {
   const { t } = useTranslation();
   const router = useRouter();
+  const { theme } = useThemeStore();
+  const currentTheme = themes[theme];
 
   const handleUserPress = (userId: string) => {
     // Navigate to user profile screen
@@ -50,7 +54,7 @@ export function UsersList({ users, isLoading, emptyMessage }: UsersListProps) {
         justifyContent="center"
         paddingVertical="$8"
       >
-        <Text fontSize={14} color="#8E8E93" textAlign="center">
+        <Text fontSize={14} color={currentTheme.muted} textAlign="center">
           {emptyMessage || t("users.noUsers")}
         </Text>
       </YStack>
@@ -59,9 +63,9 @@ export function UsersList({ users, isLoading, emptyMessage }: UsersListProps) {
 
   return (
     <ScrollView
-      flex={1}
       backgroundColor="$background"
       showsVerticalScrollIndicator={false}
+      contentContainerStyle={{ flexGrow: 1 }}
     >
       <YStack paddingHorizontal="$4" paddingBottom="$6" gap="$3">
         {users.map((user) => (
