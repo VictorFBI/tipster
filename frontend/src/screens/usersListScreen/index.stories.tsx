@@ -1,12 +1,16 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { withTheme, withMobile} from "@/src/shared/storybook/decorators";
-import { LanguageSelector } from "./language-selector";
+import {
+  withTheme,
+  withSafeArea,
+  withMobile,
+} from "@/src/shared/storybook/decorators";
+import UsersListScreen from "./index";
 
 const meta = {
-  title: "Screens/Settings/LanguageSelector",
-  component: LanguageSelector,
-  decorators: [withTheme, withMobile],
-} satisfies Meta<typeof LanguageSelector>;
+  title: "Screens/UsersList",
+  component: UsersListScreen,
+  decorators: [withTheme, withSafeArea, withMobile],
+} satisfies Meta<typeof UsersListScreen>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

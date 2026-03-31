@@ -76,7 +76,7 @@
     "@vitejs/plugin-react": "^5.1.4",
     "babel-plugin-module-resolver": "^5.0.0",
     "babel-plugin-react-docgen-typescript": "^1.5.1",
-    "chromatic": "^15.2.0",
+    "chromatic": "^16.0.0",
     "cross-env": "^10.0.0",
     "storybook": "^10.0.0",
     "typescript": "~5.9.2",

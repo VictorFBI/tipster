@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { ConfirmButton } from "./confirmButton";
-import { withTheme } from "@/src/shared/storybook/decorators";
+import { withTheme, withMobile } from "@/src/shared/storybook/decorators";
 
 const meta = {
   title: "Shared/UI/ConfirmButton",
   component: ConfirmButton,
-  decorators: [withTheme],
+  decorators: [withTheme, withMobile],
   argTypes: {
     text: {
       control: "text",
@@ -71,56 +71,6 @@ export const DisabledLight: Story = {
     text: "Confirm",
     disabled: true,
     opacity: 0.5,
-    onPress: () => console.log("Button pressed"),
-  },
-  parameters: {
-    backgrounds: { default: "light" },
-    theme: "light",
-  },
-};
-
-export const CustomTextDark: Story = {
-  args: {
-    text: "Continue",
-    disabled: false,
-    opacity: 1,
-    onPress: () => console.log("Button pressed"),
-  },
-  parameters: {
-    backgrounds: { default: "dark" },
-  },
-};
-
-export const CustomTextLight: Story = {
-  args: {
-    text: "Continue",
-    disabled: false,
-    opacity: 1,
-    onPress: () => console.log("Button pressed"),
-  },
-  parameters: {
-    backgrounds: { default: "light" },
-    theme: "light",
-  },
-};
-
-export const LowOpacityDark: Story = {
-  args: {
-    text: "Submit",
-    disabled: false,
-    opacity: 0.3,
-    onPress: () => console.log("Button pressed"),
-  },
-  parameters: {
-    backgrounds: { default: "dark" },
-  },
-};
-
-export const LowOpacityLight: Story = {
-  args: {
-    text: "Submit",
-    disabled: false,
-    opacity: 0.3,
     onPress: () => console.log("Button pressed"),
   },
   parameters: {

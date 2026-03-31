@@ -1,12 +1,12 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { useState } from "react";
 import { SettingItem } from "./setting-item";
-import { withTheme } from "@/src/shared/storybook/decorators";
+import { withTheme, withMobile} from "@/src/shared/storybook/decorators";
 
 const meta = {
   title: "Screens/Settings/SettingItem",
   component: SettingItem,
-  decorators: [withTheme],
+  decorators: [withTheme, withMobile],
   argTypes: {
     icon: {
       control: "text",

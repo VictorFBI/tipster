@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { CommentsSection, Comment } from "./comments-section";
-import { withTheme } from "@/src/shared/storybook/decorators";
+import { withTheme, withMobile} from "@/src/shared/storybook/decorators";
 
 const meta = {
   title: "Modules/Posts/CommentsSection",
   component: CommentsSection,
-  decorators: [withTheme],
+  decorators: [withTheme, withMobile],
   argTypes: {
     comments: {
       control: "object",

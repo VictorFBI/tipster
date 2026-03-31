@@ -1,0 +1,23 @@
+[01:04:46.640] [INFO] storybook v10.2.16
+[01:04:47.009] [DEBUG] Getting package.json info for /Users/mayaffia/Desktop/tipster/tipster/frontend/package.json...
+[01:04:47.982] [DEBUG] Serving static files from [36mfrontend/node_modules/@chromatic-com/storybook/assets[39m at [36m/addon-visual-tests-assets[39m
+[01:04:47.984] [INFO] Starting...
+[01:04:48.018] [WARN] No story files found for the specified pattern: [34mcomponents/**/*.stories.mdx[39m
+[01:04:48.018] [WARN] No story files found for the specified pattern: [34mcomponents/**/*.stories.@(js|jsx|ts|tsx)[39m
+[01:04:48.029] [WARN] No story files found for the specified pattern: [34msrc/**/*.stories.mdx[39m
+[01:04:48.241] [DEBUG] Starting preview..
+[01:04:48.293] [DEBUG] Using tsconfig paths for react-docgen
+[01:04:48.314] [ERROR] Failed to build the preview
+[01:04:48.315] [ERROR] [38;2;241;97;97mReferenceError: __dirname is not defined[39m
+    at Object.viteFinal (file://./.storybook/main.ts:19:35)
+    at file://./node_modules/storybook/dist/_node-chunks/chunk-UXMBIWPQ.js:10114:36
+    at async createViteServer (file://./node_modules/@storybook/builder-vite/dist/index.js:1887:21)
+    at async Module.start (file://./node_modules/@storybook/builder-vite/dist/index.js:1912:17)
+    at async storybookDevServer (file://./node_modules/storybook/dist/core-server/index.js:7295:83)
+    at async buildOrThrow (file://./node_modules/storybook/dist/core-server/index.js:4506:12)
+    at async buildDevStandalone (file://./node_modules/storybook/dist/core-server/index.js:7710:41)
+    at async withTelemetry (file://./node_modules/storybook/dist/_node-chunks/chunk-CSGMAQQ4.js:218:12)
+    at async dev (file://./node_modules/storybook/dist/bin/core.js:2734:3)
+    at async _Command.<anonymous> (file://./node_modules/storybook/dist/bin/core.js:2804:92)
+[01:04:48.316] [WARN] Broken build, fix the error above.
+You may need to refresh the browser.

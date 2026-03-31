@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { SearchInput } from "./search-input";
-import { withTheme } from "@/src/shared/storybook/decorators";
+import { withTheme, withMobile} from "@/src/shared/storybook/decorators";
 
 const meta = {
   title: "Screens/Search/SearchInput",
   component: SearchInput,
-  decorators: [withTheme],
+  decorators: [withTheme, withMobile],
 } satisfies Meta<typeof SearchInput>;
 
 export default meta;

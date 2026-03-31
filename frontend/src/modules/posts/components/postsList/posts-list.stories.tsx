@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { PostsList } from "../postsList/posts-list";
-import { withTheme } from "@/src/shared/storybook/decorators";
+import { withTheme, withMobile } from "@/src/shared/storybook/decorators";
 
 const meta = {
   title: "Modules/Posts/PostsList",
   component: PostsList,
-  decorators: [withTheme],
+  decorators: [withTheme, withMobile],
 } satisfies Meta<typeof PostsList>;
 
 export default meta;
@@ -84,77 +84,6 @@ export const SinglePostDark: Story = {
 export const SinglePostLight: Story = {
   args: {
     posts: [mockPosts[0]],
-  },
-  parameters: {
-    backgrounds: { default: "light" },
-    theme: "light",
-  },
-};
-
-export const ManyPostsDark: Story = {
-  args: {
-    posts: [
-      ...mockPosts,
-      {
-        id: "4",
-        author: {
-          name: "CryptoWhale",
-          avatar: "https://i.pravatar.cc/150?img=5",
-        },
-        timestamp: "3h ago",
-        content: "Market update: Bitcoin holding strong above support levels.",
-        tipAmount: 200,
-        likes: 567,
-        comments: 89,
-      },
-      {
-        id: "5",
-        author: {
-          name: "NewUser",
-          avatar: "https://i.pravatar.cc/150?img=6",
-        },
-        timestamp: "Just now",
-        content: "My first post on this platform! Excited to be here 👋",
-        tipAmount: 0,
-        likes: 0,
-        comments: 0,
-      },
-    ],
-  },
-  parameters: {
-    backgrounds: { default: "dark" },
-  },
-};
-
-export const ManyPostsLight: Story = {
-  args: {
-    posts: [
-      ...mockPosts,
-      {
-        id: "4",
-        author: {
-          name: "CryptoWhale",
-          avatar: "https://i.pravatar.cc/150?img=5",
-        },
-        timestamp: "3h ago",
-        content: "Market update: Bitcoin holding strong above support levels.",
-        tipAmount: 200,
-        likes: 567,
-        comments: 89,
-      },
-      {
-        id: "5",
-        author: {
-          name: "NewUser",
-          avatar: "https://i.pravatar.cc/150?img=6",
-        },
-        timestamp: "Just now",
-        content: "My first post on this platform! Excited to be here 👋",
-        tipAmount: 0,
-        likes: 0,
-        comments: 0,
-      },
-    ],
   },
   parameters: {
     backgrounds: { default: "light" },

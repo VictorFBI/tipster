@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { ProfileFillingScreen } from "./profile-filling";
-import { withTheme } from "@/src/shared/storybook/decorators";
+import { withTheme, withMobile} from "@/src/shared/storybook/decorators";
 
 const meta = {
   title: "Screens/Profile/ProfileFilling",
   component: ProfileFillingScreen,
-  decorators: [withTheme],
+  decorators: [withTheme, withMobile],
   argTypes: {
     onComplete: { action: "completed" },
     onSkip: { action: "skipped" },

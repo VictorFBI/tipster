@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { EmailInput } from "./emailInput";
-import { withTheme } from "@/src/shared/storybook/decorators";
+import { withTheme, withMobile } from "@/src/shared/storybook/decorators";
 import { useForm } from "react-hook-form";
 
 // Wrapper component to provide form context
@@ -34,7 +34,7 @@ function EmailInputWrapper(props: {
 const meta = {
   title: "Modules/Auth/EmailInput",
   component: EmailInputWrapper,
-  decorators: [withTheme],
+  decorators: [withTheme, withMobile],
   argTypes: {
     hasError: {
       control: "boolean",
@@ -57,6 +57,7 @@ export const DefaultDark: Story = {
   parameters: {
     backgrounds: { default: "dark" },
   },
+  decorators: [withMobile],
 };
 
 export const DefaultLight: Story = {
@@ -83,50 +84,6 @@ export const WithErrorLight: Story = {
   args: {
     hasError: true,
     errorMessage: "Email is required",
-  },
-  parameters: {
-    backgrounds: { default: "light" },
-    theme: "light",
-  },
-};
-
-export const InvalidEmailErrorDark: Story = {
-  args: {
-    hasError: true,
-    errorMessage: "Please enter a valid email address",
-  },
-  parameters: {
-    backgrounds: { default: "dark" },
-  },
-};
-
-export const InvalidEmailErrorLight: Story = {
-  args: {
-    hasError: true,
-    errorMessage: "Please enter a valid email address",
-  },
-  parameters: {
-    backgrounds: { default: "light" },
-    theme: "light",
-  },
-};
-
-export const LongErrorMessageDark: Story = {
-  args: {
-    hasError: true,
-    errorMessage:
-      "The email address you entered is not valid. Please check and try again with a properly formatted email address.",
-  },
-  parameters: {
-    backgrounds: { default: "dark" },
-  },
-};
-
-export const LongErrorMessageLight: Story = {
-  args: {
-    hasError: true,
-    errorMessage:
-      "The email address you entered is not valid. Please check and try again with a properly formatted email address.",
   },
   parameters: {
     backgrounds: { default: "light" },

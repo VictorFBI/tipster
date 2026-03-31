@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { PasswordInput } from "./passwordInput";
-import { withTheme } from "@/src/shared/storybook/decorators";
+import { withTheme, withMobile } from "@/src/shared/storybook/decorators";
 import { useForm } from "react-hook-form";
 
 // Wrapper component to provide form context
@@ -36,7 +36,7 @@ function PasswordInputWrapper(props: {
 const meta = {
   title: "Modules/Auth/PasswordInput",
   component: PasswordInputWrapper,
-  decorators: [withTheme],
+  decorators: [withTheme, withMobile],
   argTypes: {
     label: {
       control: "text",
@@ -83,29 +83,6 @@ export const DefaultLight: Story = {
   },
 };
 
-export const ConfirmPasswordDark: Story = {
-  args: {
-    label: "Confirm Password",
-    hasError: false,
-    controlName: "confirmPassword",
-  },
-  parameters: {
-    backgrounds: { default: "dark" },
-  },
-};
-
-export const ConfirmPasswordLight: Story = {
-  args: {
-    label: "Confirm Password",
-    hasError: false,
-    controlName: "confirmPassword",
-  },
-  parameters: {
-    backgrounds: { default: "light" },
-    theme: "light",
-  },
-};
-
 export const WithErrorDark: Story = {
   args: {
     label: "Password",
@@ -123,106 +100,6 @@ export const WithErrorLight: Story = {
     label: "Password",
     hasError: true,
     errorMessage: "Password is required",
-    controlName: "password",
-  },
-  parameters: {
-    backgrounds: { default: "light" },
-    theme: "light",
-  },
-};
-
-export const MinLengthErrorDark: Story = {
-  args: {
-    label: "Password",
-    hasError: true,
-    errorMessage: "Password must be at least 6 characters",
-    controlName: "password",
-  },
-  parameters: {
-    backgrounds: { default: "dark" },
-  },
-};
-
-export const MinLengthErrorLight: Story = {
-  args: {
-    label: "Password",
-    hasError: true,
-    errorMessage: "Password must be at least 6 characters",
-    controlName: "password",
-  },
-  parameters: {
-    backgrounds: { default: "light" },
-    theme: "light",
-  },
-};
-
-export const PasswordMismatchDark: Story = {
-  args: {
-    label: "Confirm Password",
-    hasError: true,
-    errorMessage: "Passwords do not match",
-    controlName: "confirmPassword",
-  },
-  parameters: {
-    backgrounds: { default: "dark" },
-  },
-};
-
-export const PasswordMismatchLight: Story = {
-  args: {
-    label: "Confirm Password",
-    hasError: true,
-    errorMessage: "Passwords do not match",
-    controlName: "confirmPassword",
-  },
-  parameters: {
-    backgrounds: { default: "light" },
-    theme: "light",
-  },
-};
-
-export const NewPasswordDark: Story = {
-  args: {
-    label: "New Password",
-    hasError: false,
-    controlName: "password",
-  },
-  parameters: {
-    backgrounds: { default: "dark" },
-  },
-};
-
-export const NewPasswordLight: Story = {
-  args: {
-    label: "New Password",
-    hasError: false,
-    controlName: "password",
-  },
-  parameters: {
-    backgrounds: { default: "light" },
-    theme: "light",
-  },
-};
-
-export const LongErrorMessageDark: Story = {
-  args: {
-    label: "Password",
-    hasError: true,
-    errorMessage:
-      "Your password must be at least 6 characters long and contain a mix of letters, numbers, and special characters for security.",
-    controlName: "password",
-  },
-  parameters: {
-    backgrounds: { default: "dark" },
-  },
-};
-
-export const LongErrorMessageLight: Story = {
-  args: {
-    label: "Password",
-    hasError: true,
-    errorMessage:
-      "Your password must be at least 6 characters long and contain a mix of letters, numbers, and special characters for security.",
     controlName: "password",
   },
   parameters: {
