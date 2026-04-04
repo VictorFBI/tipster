@@ -9,15 +9,22 @@ interface StyledButtonProps {
   text?: string;
   children?: ReactNode;
   buttonSize?: "s" | "m" | "l";
-  color?: "accent" | "normal";
+  color?: "accent" | "normal" | "surface";
   borderRadius?: number;
   minWidth?: number;
+  marginTop?: number | string;
 }
 
 const buttonSizes: Record<string, SizeTokens> = {
   s: "$3",
   m: "$4",
   l: "$5",
+};
+
+const buttonColor = {
+  accent: "$accent",
+  normal: "$borderColor",
+  surface: "$surface",
 };
 
 export function StyledButton({
@@ -30,6 +37,7 @@ export function StyledButton({
   onPress,
   borderRadius = 12,
   minWidth,
+  marginTop,
 }: StyledButtonProps) {
   const content = useMemo(() => {
     if (children) {
@@ -51,11 +59,13 @@ export function StyledButton({
     <Button
       onPress={onPress}
       size={buttonSizes[buttonSize]}
-      marginTop={buttonSize === "s" ? "$1" : "$4"}
+      marginTop={
+        marginTop !== undefined ? marginTop : buttonSize === "s" ? "$1" : "$4"
+      }
       disabled={disabled}
       opacity={disabled ? 0.5 : opacity}
       pressStyle={{ opacity: 0.8 }}
-      backgroundColor={color === "accent" ? "$accent" : "$borderColor"}
+      backgroundColor={buttonColor[color]}
       borderRadius={borderRadius}
       minWidth={minWidth}
     >

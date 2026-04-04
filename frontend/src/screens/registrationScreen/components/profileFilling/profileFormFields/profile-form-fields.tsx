@@ -40,7 +40,6 @@ export function ProfileFormFields({
           backgroundColor="$input"
           color="$text"
           fontSize={16}
-          autoCapitalize="none"
           inputSize="m"
         />
         <Text fontSize={13} color="$placeholder" lineHeight={18}>

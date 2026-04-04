@@ -1,4 +1,4 @@
-import { Avatar, YStack, Text, XStack, Spinner, Button } from "tamagui";
+import { Avatar, YStack, Text, XStack, Spinner } from "tamagui";
 import { useTranslation } from "react-i18next";
 import { useAccountProfile } from "@/src/modules/user";
 import { useAuthStore } from "@/src/modules/auth";
@@ -6,6 +6,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Pressable } from "react-native";
 import { useRouter } from "expo-router";
 import { useThemeStore, themes } from "@/src/core";
+import { StyledButton } from "@/src/shared";
 
 export function ProfileHeader() {
   const { t } = useTranslation();
@@ -116,18 +117,12 @@ export function ProfileHeader() {
         Активный участник Tipster. Заработал свой первый airdrop! 🚀
       </Text>
 
-      <Button
-        backgroundColor="$surface"
-        borderRadius="$3"
-        paddingHorizontal="$4"
-        paddingVertical="$2"
-        marginTop="$3"
+      <StyledButton
         onPress={handleEditProfile}
-        pressStyle={{
-          opacity: 0.8,
-        }}
-        width="90%"
-        maxWidth={400}
+        color="surface"
+        buttonSize="m"
+        borderRadius={8}
+        minWidth={400}
       >
         <XStack alignItems="center" gap="$2">
           <Ionicons name="create-outline" size={18} color={currentTheme.text} />
@@ -135,7 +130,7 @@ export function ProfileHeader() {
             {t("profile.edit.title")}
           </Text>
         </XStack>
-      </Button>
+      </StyledButton>
 
       <XStack gap="$8" marginTop="$4">
         <YStack alignItems="center" gap="$1">

@@ -9,6 +9,7 @@ import {
   VerifyButton,
   ResendSection,
 } from "@/src/modules/verification";
+import { StyledButton } from "@/src/shared";
 
 interface VerificationCodeScreenProps {
   email: string;
@@ -69,6 +70,9 @@ export function VerificationCodeScreen({
     errorIncompleteCode: finalErrorIncompleteCode,
   });
 
+  const isCodeComplete = code.join("").length === 6;
+  const disabled = isVerifying || !isCodeComplete;
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -117,13 +121,13 @@ export function VerificationCodeScreen({
               onKeyPress={handleKeyPress}
             />
 
-            <VerifyButton
+            <StyledButton
               onPress={handleVerify}
-              isVerifying={isVerifying}
-              isCodeComplete={code.join("").length === 6}
-              useConfirmButton={useConfirmButton}
-              verifyText={finalVerifyButtonText}
-              verifyingText={finalVerifyingButtonText}
+              disabled={disabled}
+              text={
+                isVerifying ? finalVerifyingButtonText : finalVerifyButtonText
+              }
+              buttonSize="l"
             />
 
             <ResendSection

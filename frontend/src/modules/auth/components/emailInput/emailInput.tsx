@@ -33,7 +33,6 @@ export function EmailInput({ control, errors, message }: EmailInputProps) {
             onChangeText={onChange}
             onBlur={onBlur}
             keyboardType="email-address"
-            autoCapitalize="none"
             autoComplete="email"
             hasError={!!errors}
             inputSize="l"

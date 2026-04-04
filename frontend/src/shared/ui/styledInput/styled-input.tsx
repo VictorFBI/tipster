@@ -49,7 +49,7 @@ export function StyledInput({
   paddingHorizontal = "$3",
   paddingVertical = "$2",
   paddingRight,
-  fontSize = 14,
+  fontSize = 16,
   borderWidth = 1,
 }: StyledInputProps) {
   const finalBorderColor = borderColor || (hasError ? "$error" : "$border");

@@ -154,7 +154,6 @@ export default function EditProfileScreen() {
               fontSize={16}
               paddingVertical="$3"
               paddingHorizontal="$4"
-              autoCapitalize="none"
             />
             <Text fontSize={13} color={currentTheme.muted} lineHeight={18}>
               {t("profile.edit.usernameHint")}

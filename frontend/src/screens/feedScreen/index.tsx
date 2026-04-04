@@ -1,4 +1,4 @@
-import { Button, XStack, YStack, Text } from "tamagui";
+import { XStack, YStack, Text } from "tamagui";
 import { PostsList } from "@/src/modules/posts";
 import { Header, InfoBlock, StyledButton } from "@/src/shared";
 import { Ionicons } from "@expo/vector-icons";
@@ -82,21 +82,16 @@ export default function Feed() {
         marginHorizontal="$4"
       />
 
-      <Button
-        backgroundColor="$accent"
-        marginHorizontal="$4"
-        marginTop="$4"
-        borderRadius="$3"
-        pressStyle={{ opacity: 0.8 }}
-        onPress={handleCreatePost}
-      >
-        <XStack alignItems="center" gap="$2">
-          <Ionicons name="add" size={20} color="white" />
-          <Text fontSize={16} fontWeight="600" color="white">
-            {t("feed.createPost")}
-          </Text>
-        </XStack>
-      </Button>
+      <YStack marginHorizontal="$4">
+        <StyledButton onPress={handleCreatePost} buttonSize="m">
+          <XStack alignItems="center" gap="$2">
+            <Ionicons name="add" size={20} color="white" />
+            <Text fontSize={16} fontWeight="600" color="white">
+              {t("feed.createPost")}
+            </Text>
+          </XStack>
+        </StyledButton>
+      </YStack>
 
       <PostsList posts={mockPosts} />
     </YStack>
