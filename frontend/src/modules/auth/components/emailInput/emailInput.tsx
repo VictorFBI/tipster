@@ -1,6 +1,7 @@
 import { Controller, Control, FieldError } from "react-hook-form";
-import { YStack, Text, Input } from "tamagui";
+import { YStack, Text } from "tamagui";
 import { useTranslation } from "react-i18next";
+import { StyledInput } from "@/src/shared";
 
 interface EmailInputProps {
   control: Control<any>;
@@ -26,7 +27,7 @@ export function EmailInput({ control, errors, message }: EmailInputProps) {
           },
         }}
         render={({ field: { onChange, onBlur, value } }) => (
-          <Input
+          <StyledInput
             placeholder="your@email.com"
             value={value}
             onChangeText={onChange}
@@ -34,11 +35,8 @@ export function EmailInput({ control, errors, message }: EmailInputProps) {
             keyboardType="email-address"
             autoCapitalize="none"
             autoComplete="email"
-            size="$5"
-            backgroundColor="$background2"
-            borderColor={errors ? "$error" : "$border"}
-            color="$text"
-            placeholderTextColor="$placeholder"
+            hasError={!!errors}
+            inputSize="l"
           />
         )}
       />

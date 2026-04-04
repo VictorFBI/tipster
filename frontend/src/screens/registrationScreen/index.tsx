@@ -3,7 +3,7 @@ import { Platform, KeyboardAvoidingView, TouchableOpacity } from "react-native";
 import { Link, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useForm, Controller } from "react-hook-form";
-import { YStack, XStack, Text, Input, ScrollView } from "tamagui";
+import { YStack, XStack, Text, ScrollView } from "tamagui";
 import {
   PasswordInput,
   EmailInput,

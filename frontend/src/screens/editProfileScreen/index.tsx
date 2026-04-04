@@ -1,13 +1,14 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
 import { TouchableOpacity, ScrollView, Alert } from "react-native";
-import { Avatar, YStack, Text, Input, TextArea, Button } from "tamagui";
+import { Avatar, YStack, Text, TextArea, Button } from "tamagui";
 import { useTranslation } from "react-i18next";
 import * as ImagePicker from "expo-image-picker";
 import { Header } from "@/src/shared/components/header/header";
 import { useRouter } from "expo-router";
 import { useThemeStore } from "@/src/core/store/themeStore";
 import { themes } from "@/src/core/theme/themes";
+import { StyledInput } from "@/src/shared";
 
 export default function EditProfileScreen() {
   const { t } = useTranslation();
@@ -122,22 +123,18 @@ export default function EditProfileScreen() {
             <Text fontSize={16} fontWeight="600" color="$text">
               {t("profile.filling.displayName") || "Имя"}
             </Text>
-            <Input
+            <StyledInput
               placeholder={
                 t("profile.filling.displayNamePlaceholder") || "Введите имя"
               }
               value={displayName}
               onChangeText={setDisplayName}
               backgroundColor={currentTheme.avatarBg}
-              borderWidth={1}
               borderColor={currentTheme.inputBorder}
               color={currentTheme.text}
-              // @ts-ignore
-              placeholderTextColor={currentTheme.inputPlaceholder}
               fontSize={16}
               paddingVertical="$3"
               paddingHorizontal="$4"
-              borderRadius={12}
             />
           </YStack>
 
@@ -146,7 +143,7 @@ export default function EditProfileScreen() {
             <Text fontSize={16} fontWeight="600" color="$text">
               {t("profile.username")}
             </Text>
-            <Input
+            <StyledInput
               placeholder="@username"
               value={username}
               onChangeText={(text) => setUsername(text.toLowerCase())}
@@ -154,12 +151,9 @@ export default function EditProfileScreen() {
               borderWidth={1}
               borderColor={currentTheme.inputBorder}
               color={currentTheme.text}
-              // @ts-ignore
-              placeholderTextColor={currentTheme.inputPlaceholder}
               fontSize={16}
               paddingVertical="$3"
               paddingHorizontal="$4"
-              borderRadius={12}
               autoCapitalize="none"
             />
             <Text fontSize={13} color={currentTheme.muted} lineHeight={18}>

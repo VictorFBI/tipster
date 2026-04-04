@@ -4,13 +4,14 @@ import {
   FieldError,
   RegisterOptions,
 } from "react-hook-form";
-import { YStack, Text, Input, XStack } from "tamagui";
+import { YStack, Text, XStack } from "tamagui";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { TouchableOpacity } from "react-native";
 import { useThemeStore } from "@/src/core/store/themeStore";
 import { themes } from "@/src/core/theme/themes";
+import { StyledInput } from "@/src/shared";
 
 interface PasswordInputProps {
   label: string;
@@ -57,19 +58,16 @@ export function PasswordInput({
         rules={rules || defaultRules}
         render={({ field: { onChange, onBlur, value } }) => (
           <XStack position="relative" alignItems="center">
-            <Input
+            <StyledInput
               placeholder="••••••••"
               value={value}
               onChangeText={onChange}
               onBlur={onBlur}
               secureTextEntry={!isPasswordVisible}
-              size="$5"
-              backgroundColor="$background2"
-              borderColor={errors ? "$error" : "$border"}
-              color="$text"
-              placeholderTextColor="$placeholder"
-              flex={1}
+              hasError={!!errors}
               paddingRight="$10"
+              inputSize="l"
+              flex={1}
             />
             <TouchableOpacity
               onPress={togglePasswordVisibility}

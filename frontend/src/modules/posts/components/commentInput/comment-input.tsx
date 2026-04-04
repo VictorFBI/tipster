@@ -1,8 +1,9 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
-import { XStack, Button, Input } from "tamagui";
+import { XStack, Button } from "tamagui";
 import { useThemeStore } from "@/src/core/store/themeStore";
 import { themes } from "@/src/core/theme/themes";
+import { StyledInput } from "@/src/shared";
 
 interface CommentInputProps {
   value: string;
@@ -21,21 +22,13 @@ export function CommentInput({
 
   return (
     <XStack gap="$2" alignItems="center">
-      <Input
+      <StyledInput
         flex={1}
         placeholder={t("comments.addComment")}
         value={value}
         onChangeText={onChangeText}
         backgroundColor="$background"
-        borderColor="$borderColor"
-        borderWidth={1}
-        borderRadius="$3"
-        paddingHorizontal="$3"
-        paddingVertical="$2"
         fontSize={14}
-        color="$text"
-        // @ts-ignore
-        placeholderTextColor={currentTheme.muted}
       />
       <Button
         onPress={onSubmit}

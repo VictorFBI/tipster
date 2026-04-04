@@ -1,5 +1,6 @@
-import { YStack, Text, Input, TextArea } from "tamagui";
+import { YStack, Text, TextArea } from "tamagui";
 import { useTranslation } from "react-i18next";
+import { StyledInput } from "@/src/shared";
 
 interface ProfileFormFieldsProps {
   username: string;
@@ -32,20 +33,15 @@ export function ProfileFormFields({
         <Text fontSize={16} fontWeight="600" color="$text">
           {t("profile.filling.username")}
         </Text>
-        <Input
+        <StyledInput
           placeholder={t("profile.filling.usernamePlaceholder")}
           value={username}
           onChangeText={onUsernameChange}
           backgroundColor="$input"
-          borderWidth={1}
-          borderColor="$border"
           color="$text"
-          placeholderTextColor="$placeholder"
           fontSize={16}
-          paddingVertical="$3"
-          paddingHorizontal="$4"
-          borderRadius={12}
           autoCapitalize="none"
+          inputSize="m"
         />
         <Text fontSize={13} color="$placeholder" lineHeight={18}>
           {t("profile.filling.usernameHint")}
@@ -56,19 +52,14 @@ export function ProfileFormFields({
         <Text fontSize={16} fontWeight="600" color="$text">
           {t("profile.filling.firstName")}
         </Text>
-        <Input
+        <StyledInput
           placeholder={t("profile.filling.firstNamePlaceholder")}
           value={firstName}
           onChangeText={onFirstNameChange}
           backgroundColor="$input"
-          borderWidth={1}
-          borderColor="$border"
           color="$text"
-          placeholderTextColor="$placeholder"
           fontSize={16}
-          paddingVertical="$3"
-          paddingHorizontal="$4"
-          borderRadius={12}
+          inputSize="m"
         />
       </YStack>
 
@@ -76,19 +67,14 @@ export function ProfileFormFields({
         <Text fontSize={16} fontWeight="600" color="$text">
           {t("profile.filling.lastName")}
         </Text>
-        <Input
+        <StyledInput
           placeholder={t("profile.filling.lastNamePlaceholder")}
           value={lastName}
           onChangeText={onLastNameChange}
           backgroundColor="$input"
-          borderWidth={1}
-          borderColor="$border"
           color="$text"
-          placeholderTextColor="$placeholder"
           fontSize={16}
-          paddingVertical="$3"
-          paddingHorizontal="$4"
-          borderRadius={12}
+          inputSize="m"
         />
       </YStack>
 
