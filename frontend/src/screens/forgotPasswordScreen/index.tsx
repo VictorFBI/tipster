@@ -4,12 +4,10 @@ import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useForm } from "react-hook-form";
 import { YStack, XStack, Text, ScrollView } from "tamagui";
-import { EmailInput } from "@/src/modules/auth/components/emailInput/emailInput";
-import { ErrorMessage } from "@/src/shared/ui/errorMessage/errorMessage";
+import { EmailInput, useSendEmailResetPassword } from "@/src/modules/auth";
+import { ErrorMessage, StyledButton } from "@/src/shared";
 import { useTranslation } from "react-i18next";
-import { useSendEmailResetPassword } from "@/src/modules/auth";
-import { getErrorMessage } from "@/src/core/utils/errorHandler";
-import { StyledButton } from "@/src/shared/ui/styledButton/styledButton";
+import { getErrorMessage } from "@/src/core";
 
 type ForgotPasswordFormData = {
   email: string;

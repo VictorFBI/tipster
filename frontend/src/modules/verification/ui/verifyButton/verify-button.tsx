@@ -1,5 +1,5 @@
 import { Text, Button } from "tamagui";
-import { StyledButton } from "@/src/shared/ui/styledButton/styledButton";
+import { StyledButton } from "@/src/shared";
 
 interface VerifyButtonProps {
   onPress: () => void;

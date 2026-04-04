@@ -7,4 +7,11 @@ export {
   useSendEmailResetPassword,
   useConfirmEmailResetPassword,
   useResetPassword,
-} from './hooks/useAuth';
+} from "./hooks/useAuth";
+
+export { EmailInput } from "./components/emailInput/emailInput";
+export { PasswordInput } from "./components/passwordInput/passwordInput";
+
+export { useAuthStore } from "./store/authStore";
+export { STORAGE_KEYS } from "./api/client";
+export type { ApiError } from "./api/types";

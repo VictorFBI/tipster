@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { StyledButton } from "./StyledButton";
+import { StyledButton } from "./styled-button";
 import { withTheme, withMobile } from "@/src/shared/storybook/decorators";
 import { YStack } from "tamagui";
 

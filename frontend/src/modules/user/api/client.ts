@@ -1,6 +1,6 @@
 import axios, { AxiosInstance } from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { STORAGE_KEYS } from "@/src/modules/auth/api/client";
+import { STORAGE_KEYS } from "@/src/modules/auth";
 
 // Accounts API base URL
 const ACCOUNTS_API_URL =

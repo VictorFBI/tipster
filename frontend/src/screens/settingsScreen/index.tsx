@@ -3,17 +3,12 @@ import { YStack, XStack, Text, ScrollView } from "tamagui";
 import { TouchableOpacity, Alert } from "react-native";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Header } from "@/src/shared/components/header/header";
+import { Header, InfoBlock } from "@/src/shared";
 import { BalanceBlock } from "./components/balanceBlock/balance-block";
 import { SettingsBlock } from "./components/settingsBlock/settings-block";
-import { InfoBlock } from "@/src/shared/components/infoBlock/info-block";
 import { useTranslation } from "react-i18next";
-import { useThemeStore } from "@/src/core/store/themeStore";
-import { themes } from "@/src/core/theme/themes";
-import { useLogout } from "@/src/modules/auth";
-import { useAuthStore } from "@/src/modules/auth/store/authStore";
-import { STORAGE_KEYS } from "@/src/modules/auth/api/client";
-import { getErrorMessage } from "@/src/core/utils";
+import { useThemeStore, themes, getErrorMessage } from "@/src/core";
+import { useLogout, useAuthStore, STORAGE_KEYS } from "@/src/modules/auth";
 import { ReferalBlock } from "./components/referalBlock/referal-block";
 
 export default function Settings() {

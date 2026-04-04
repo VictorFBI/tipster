@@ -4,12 +4,10 @@ import { useRouter, useLocalSearchParams } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useForm } from "react-hook-form";
 import { YStack, Text, ScrollView } from "tamagui";
-import { PasswordInput } from "@/src/modules/auth/components/passwordInput/passwordInput";
-import { ErrorMessage } from "@/src/shared/ui/errorMessage/errorMessage";
+import { PasswordInput, useResetPassword } from "@/src/modules/auth";
+import { ErrorMessage, StyledButton } from "@/src/shared";
 import { useTranslation } from "react-i18next";
-import { useResetPassword } from "@/src/modules/auth";
-import { getErrorMessage } from "@/src/core/utils/errorHandler";
-import { StyledButton } from "@/src/shared/ui/styledButton/styledButton";
+import { getErrorMessage } from "@/src/core";
 
 type ResetPasswordFormData = {
   password: string;

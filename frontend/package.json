@@ -15,7 +15,9 @@
     "storybook:ios": "cross-env EXPO_PUBLIC_STORYBOOK_ENABLED='true' expo start --ios",
     "storybook:android": "cross-env EXPO_PUBLIC_STORYBOOK_ENABLED='true' expo start --android",
     "chromatic": "npx chromatic --project-token=chpt_30420f5b19bcbf0",
-    "start:prod": "cross-env NODE_ENV=production expo start --no-dev --minify --localhost"
+    "start:prod": "cross-env NODE_ENV=production expo start --no-dev --minify --localhost",
+    "lint": "eslint src --ext .ts,.tsx",
+    "lint:fix": "eslint src --ext .ts,.tsx --fix"
   },
   "dependencies": {
     "@gorhom/bottom-sheet": "^5.2.6",
@@ -73,11 +75,15 @@
     "@storybook/react-native-web-vite": "^10.0.0",
     "@tamagui/babel-plugin": "^2.0.0-rc.22",
     "@types/react": "~19.1.10",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
     "@vitejs/plugin-react": "^5.1.4",
     "babel-plugin-module-resolver": "^5.0.0",
     "babel-plugin-react-docgen-typescript": "^1.5.1",
     "chromatic": "^16.0.0",
     "cross-env": "^10.0.0",
+    "eslint": "^9.0.0",
+    "eslint-config-expo": "^8.0.0",
     "storybook": "^10.0.0",
     "typescript": "~5.9.2",
     "vite": "^7.1.12"

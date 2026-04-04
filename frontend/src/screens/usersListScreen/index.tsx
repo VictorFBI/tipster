@@ -1,6 +1,6 @@
 import { YStack } from "tamagui";
-import { Header } from "@/src/shared/components/header/header";
-import { UsersList } from "@/src/modules/user/components/usersList/users-list";
+import { Header } from "@/src/shared";
+import { UsersList } from "@/src/modules/user";
 import { useLocalSearchParams } from "expo-router";
 import { useTranslation } from "react-i18next";
 

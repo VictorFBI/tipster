@@ -1,12 +1,11 @@
 import { Avatar, YStack, Text, XStack, Spinner, Button } from "tamagui";
 import { useTranslation } from "react-i18next";
 import { useAccountProfile } from "@/src/modules/user";
-import { useAuthStore } from "@/src/modules/auth/store/authStore";
+import { useAuthStore } from "@/src/modules/auth";
 import { Ionicons } from "@expo/vector-icons";
 import { Pressable } from "react-native";
 import { useRouter } from "expo-router";
-import { useThemeStore } from "@/src/core/store/themeStore";
-import { themes } from "@/src/core/theme/themes";
+import { useThemeStore, themes } from "@/src/core";
 
 export function ProfileHeader() {
   const { t } = useTranslation();

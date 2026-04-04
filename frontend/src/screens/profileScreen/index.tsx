@@ -1,13 +1,11 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
 import { YStack, Text } from "tamagui";
-import { Header } from "@/src/shared/components/header/header";
-import { ProfileHeader } from "./components/profileHeader/profile-header";
+import { Header, Tabs } from "@/src/shared";
+import { ProfileHeader } from "@/src/screens";
 import { PostsList } from "@/src/modules/posts";
-import { Tabs } from "@/src/shared/ui/tabs/tabs";
 import { useTranslation } from "react-i18next";
-import { useThemeStore } from "@/src/core/store/themeStore";
-import { themes } from "@/src/core/theme/themes";
+import { useThemeStore, themes } from "@/src/core";
 
 interface Post {
   id: string;

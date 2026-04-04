@@ -2,11 +2,13 @@ import { Platform, KeyboardAvoidingView } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { YStack, Text, ScrollView } from "tamagui";
 import { useTranslation } from "react-i18next";
-import { useVerificationCode } from "@/src/modules/verification/hooks/useVerificationCode";
-import { VerificationIcon } from "@/src/modules/verification/ui/verificationIcon/verification-icon";
-import { CodeInput } from "@/src/modules/verification/ui/codeInput/code-input";
-import { VerifyButton } from "@/src/modules/verification/ui/verifyButton/verify-button";
-import { ResendSection } from "@/src/modules/verification/ui/resendSection/resend-section";
+import {
+  useVerificationCode,
+  VerificationIcon,
+  CodeInput,
+  VerifyButton,
+  ResendSection,
+} from "@/src/modules/verification";
 
 interface VerificationCodeScreenProps {
   email: string;

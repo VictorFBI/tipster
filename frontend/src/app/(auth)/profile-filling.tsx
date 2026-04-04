@@ -1,4 +1,4 @@
-import { ProfileFillingScreen } from "@/src/screens/registrationScreen/components/profileFilling/profile-filling";
+import { ProfileFillingScreen } from "@/src/screens";
 import React from "react";
 
 export default function ProfileFilling() {

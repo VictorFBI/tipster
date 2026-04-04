@@ -3,8 +3,7 @@ import { YStack, Text } from "tamagui";
 import { CommentsSection } from "../commentsSection/comments-section";
 import { PostHeader } from "../postHeader/post-header";
 import { PostActions } from "../postActions/post-actions";
-import { usePostComments } from "../../hooks/usePostComments";
-import type { Post } from "../../types";
+import { usePostComments, type Post } from "@/src/modules/posts";
 
 export type { Post };
 

@@ -1,9 +1,7 @@
 import { useState } from "react";
 import { YStack } from "tamagui";
-import { CommentsList } from "@/src/modules/posts/components/commentsList/comments-list";
-
+import { CommentsList, CommentInput } from "@/src/modules/posts";
 import type { Comment, CommentsSectionProps } from "@/src/modules/posts/types";
-import { CommentInput } from "../commentInput/comment-input";
 
 export type { Comment, CommentsSectionProps };
 

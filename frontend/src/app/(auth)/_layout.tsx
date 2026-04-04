@@ -1,6 +1,5 @@
 import { Stack } from "expo-router";
-import { useThemeStore } from "@/src/core/store/themeStore";
-import { themes } from "@/src/core/theme/themes";
+import { useThemeStore, themes } from "@/src/core";
 
 export default function AuthLayout() {
   const { theme } = useThemeStore();

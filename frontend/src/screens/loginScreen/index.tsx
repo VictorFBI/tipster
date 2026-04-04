@@ -5,12 +5,9 @@ import { StatusBar } from "expo-status-bar";
 import { useForm } from "react-hook-form";
 import { YStack, XStack, Text, View } from "tamagui";
 import { useTranslation } from "react-i18next";
-import { PasswordInput } from "@/src/modules/auth/components/passwordInput/passwordInput";
-import { EmailInput } from "@/src/modules/auth/components/emailInput/emailInput";
-import { ErrorMessage } from "@/src/shared/ui/errorMessage/errorMessage";
-import { getErrorMessage } from "@/src/core/utils";
-import { useLogin } from "@/src/modules/auth";
-import { StyledButton } from "@/src/shared/ui/styledButton/styledButton";
+import { PasswordInput, EmailInput, useLogin } from "@/src/modules/auth";
+import { ErrorMessage, StyledButton } from "@/src/shared";
+import { getErrorMessage } from "@/src/core";
 
 type LoginFormData = {
   email: string;

@@ -1,5 +1,5 @@
 import { AxiosError } from "axios";
-import { ApiError } from "@/src/modules/auth/api/types";
+import type { ApiError } from "@/src/modules/auth";
 
 export const getErrorMessage = (error: unknown): string => {
   if (error instanceof AxiosError) {

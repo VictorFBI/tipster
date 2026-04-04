@@ -4,13 +4,15 @@ import { Link, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useForm, Controller } from "react-hook-form";
 import { YStack, XStack, Text, Input, ScrollView } from "tamagui";
-import { PasswordInput } from "@/src/modules/auth/components/passwordInput/passwordInput";
-import { EmailInput } from "@/src/modules/auth/components/emailInput/emailInput";
-import { ErrorMessage } from "@/src/shared/ui/errorMessage/errorMessage";
+import {
+  PasswordInput,
+  EmailInput,
+  useRegister,
+  useSendEmailRegistration,
+} from "@/src/modules/auth";
+import { ErrorMessage, StyledButton } from "@/src/shared";
 import { useTranslation } from "react-i18next";
-import { getErrorMessage } from "@/src/core/utils";
-import { useRegister, useSendEmailRegistration } from "@/src/modules/auth";
-import { StyledButton } from "@/src/shared/ui/styledButton/styledButton";
+import { getErrorMessage } from "@/src/core";
 
 type RegisterFormData = {
   username: string;
