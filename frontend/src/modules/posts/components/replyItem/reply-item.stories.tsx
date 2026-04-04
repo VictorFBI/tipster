@@ -3,7 +3,7 @@ import { ReplyItem } from "./reply-item";
 import { withTheme, withMobile } from "@/src/shared/storybook/decorators";
 
 const meta = {
-  title: "Modules/Posts/CommentsSection/ReplyItem",
+  title: "Modules/Posts/ReplyItem",
   component: ReplyItem,
   decorators: [withTheme, withMobile],
   argTypes: {

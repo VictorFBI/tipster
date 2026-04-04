@@ -3,7 +3,7 @@ import { CommentInput } from "./comment-input";
 import { withTheme, withMobile } from "@/src/shared/storybook/decorators";
 
 const meta = {
-  title: "Modules/Posts/CommentsSection/CommentInput",
+  title: "Modules/Posts/CommentInput",
   component: CommentInput,
   decorators: [withTheme, withMobile],
   argTypes: {

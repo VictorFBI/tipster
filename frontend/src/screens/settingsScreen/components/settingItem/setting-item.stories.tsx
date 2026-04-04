@@ -4,7 +4,7 @@ import { SettingItem } from "./setting-item";
 import { withTheme, withMobile } from "@/src/shared/storybook/decorators";
 
 const meta = {
-  title: "Screens/Settings/SettingItem",
+  title: "Screens/Settings/Components/SettingItem",
   component: SettingItem,
   decorators: [withTheme, withMobile],
   argTypes: {

@@ -4,7 +4,7 @@ import { withTheme, withMobile } from "@/src/shared/storybook/decorators";
 import type { Comment } from "@/src/modules/posts/types";
 
 const meta = {
-  title: "Modules/Posts/CommentsSection/CommentItem",
+  title: "Modules/Posts/CommentItem",
   component: CommentItem,
   decorators: [withTheme, withMobile],
   argTypes: {
@@ -106,37 +106,6 @@ export const DefaultLight: Story = {
   },
 };
 
-export const WithRepliesDark: Story = {
-  args: {
-    comment: mockCommentWithReplies,
-    isReplying: false,
-    replyText: "",
-    onReplyTextChange: () => {},
-    onStartReply: () => {},
-    onSubmitReply: () => {},
-    onCancelReply: () => {},
-  },
-  parameters: {
-    backgrounds: { default: "dark" },
-  },
-};
-
-export const WithRepliesLight: Story = {
-  args: {
-    comment: mockCommentWithReplies,
-    isReplying: false,
-    replyText: "",
-    onReplyTextChange: () => {},
-    onStartReply: () => {},
-    onSubmitReply: () => {},
-    onCancelReply: () => {},
-  },
-  parameters: {
-    backgrounds: { default: "light" },
-    theme: "light",
-  },
-};
-
 export const ReplyingDark: Story = {
   args: {
     comment: mockComment,
@@ -157,37 +126,6 @@ export const ReplyingLight: Story = {
     comment: mockComment,
     isReplying: true,
     replyText: "",
-    onReplyTextChange: () => {},
-    onStartReply: () => {},
-    onSubmitReply: () => {},
-    onCancelReply: () => {},
-  },
-  parameters: {
-    backgrounds: { default: "light" },
-    theme: "light",
-  },
-};
-
-export const ReplyingWithTextDark: Story = {
-  args: {
-    comment: mockCommentWithReplies,
-    isReplying: true,
-    replyText: "I totally agree with this!",
-    onReplyTextChange: () => {},
-    onStartReply: () => {},
-    onSubmitReply: () => {},
-    onCancelReply: () => {},
-  },
-  parameters: {
-    backgrounds: { default: "dark" },
-  },
-};
-
-export const ReplyingWithTextLight: Story = {
-  args: {
-    comment: mockCommentWithReplies,
-    isReplying: true,
-    replyText: "I totally agree with this!",
     onReplyTextChange: () => {},
     onStartReply: () => {},
     onSubmitReply: () => {},

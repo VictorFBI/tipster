@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { useState } from "react";
 import { Tabs } from "./tabs";
-import { withTheme, withMobile} from "@/src/shared/storybook/decorators";
+import { withTheme, withMobile } from "@/src/shared/storybook/decorators";
 
 const meta = {
-  title: "Screens/Profile/Tabs",
+  title: "Shared/UI/Tabs",
   component: Tabs,
   decorators: [withTheme, withMobile],
   argTypes: {

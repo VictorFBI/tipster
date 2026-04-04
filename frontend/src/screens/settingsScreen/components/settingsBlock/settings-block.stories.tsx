@@ -1,23 +1,23 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { SearchInput } from "./search-input";
+import { SettingsBlock } from "./settings-block";
 import { withTheme, withMobile } from "@/src/shared/storybook/decorators";
 
 const meta = {
-  title: "Screens/Search/Components/SearchInput",
-  component: SearchInput,
+  title: "Screens/Settings/Components/SettingsBlock",
+  component: SettingsBlock,
   decorators: [withTheme, withMobile],
-} satisfies Meta<typeof SearchInput>;
+} satisfies Meta<typeof SettingsBlock>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Dark: Story = {
+export const DefaultDark: Story = {
   parameters: {
     backgrounds: { default: "dark" },
   },
 };
 
-export const Light: Story = {
+export const DefaultLight: Story = {
   parameters: {
     backgrounds: { default: "light" },
     theme: "light",

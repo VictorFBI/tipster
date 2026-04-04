@@ -110,14 +110,11 @@ export function UserCard({ user }: { user: User }) {
       </XStack>
 
       <StyledButton
-        // borderRadius="$3"
-        // paddingHorizontal="$3"
-        // paddingVertical="$2"
         onPress={() => toggleSubscribe(user.id)}
         buttonSize="s"
-        // width="$11"
         color={user.isSubscribed ? "normal" : "accent"}
         borderRadius={6}
+        minWidth={120}
       >
         <Text
           fontSize={14}

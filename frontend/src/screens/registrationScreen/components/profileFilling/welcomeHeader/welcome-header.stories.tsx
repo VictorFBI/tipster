@@ -1,23 +1,23 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { SearchInput } from "./search-input";
+import { WelcomeHeader } from "./welcome-header";
 import { withTheme, withMobile } from "@/src/shared/storybook/decorators";
 
 const meta = {
-  title: "Screens/Search/Components/SearchInput",
-  component: SearchInput,
+  title: "Screens/Registration/Components/ProfileFilling/WelcomeHeader",
+  component: WelcomeHeader,
   decorators: [withTheme, withMobile],
-} satisfies Meta<typeof SearchInput>;
+} satisfies Meta<typeof WelcomeHeader>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Dark: Story = {
+export const DefaultDark: Story = {
   parameters: {
     backgrounds: { default: "dark" },
   },
 };
 
-export const Light: Story = {
+export const DefaultLight: Story = {
   parameters: {
     backgrounds: { default: "light" },
     theme: "light",

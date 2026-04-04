@@ -20,3 +20,5 @@ export function VerificationIcon({ icon }: VerificationIconProps) {
     </YStack>
   );
 }
+
+//DELETE

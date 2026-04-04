@@ -3,7 +3,7 @@ import { withTheme, withMobile } from "@/src/shared/storybook/decorators";
 import { ProfileHeader } from "./profile-header";
 
 const meta = {
-  title: "Screens/Profile/ProfileHeader",
+  title: "Screens/Profile/Components/ProfileHeader",
   component: ProfileHeader,
   decorators: [withTheme, withMobile],
 } satisfies Meta<typeof ProfileHeader>;

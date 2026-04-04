@@ -3,7 +3,7 @@ import { PostActions } from "./post-actions";
 import { withTheme, withMobile } from "@/src/shared/storybook/decorators";
 
 const meta = {
-  title: "Modules/Posts/PostCard/PostActions",
+  title: "Modules/Posts/PostActions",
   component: PostActions,
   decorators: [withTheme, withMobile],
   argTypes: {
@@ -33,34 +33,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const NotLikedDark: Story = {
-  args: {
-    liked: false,
-    likeCount: 42,
-    commentsCount: 8,
-    onLike: () => {},
-    onToggleComments: () => {},
-  },
-  parameters: {
-    backgrounds: { default: "dark" },
-  },
-};
-
-export const NotLikedLight: Story = {
-  args: {
-    liked: false,
-    likeCount: 42,
-    commentsCount: 8,
-    onLike: () => {},
-    onToggleComments: () => {},
-  },
-  parameters: {
-    backgrounds: { default: "light" },
-    theme: "light",
-  },
-};
-
-export const LikedDark: Story = {
+export const normalDark: Story = {
   args: {
     liked: true,
     likeCount: 43,
@@ -73,65 +46,11 @@ export const LikedDark: Story = {
   },
 };
 
-export const LikedLight: Story = {
+export const normalLight: Story = {
   args: {
     liked: true,
     likeCount: 43,
     commentsCount: 8,
-    onLike: () => {},
-    onToggleComments: () => {},
-  },
-  parameters: {
-    backgrounds: { default: "light" },
-    theme: "light",
-  },
-};
-
-export const ZeroCountsDark: Story = {
-  args: {
-    liked: false,
-    likeCount: 0,
-    commentsCount: 0,
-    onLike: () => {},
-    onToggleComments: () => {},
-  },
-  parameters: {
-    backgrounds: { default: "dark" },
-  },
-};
-
-export const ZeroCountsLight: Story = {
-  args: {
-    liked: false,
-    likeCount: 0,
-    commentsCount: 0,
-    onLike: () => {},
-    onToggleComments: () => {},
-  },
-  parameters: {
-    backgrounds: { default: "light" },
-    theme: "light",
-  },
-};
-
-export const HighCountsDark: Story = {
-  args: {
-    liked: true,
-    likeCount: 12500,
-    commentsCount: 3420,
-    onLike: () => {},
-    onToggleComments: () => {},
-  },
-  parameters: {
-    backgrounds: { default: "dark" },
-  },
-};
-
-export const HighCountsLight: Story = {
-  args: {
-    liked: true,
-    likeCount: 12500,
-    commentsCount: 3420,
     onLike: () => {},
     onToggleComments: () => {},
   },

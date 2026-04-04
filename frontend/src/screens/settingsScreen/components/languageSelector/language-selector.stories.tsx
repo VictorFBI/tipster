@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { withTheme, withMobile} from "@/src/shared/storybook/decorators";
+import { withTheme, withMobile } from "@/src/shared/storybook/decorators";
 import { LanguageSelector } from "./language-selector";
 
 const meta = {
-  title: "Screens/Settings/LanguageSelector",
+  title: "Screens/Settings/Components/LanguageSelector",
   component: LanguageSelector,
   decorators: [withTheme, withMobile],
 } satisfies Meta<typeof LanguageSelector>;

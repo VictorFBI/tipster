@@ -3,7 +3,7 @@ import { ProfileFillingScreen } from "./profileFilling/profile-filling";
 import { withTheme, withMobile } from "@/src/shared/storybook/decorators";
 
 const meta = {
-  title: "Screens/Profile/ProfileFilling",
+  title: "Screens/Registration/ProfileFilling",
   component: ProfileFillingScreen,
   decorators: [withTheme, withMobile],
 } satisfies Meta<typeof ProfileFillingScreen>;

@@ -142,6 +142,7 @@ export function Login() {
                   ? t("auth.loggingIn")
                   : t("auth.login")
               }
+              buttonSize="l"
             />
 
             <Text

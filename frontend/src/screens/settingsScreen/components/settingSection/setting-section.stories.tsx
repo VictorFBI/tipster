@@ -4,7 +4,7 @@ import { SettingSection } from "./setting-section";
 import { withTheme, withMobile } from "@/src/shared/storybook/decorators";
 
 const meta = {
-  title: "Screens/Settings/SettingSection",
+  title: "Screens/Settings/Components/SettingSection",
   component: SettingSection,
   decorators: [withTheme, withMobile],
   argTypes: {

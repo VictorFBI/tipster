@@ -11,6 +11,7 @@ interface StyledButtonProps {
   buttonSize?: "s" | "m" | "l";
   color?: "accent" | "normal";
   borderRadius?: number;
+  minWidth?: number;
 }
 
 const buttonSizes: Record<string, SizeTokens> = {
@@ -28,6 +29,7 @@ export function StyledButton({
   color = "accent",
   onPress,
   borderRadius = 12,
+  minWidth,
 }: StyledButtonProps) {
   const content = useMemo(() => {
     if (children) {
@@ -55,6 +57,7 @@ export function StyledButton({
       pressStyle={{ opacity: 0.8 }}
       backgroundColor={color === "accent" ? "$accent" : "$borderColor"}
       borderRadius={borderRadius}
+      minWidth={minWidth}
     >
       {content}
     </Button>

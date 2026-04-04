@@ -3,7 +3,7 @@ import { ReplyInput } from "./reply-input";
 import { withTheme, withMobile } from "@/src/shared/storybook/decorators";
 
 const meta = {
-  title: "Modules/Posts/CommentsSection/ReplyInput",
+  title: "Modules/Posts/ReplyInput",
   component: ReplyInput,
   decorators: [withTheme, withMobile],
   argTypes: {

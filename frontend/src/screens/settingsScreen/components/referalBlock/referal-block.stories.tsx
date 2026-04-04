@@ -3,7 +3,7 @@ import { ReferalBlock } from "./referal-block";
 import { withTheme, withMobile } from "@/src/shared/storybook/decorators";
 
 const meta = {
-  title: "Screens/Settings/ReferalBlock",
+  title: "Screens/Settings/Components/ReferalBlock",
   component: ReferalBlock,
   decorators: [withTheme, withMobile],
   argTypes: {
