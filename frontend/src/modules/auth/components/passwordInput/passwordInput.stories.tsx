@@ -3,7 +3,6 @@ import { PasswordInput } from "./passwordInput";
 import { withTheme, withMobile } from "@/src/shared/storybook/decorators";
 import { useForm } from "react-hook-form";
 
-// Wrapper component to provide form context
 function PasswordInputWrapper(props: {
   label?: string;
   hasError?: boolean;
@@ -17,7 +16,6 @@ function PasswordInputWrapper(props: {
     },
   });
 
-  // Simulate error state if needed
   const simulatedErrors = props.hasError
     ? { type: "manual", message: props.errorMessage }
     : undefined;

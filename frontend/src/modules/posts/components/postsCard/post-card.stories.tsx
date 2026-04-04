@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { PostCard } from "./post-card";
 import { withTheme, withMobile } from "@/src/shared/storybook/decorators";
-import type { Comment as CommentType } from "../commentsSection/comments-section";
+import type { Comment as CommentType } from "@/src/modules/posts/types";
 
 const meta = {
   title: "Modules/Posts/PostCard",

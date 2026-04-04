@@ -5,12 +5,12 @@ import { StatusBar } from "expo-status-bar";
 import { useForm } from "react-hook-form";
 import { YStack, XStack, Text, View } from "tamagui";
 import { useTranslation } from "react-i18next";
-import { ConfirmButton } from "../../shared/ui/confirmButton/confirmButton";
-import { PasswordInput } from "../../modules/auth/components/passwordInput/passwordInput";
-import { EmailInput } from "../../modules/auth/components/emailInput/emailInput";
-import { ErrorMessage } from "../../shared/ui/errorMessage/errorMessage";
-import { getErrorMessage } from "../../core/utils";
+import { PasswordInput } from "@/src/modules/auth/components/passwordInput/passwordInput";
+import { EmailInput } from "@/src/modules/auth/components/emailInput/emailInput";
+import { ErrorMessage } from "@/src/shared/ui/errorMessage/errorMessage";
+import { getErrorMessage } from "@/src/core/utils";
 import { useLogin } from "@/src/modules/auth";
+import { StyledButton } from "@/src/shared/ui/styledButton/styledButton";
 
 type LoginFormData = {
   email: string;
@@ -136,7 +136,7 @@ export function Login() {
 
             <ErrorMessage message={errorMsg} visible={!!errorMsg} />
 
-            <ConfirmButton
+            <StyledButton
               onPress={handleSubmit(onSubmit)}
               disabled={isSubmitting || loginMutation.isPending}
               opacity={isSubmitting || loginMutation.isPending ? 0.5 : 1}

@@ -1,3 +1,3 @@
-import CreatePostScreen from "../../screens/createPostScreen";
+import CreatePostScreen from "@/src/screens/createPostScreen";
 
 export default CreatePostScreen;

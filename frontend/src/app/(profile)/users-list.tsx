@@ -1,3 +1,3 @@
-import UsersListScreen from "../../screens/usersListScreen";
+import UsersListScreen from "@/src/screens/usersListScreen";
 
 export default UsersListScreen;

@@ -5,7 +5,7 @@ import {
   useConfirmEmailRegistration,
   useSendEmailRegistration,
 } from "@/src/modules/auth";
-import { getErrorMessage } from "../../../../core/utils";
+import { getErrorMessage } from "@/src/core/utils";
 import { Alert } from "react-native";
 import { VerificationCodeScreen } from "../verificationCodeScreen/verification-code-screen";
 

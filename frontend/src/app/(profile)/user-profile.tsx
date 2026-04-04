@@ -1,3 +1,3 @@
-import UserProfileScreen from "../../screens/userProfileScreen";
+import UserProfileScreen from "@/src/screens/userProfileScreen";
 
 export default UserProfileScreen;

@@ -1,42 +1,40 @@
-import { AxiosError } from 'axios';
-import { ApiError } from '../../modules/auth/api/types';
-
+import { AxiosError } from "axios";
+import { ApiError } from "@/src/modules/auth/api/types";
 
 export const getErrorMessage = (error: unknown): string => {
   if (error instanceof AxiosError) {
     const apiError = error.response?.data as ApiError | undefined;
-    console.log('error', error)
-    console.log('apiError', apiError)
-    
+    console.log("error", error);
+    console.log("apiError", apiError);
+
     // // Return API error message if available
     // if (apiError?.message) {
     //   return apiError.message;
     // }
-    
 
     switch (error.response?.status) {
       case 400:
-        return 'Неверный запрос. Проверьте введенные данные.';
+        return "Неверный запрос. Проверьте введенные данные.";
       case 401:
-        return 'Неверный логин или пароль. Проверьте данные и попробуйте снова.';
+        return "Неверный логин или пароль. Проверьте данные и попробуйте снова.";
       case 403:
-        return 'Доступ запрещен.';
+        return "Доступ запрещен.";
       case 404:
-        return 'Ресурс не найден.';
+        return "Ресурс не найден.";
       case 429:
-        return 'Слишком много попыток. Попробуйте позже.';
+        return "Слишком много попыток. Попробуйте позже.";
       case 500:
-        return 'Ошибка сервера. Попробуйте позже.';
+        return "Ошибка сервера. Попробуйте позже.";
       default:
-        return error.message || 'Произошла ошибка. Попробуйте еще раз.';
+        return error.message || "Произошла ошибка. Попробуйте еще раз.";
     }
   }
-  
+
   if (error instanceof Error) {
     return error.message;
   }
-  
-  return 'Произошла неизвестная ошибка.';
+
+  return "Произошла неизвестная ошибка.";
 };
 
 /**
@@ -44,7 +42,7 @@ export const getErrorMessage = (error: unknown): string => {
  */
 export const isNetworkError = (error: unknown): boolean => {
   if (error instanceof AxiosError) {
-    return !error.response && error.code === 'ERR_NETWORK';
+    return !error.response && error.code === "ERR_NETWORK";
   }
   return false;
 };
@@ -72,33 +70,35 @@ export const isValidationError = (error: unknown): boolean => {
 /**
  * Format error for display to user
  */
-export const formatErrorForDisplay = (error: unknown): {
+export const formatErrorForDisplay = (
+  error: unknown,
+): {
   title: string;
   message: string;
 } => {
   if (isNetworkError(error)) {
     return {
-      title: 'Ошибка сети',
-      message: 'Проверьте подключение к интернету и попробуйте снова.',
+      title: "Ошибка сети",
+      message: "Проверьте подключение к интернету и попробуйте снова.",
     };
   }
-  
+
   if (isAuthError(error)) {
     return {
-      title: 'Ошибка авторизации',
+      title: "Ошибка авторизации",
       message: getErrorMessage(error),
     };
   }
-  
+
   if (isValidationError(error)) {
     return {
-      title: 'Ошибка валидации',
+      title: "Ошибка валидации",
       message: getErrorMessage(error),
     };
   }
-  
+
   return {
-    title: 'Ошибка',
+    title: "Ошибка",
     message: getErrorMessage(error),
   };
 };

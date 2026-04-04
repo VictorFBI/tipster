@@ -1,8 +1,8 @@
-import { useMutation, UseMutationResult } from '@tanstack/react-query';
-import { AxiosError } from 'axios';
-import authService from '../api/auth.service';
-import { setAuthTokens, clearAuthTokens } from '../api/client';
-import { useAuthStore } from '../store/authStore';
+import { useMutation, UseMutationResult } from "@tanstack/react-query";
+import { AxiosError } from "axios";
+import authService from "../api/auth.service";
+import { setAuthTokens, clearAuthTokens } from "../api/client";
+import { useAuthStore } from "../store/authStore";
 import {
   RegisterRequest,
   LoginRequest,
@@ -12,8 +12,7 @@ import {
   ConfirmEmailRequest,
   ResetPasswordRequest,
   ApiError,
-} from '../api/types';
-
+} from "../api/types";
 
 export const useRegister = (): UseMutationResult<
   void,
@@ -23,11 +22,13 @@ export const useRegister = (): UseMutationResult<
   return useMutation({
     mutationFn: authService.register,
     onError: (error) => {
-      console.error('Registration error:', error.response?.data?.message || error.message);
+      console.error(
+        "Registration error:",
+        error.response?.data?.message || error.message,
+      );
     },
   });
 };
-
 
 export const useLogin = (): UseMutationResult<
   LoginResponse,
@@ -39,21 +40,21 @@ export const useLogin = (): UseMutationResult<
     onSuccess: async (data) => {
       // Save tokens to storage
       await setAuthTokens(data.access_token, data.refresh_token);
-      
-    
-      
+
       // Update Zustand store with user data including accountId
       useAuthStore.getState().setUser({
-        email: '', // TODO: extract from token or get from API
+        email: "", // TODO: extract from token or get from API
         //accountId: accountId || undefined,
       });
     },
     onError: (error) => {
-      console.error('Login error:', error.response?.data?.message || error.message);
+      console.error(
+        "Login error:",
+        error.response?.data?.message || error.message,
+      );
     },
   });
 };
-
 
 export const useLogout = (): UseMutationResult<
   void,
@@ -69,14 +70,16 @@ export const useLogout = (): UseMutationResult<
       useAuthStore.getState().logout();
     },
     onError: (error) => {
-      console.error('Logout error:', error.response?.data?.message || error.message);
+      console.error(
+        "Logout error:",
+        error.response?.data?.message || error.message,
+      );
       // Clear tokens even on error
       clearAuthTokens();
       useAuthStore.getState().logout();
     },
   });
 };
-
 
 export const useSendEmailRegistration = (): UseMutationResult<
   void,
@@ -87,13 +90,12 @@ export const useSendEmailRegistration = (): UseMutationResult<
     mutationFn: authService.sendEmailRegistration,
     onError: (error) => {
       console.error(
-        'Send email registration error:',
-        error.response?.data?.message || error.message
+        "Send email registration error:",
+        error.response?.data?.message || error.message,
       );
     },
   });
 };
-
 
 export const useConfirmEmailRegistration = (): UseMutationResult<
   void,
@@ -104,13 +106,12 @@ export const useConfirmEmailRegistration = (): UseMutationResult<
     mutationFn: authService.confirmEmailRegistration,
     onError: (error) => {
       console.error(
-        'Confirm email registration error:',
-        error.response?.data?.message || error.message
+        "Confirm email registration error:",
+        error.response?.data?.message || error.message,
       );
     },
   });
 };
-
 
 export const useSendEmailResetPassword = (): UseMutationResult<
   void,
@@ -121,13 +122,12 @@ export const useSendEmailResetPassword = (): UseMutationResult<
     mutationFn: authService.sendEmailResetPassword,
     onError: (error) => {
       console.error(
-        'Send email reset password error:',
-        error.response?.data?.message || error.message
+        "Send email reset password error:",
+        error.response?.data?.message || error.message,
       );
     },
   });
 };
-
 
 export const useConfirmEmailResetPassword = (): UseMutationResult<
   void,
@@ -138,13 +138,12 @@ export const useConfirmEmailResetPassword = (): UseMutationResult<
     mutationFn: authService.confirmEmailResetPassword,
     onError: (error) => {
       console.error(
-        'Confirm email reset password error:',
-        error.response?.data?.message || error.message
+        "Confirm email reset password error:",
+        error.response?.data?.message || error.message,
       );
     },
   });
 };
-
 
 export const useResetPassword = (): UseMutationResult<
   void,
@@ -155,8 +154,8 @@ export const useResetPassword = (): UseMutationResult<
     mutationFn: authService.resetPassword,
     onError: (error) => {
       console.error(
-        'Reset password error:',
-        error.response?.data?.message || error.message
+        "Reset password error:",
+        error.response?.data?.message || error.message,
       );
     },
   });

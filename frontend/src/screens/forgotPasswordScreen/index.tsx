@@ -4,12 +4,12 @@ import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useForm } from "react-hook-form";
 import { YStack, XStack, Text, ScrollView } from "tamagui";
-import { ConfirmButton } from "../../shared/ui/confirmButton/confirmButton";
-import { EmailInput } from "../../modules/auth/components/emailInput/emailInput";
-import { ErrorMessage } from "../../shared/ui/errorMessage/errorMessage";
+import { EmailInput } from "@/src/modules/auth/components/emailInput/emailInput";
+import { ErrorMessage } from "@/src/shared/ui/errorMessage/errorMessage";
 import { useTranslation } from "react-i18next";
 import { useSendEmailResetPassword } from "@/src/modules/auth";
-import { getErrorMessage } from "../../core/utils/errorHandler";
+import { getErrorMessage } from "@/src/core/utils/errorHandler";
+import { StyledButton } from "@/src/shared/ui/styledButton/styledButton";
 
 type ForgotPasswordFormData = {
   email: string;
@@ -97,7 +97,7 @@ export function ForgotPassword() {
 
             {error && <ErrorMessage message={error} />}
 
-            <ConfirmButton
+            <StyledButton
               onPress={handleSubmit(onSubmit)}
               disabled={sendEmailMutation.isPending}
               opacity={sendEmailMutation.isPending ? 0.5 : 1}

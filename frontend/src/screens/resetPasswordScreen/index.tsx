@@ -4,12 +4,12 @@ import { useRouter, useLocalSearchParams } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useForm } from "react-hook-form";
 import { YStack, Text, ScrollView } from "tamagui";
-import { ConfirmButton } from "../../shared/ui/confirmButton/confirmButton";
-import { PasswordInput } from "../../modules/auth/components/passwordInput/passwordInput";
-import { ErrorMessage } from "../../shared/ui/errorMessage/errorMessage";
+import { PasswordInput } from "@/src/modules/auth/components/passwordInput/passwordInput";
+import { ErrorMessage } from "@/src/shared/ui/errorMessage/errorMessage";
 import { useTranslation } from "react-i18next";
 import { useResetPassword } from "@/src/modules/auth";
-import { getErrorMessage } from "../../core/utils/errorHandler";
+import { getErrorMessage } from "@/src/core/utils/errorHandler";
+import { StyledButton } from "@/src/shared/ui/styledButton/styledButton";
 
 type ResetPasswordFormData = {
   password: string;
@@ -124,7 +124,7 @@ export function ResetPassword() {
 
             {error && <ErrorMessage message={error} />}
 
-            <ConfirmButton
+            <StyledButton
               onPress={handleSubmit(onSubmit)}
               disabled={resetPasswordMutation.isPending}
               opacity={resetPasswordMutation.isPending ? 0.5 : 1}

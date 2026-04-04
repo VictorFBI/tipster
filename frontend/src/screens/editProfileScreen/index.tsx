@@ -4,7 +4,7 @@ import { TouchableOpacity, ScrollView, Alert } from "react-native";
 import { Avatar, YStack, Text, Input, TextArea, Button } from "tamagui";
 import { useTranslation } from "react-i18next";
 import * as ImagePicker from "expo-image-picker";
-import { Header } from "../../shared/components/header/header";
+import { Header } from "@/src/shared/components/header/header";
 import { useRouter } from "expo-router";
 import { useThemeStore } from "@/src/core/store/themeStore";
 import { themes } from "@/src/core/theme/themes";

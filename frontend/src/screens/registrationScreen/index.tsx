@@ -4,13 +4,13 @@ import { Link, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useForm, Controller } from "react-hook-form";
 import { YStack, XStack, Text, Input, ScrollView } from "tamagui";
-import { ConfirmButton } from "../../shared/ui/confirmButton/confirmButton";
-import { PasswordInput } from "../../modules/auth/components/passwordInput/passwordInput";
-import { EmailInput } from "../../modules/auth/components/emailInput/emailInput";
-import { ErrorMessage } from "../../shared/ui/errorMessage/errorMessage";
+import { PasswordInput } from "@/src/modules/auth/components/passwordInput/passwordInput";
+import { EmailInput } from "@/src/modules/auth/components/emailInput/emailInput";
+import { ErrorMessage } from "@/src/shared/ui/errorMessage/errorMessage";
 import { useTranslation } from "react-i18next";
-import { getErrorMessage } from "../../core/utils";
+import { getErrorMessage } from "@/src/core/utils";
 import { useRegister, useSendEmailRegistration } from "@/src/modules/auth";
+import { StyledButton } from "@/src/shared/ui/styledButton/styledButton";
 
 type RegisterFormData = {
   username: string;
@@ -141,7 +141,7 @@ export function Registration() {
               }}
             />
 
-            <ConfirmButton
+            <StyledButton
               onPress={handleSubmit(onSubmit)}
               disabled={
                 isSubmitting ||

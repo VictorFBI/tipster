@@ -3,7 +3,6 @@ import { EmailInput } from "./emailInput";
 import { withTheme, withMobile } from "@/src/shared/storybook/decorators";
 import { useForm } from "react-hook-form";
 
-// Wrapper component to provide form context
 function EmailInputWrapper(props: {
   hasError?: boolean;
   errorMessage?: string;
@@ -17,7 +16,6 @@ function EmailInputWrapper(props: {
     },
   });
 
-  // Simulate error state if needed
   const simulatedErrors = props.hasError
     ? { type: "manual", message: props.errorMessage }
     : undefined;

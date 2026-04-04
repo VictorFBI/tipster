@@ -1,10 +1,10 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
 import { YStack, Text } from "tamagui";
-import { Header } from "../../shared/components/header/header";
-import { ProfileHeader } from "../profileScreen/components/profileHeader/profile-header";
-import { PostsList } from "../../modules/posts";
-import { Tabs } from "../profileScreen/components/tabs/tabs";
+import { Header } from "@/src/shared/components/header/header";
+import { ProfileHeader } from "@/src/screens/profileScreen/components/profileHeader/profile-header";
+import { PostsList } from "@/src/modules/posts";
+import { Tabs } from "@/src/shared/ui/tabs/tabs";
 import { useLocalSearchParams } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { useThemeStore } from "@/src/core/store/themeStore";

@@ -1,12 +1,12 @@
-import { YStack } from "tamagui";
-import { CreatePostButton, PostsList } from "../../modules/posts";
-import { Header } from "../../shared/components/header/header";
-import { InfoBlock } from "../../shared/components/infoBlock/info-block";
+import { Button, XStack, YStack, Text } from "tamagui";
+import { PostsList } from "@/src/modules/posts";
+import { Header, InfoBlock, StyledButton } from "@/src/shared";
 import { Ionicons } from "@expo/vector-icons";
 
 import { useTranslation } from "react-i18next";
 import { useThemeStore } from "@/src/core/store/themeStore";
 import { themes } from "@/src/core/theme/themes";
+import { useRouter } from "expo-router";
 
 interface Post {
   id: string;
@@ -67,6 +67,12 @@ export default function Feed() {
   const { theme } = useThemeStore();
   const currentTheme = themes[theme];
 
+  const router = useRouter();
+
+  const handleCreatePost = () => {
+    router.push("/create-post");
+  };
+
   return (
     <YStack flex={1} backgroundColor={"$background"}>
       <Header balance={5420} headerText="Tipster" />
@@ -75,7 +81,23 @@ export default function Feed() {
         icon={<Ionicons name="bulb" size={20} color={currentTheme.accent} />}
         marginHorizontal="$4"
       />
-      <CreatePostButton />
+
+      <Button
+        backgroundColor="$accent"
+        marginHorizontal="$4"
+        marginTop="$4"
+        borderRadius="$3"
+        pressStyle={{ opacity: 0.8 }}
+        onPress={handleCreatePost}
+      >
+        <XStack alignItems="center" gap="$2">
+          <Ionicons name="add" size={20} color="white" />
+          <Text fontSize={16} fontWeight="600" color="white">
+            {t("feed.createPost")}
+          </Text>
+        </XStack>
+      </Button>
+
       <PostsList posts={mockPosts} />
     </YStack>
   );

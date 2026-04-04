@@ -1,17 +1,12 @@
-import React, { useState, useRef } from "react";
-import {
-  Platform,
-  KeyboardAvoidingView,
-  TextInput,
-  TouchableOpacity,
-} from "react-native";
-import { useRouter } from "expo-router";
+import { Platform, KeyboardAvoidingView } from "react-native";
 import { StatusBar } from "expo-status-bar";
-import { YStack, XStack, Text, Button, ScrollView } from "tamagui";
+import { YStack, Text, ScrollView } from "tamagui";
 import { useTranslation } from "react-i18next";
-import { ConfirmButton } from "@/src/shared/ui/confirmButton/confirmButton";
-import { useThemeStore } from "@/src/core/store/themeStore";
-import { themes } from "@/src/core/theme/themes";
+import { useVerificationCode } from "@/src/modules/verification/hooks/useVerificationCode";
+import { VerificationIcon } from "@/src/modules/verification/ui/verificationIcon/verification-icon";
+import { CodeInput } from "@/src/modules/verification/ui/codeInput/code-input";
+import { VerifyButton } from "@/src/modules/verification/ui/verifyButton/verify-button";
+import { ResendSection } from "@/src/modules/verification/ui/resendSection/resend-section";
 
 interface VerificationCodeScreenProps {
   email: string;
@@ -46,10 +41,7 @@ export function VerificationCodeScreen({
   errorIncompleteCode,
 }: VerificationCodeScreenProps) {
   const { t } = useTranslation();
-  const { theme } = useThemeStore();
-  const currentTheme = themes[theme];
 
-  // Set default values using translation
   const finalCodeInputLabel = codeInputLabel || t("auth.enterVerificationCode");
   const finalVerifyButtonText = verifyButtonText || t("auth.verify");
   const finalVerifyingButtonText = verifyingButtonText || t("auth.verifying");
@@ -58,62 +50,22 @@ export function VerificationCodeScreen({
   const finalErrorInvalidCode = errorInvalidCode || t("auth.invalidCode");
   const finalErrorIncompleteCode =
     errorIncompleteCode || t("auth.enterFullCode");
-  const router = useRouter();
-  const [code, setCode] = useState(["", "", "", "", "", ""]);
-  const [isVerifying, setIsVerifying] = useState(false);
-  const [error, setError] = useState("");
 
-  const inputRefs = useRef<(TextInput | null)[]>([]);
-
-  const handleCodeChange = (value: string, index: number) => {
-    if (value && !/^\d$/.test(value)) return;
-
-    const newCode = [...code];
-    newCode[index] = value;
-    setCode(newCode);
-    setError("");
-
-    if (value && index < 5) {
-      inputRefs.current[index + 1]?.focus();
-    }
-  };
-
-  const handleKeyPress = (e: any, index: number) => {
-    if (e.nativeEvent.key === "Backspace" && !code[index] && index > 0) {
-      inputRefs.current[index - 1]?.focus();
-    }
-  };
-
-  const handleVerify = async () => {
-    const verificationCode = code.join("");
-
-    if (verificationCode.length !== 6) {
-      setError(finalErrorIncompleteCode);
-      return;
-    }
-
-    setIsVerifying(true);
-    try {
-      await onVerifySuccess(verificationCode);
-    } catch (error) {
-      console.error("Verification error:", error);
-      setError(finalErrorInvalidCode);
-      setCode(["", "", "", "", "", ""]);
-      inputRefs.current[0]?.focus();
-    } finally {
-      setIsVerifying(false);
-    }
-  };
-
-  const handleResendCode = async () => {
-    if (onResendCode) {
-      try {
-        await onResendCode();
-      } catch (error) {
-        console.error("Resend error:", error);
-      }
-    }
-  };
+  const {
+    code,
+    isVerifying,
+    error,
+    inputRefs,
+    handleCodeChange,
+    handleKeyPress,
+    handleVerify,
+    handleResendCode,
+  } = useVerificationCode({
+    onVerifySuccess,
+    onResendCode,
+    errorInvalidCode: finalErrorInvalidCode,
+    errorIncompleteCode: finalErrorIncompleteCode,
+  });
 
   return (
     <KeyboardAvoidingView
@@ -129,18 +81,7 @@ export function VerificationCodeScreen({
           paddingBottom="$8"
           gap="$4"
         >
-          <YStack alignItems="center">
-            <YStack
-              width={80}
-              height={80}
-              borderRadius={40}
-              backgroundColor="$accent"
-              alignItems="center"
-              justifyContent="center"
-            >
-              <Text fontSize={40}>{icon}</Text>
-            </YStack>
-          </YStack>
+          <VerificationIcon icon={icon} />
 
           <Text
             fontSize="$9"
@@ -165,117 +106,29 @@ export function VerificationCodeScreen({
           </Text>
 
           <YStack gap="$4" width="100%" marginTop="$6">
-            <Text
-              fontSize="$3"
-              fontWeight="800"
-              color="$text"
-              textAlign="center"
-            >
-              {finalCodeInputLabel}
-            </Text>
+            <CodeInput
+              code={code}
+              error={error}
+              label={finalCodeInputLabel}
+              inputRefs={inputRefs}
+              onCodeChange={handleCodeChange}
+              onKeyPress={handleKeyPress}
+            />
 
-            <XStack justifyContent="center" gap="$3">
-              {code.map((digit, index) => (
-                <YStack
-                  key={index}
-                  width={50}
-                  height={60}
-                  borderRadius="$4"
-                  borderWidth={2}
-                  borderColor={error ? "$error" : digit ? "$accent" : "$border"}
-                  backgroundColor="$background2"
-                  alignItems="center"
-                  justifyContent="center"
-                >
-                  <TextInput
-                    ref={(ref) => {
-                      inputRefs.current[index] = ref;
-                    }}
-                    value={digit}
-                    onChangeText={(value) => handleCodeChange(value, index)}
-                    onKeyPress={(e) => handleKeyPress(e, index)}
-                    keyboardType="number-pad"
-                    maxLength={1}
-                    selectTextOnFocus
-                    style={{
-                      fontSize: 24,
-                      fontWeight: "bold",
-                      textAlign: "center",
-                      width: "100%",
-                      height: "100%",
-                      color: currentTheme.text,
-                    }}
-                  />
-                </YStack>
-              ))}
-            </XStack>
+            <VerifyButton
+              onPress={handleVerify}
+              isVerifying={isVerifying}
+              isCodeComplete={code.join("").length === 6}
+              useConfirmButton={useConfirmButton}
+              verifyText={finalVerifyButtonText}
+              verifyingText={finalVerifyingButtonText}
+            />
 
-            {error && (
-              <Text fontSize="$3" color="$error" textAlign="center">
-                {error}
-              </Text>
-            )}
-
-            {useConfirmButton ? (
-              <ConfirmButton
-                onPress={handleVerify}
-                disabled={isVerifying || code.join("").length !== 6}
-                opacity={isVerifying || code.join("").length !== 6 ? 0.5 : 1}
-                text={
-                  isVerifying ? finalVerifyingButtonText : finalVerifyButtonText
-                }
-              />
-            ) : (
-              <Button
-                size="$5"
-                marginTop="$4"
-                onPress={handleVerify}
-                disabled={isVerifying || code.join("").length !== 6}
-                opacity={isVerifying || code.join("").length !== 6 ? 0.5 : 1}
-                pressStyle={{ opacity: 0.8 }}
-                backgroundColor="$accent"
-              >
-                <Text fontSize="$5" fontWeight="800" color="white">
-                  {isVerifying
-                    ? finalVerifyingButtonText
-                    : finalVerifyButtonText}
-                </Text>
-              </Button>
-            )}
-
-            <YStack gap="$2" marginTop="$4">
-              <Text
-                fontSize="$3"
-                color="$text"
-                opacity={0.7}
-                textAlign="center"
-              >
-                {finalResendText}
-              </Text>
-              <Button
-                size="$4"
-                onPress={handleResendCode}
-                backgroundColor="transparent"
-                pressStyle={{ opacity: 0.7 }}
-              >
-                <Text fontSize="$4" color="$accent" fontWeight="800">
-                  {finalResendButtonText}
-                </Text>
-              </Button>
-            </YStack>
-
-            <XStack
-              justifyContent="center"
-              alignItems="center"
-              gap="$2"
-              marginTop="$4"
-            >
-              <TouchableOpacity onPress={() => router.back()}>
-                <Text fontSize="$3" color="$accent" fontWeight="800">
-                  {t("auth.back")}
-                </Text>
-              </TouchableOpacity>
-            </XStack>
+            <ResendSection
+              resendText={finalResendText}
+              resendButtonText={finalResendButtonText}
+              onResend={handleResendCode}
+            />
           </YStack>
         </YStack>
       </ScrollView>

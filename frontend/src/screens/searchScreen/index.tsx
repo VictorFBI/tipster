@@ -1,6 +1,6 @@
 import { ScrollView, YStack } from "tamagui";
-import { Header } from "../../shared/components/header/header";
-import { UserCard } from "../../modules/user/components/userCard/user-card";
+import { Header } from "@/src/shared/components/header/header";
+import { UserCard } from "@/src/modules/user/components/userCard/user-card";
 import { SearchInput } from "./components/search-input";
 import { useTranslation } from "react-i18next";
 import { Pressable } from "react-native";

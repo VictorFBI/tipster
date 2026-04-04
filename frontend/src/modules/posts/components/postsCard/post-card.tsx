@@ -1,31 +1,20 @@
-import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
-import { Avatar, XStack, YStack, Text, Button } from "tamagui";
+import { YStack, Text } from "tamagui";
 import { CommentsSection } from "../commentsSection/comments-section";
-import { useThemeStore } from "@/src/core/store/themeStore";
-import { themes } from "@/src/core/theme/themes";
+import { PostHeader } from "../postHeader/post-header";
+import { PostActions } from "../postActions/post-actions";
+import { usePostComments } from "../../hooks/usePostComments";
+import type { Post } from "../../types";
 
-interface Post {
-  id: string;
-  author: {
-    name: string;
-    avatar: string;
-  };
-  timestamp: string;
-  content: string;
-  tipAmount: number;
-  likes: number;
-  comments: number;
-  commentsList?: Comment[];
-}
+export type { Post };
 
 export function PostCard({ post }: { post: Post }) {
-  const { theme } = useThemeStore();
-  const currentTheme = themes[theme];
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(post.likes);
   const [showComments, setShowComments] = useState(false);
-  const [comments, setComments] = useState<Comment[]>(post.commentsList || []);
+  const { comments, handleAddComment, handleAddReply } = usePostComments(
+    post.commentsList || [],
+  );
 
   const handleLike = () => {
     if (liked) {
@@ -34,45 +23,6 @@ export function PostCard({ post }: { post: Post }) {
       setLikeCount(likeCount + 1);
     }
     setLiked(!liked);
-  };
-
-  const handleAddComment = (content: string) => {
-    const newComment: Comment = {
-      id: Date.now().toString(),
-      author: {
-        name: "Current User", // Replace with actual user data
-        avatar: "https://i.pravatar.cc/150?img=1",
-      },
-      timestamp: "Just now",
-      content,
-      replies: [],
-    };
-    setComments([...comments, newComment]);
-  };
-
-  const handleAddReply = (commentId: string, content: string) => {
-    const newReply: Comment = {
-      id: Date.now().toString(),
-      author: {
-        name: "Current User",
-        avatar: "https://i.pravatar.cc/150?img=1",
-      },
-      timestamp: "Just now",
-      content,
-      replies: [],
-    };
-
-    setComments(
-      comments.map((comment) => {
-        if (comment.id === commentId) {
-          return {
-            ...comment,
-            replies: [...(comment.replies || []), newReply],
-          };
-        }
-        return comment;
-      }),
-    );
   };
 
   const toggleComments = () => {
@@ -88,69 +38,23 @@ export function PostCard({ post }: { post: Post }) {
       borderRadius="$4"
       gap="$3"
     >
-      <XStack alignItems="center" justifyContent="space-between">
-        <XStack alignItems="center" gap="$3">
-          <Avatar circular size="$4">
-            <Avatar.Image src={post.author.avatar} />
-            <Avatar.Fallback backgroundColor="$accent" />
-          </Avatar>
-          <YStack>
-            <Text fontSize={16} fontWeight="600" color="$text">
-              {post.author.name}
-            </Text>
-            <Text fontSize={12} color={currentTheme.muted}>
-              {post.timestamp}
-            </Text>
-          </YStack>
-        </XStack>
-      </XStack>
+      <PostHeader
+        authorName={post.author.name}
+        authorAvatar={post.author.avatar}
+        timestamp={post.timestamp}
+      />
 
       <Text fontSize={16} color="$text" lineHeight={22}>
         {post.content}
       </Text>
 
-      <XStack gap="$4" marginTop="$2">
-        <Button
-          unstyled
-          onPress={handleLike}
-          pressStyle={{ opacity: 0.7 }}
-          flexDirection="row"
-          alignItems="center"
-          gap="$2"
-          backgroundColor="transparent"
-          borderWidth={0}
-          padding={0}
-        >
-          <Ionicons
-            name={liked ? "heart" : "heart-outline"}
-            size={20}
-            color={liked ? currentTheme.accent : currentTheme.muted}
-          />
-          <Text fontSize={14} color={currentTheme.muted}>
-            {likeCount}
-          </Text>
-        </Button>
-        <Button
-          unstyled
-          onPress={toggleComments}
-          pressStyle={{ opacity: 0.7 }}
-          flexDirection="row"
-          alignItems="center"
-          gap="$2"
-          backgroundColor="transparent"
-          borderWidth={0}
-          padding={0}
-        >
-          <Ionicons
-            name="chatbubble-outline"
-            size={20}
-            color={currentTheme.muted}
-          />
-          <Text fontSize={14} color={currentTheme.muted}>
-            {comments.length}
-          </Text>
-        </Button>
-      </XStack>
+      <PostActions
+        liked={liked}
+        likeCount={likeCount}
+        commentsCount={comments.length}
+        onLike={handleLike}
+        onToggleComments={toggleComments}
+      />
 
       {showComments && (
         <CommentsSection

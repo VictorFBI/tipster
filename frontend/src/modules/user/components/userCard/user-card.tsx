@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useThemeStore } from "@/src/core/store/themeStore";
 import { themes } from "@/src/core/theme/themes";
+import { StyledButton } from "@/src/shared";
 
 interface User {
   id: string;
@@ -108,17 +109,15 @@ export function UserCard({ user }: { user: User }) {
         </YStack>
       </XStack>
 
-      <Button
-        backgroundColor={user.isSubscribed ? "$surfaceSecondary" : "$accent"}
-        borderRadius="$3"
-        paddingHorizontal="$3"
-        paddingVertical="$2"
+      <StyledButton
+        // borderRadius="$3"
+        // paddingHorizontal="$3"
+        // paddingVertical="$2"
         onPress={() => toggleSubscribe(user.id)}
-        pressStyle={{
-          opacity: 0.8,
-        }}
-        size="$3"
-        width="$11"
+        buttonSize="s"
+        // width="$11"
+        color={user.isSubscribed ? "normal" : "accent"}
+        borderRadius={6}
       >
         <Text
           fontSize={14}
@@ -129,7 +128,7 @@ export function UserCard({ user }: { user: User }) {
             ? t("profile.unsubscribe")
             : t("profile.subscribe")}
         </Text>
-      </Button>
+      </StyledButton>
     </XStack>
   );
 }

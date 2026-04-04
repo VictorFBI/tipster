@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { useState } from "react";
 import { SettingItem } from "./setting-item";
-import { withTheme, withMobile} from "@/src/shared/storybook/decorators";
+import { withTheme, withMobile } from "@/src/shared/storybook/decorators";
 
 const meta = {
   title: "Screens/Settings/SettingItem",
@@ -49,60 +49,6 @@ export const NotificationsEnabledLight: Story = {
     title: "Push Notifications",
     description: "Receive notifications about new posts and comments",
     checked: true,
-    onCheckedChange: (checked) => console.log("Checked:", checked),
-  },
-  parameters: {
-    backgrounds: { default: "light" },
-    theme: "light",
-  },
-};
-
-export const NotificationsDisabledDark: Story = {
-  args: {
-    icon: "notifications-outline",
-    title: "Push Notifications",
-    description: "Receive notifications about new posts and comments",
-    checked: false,
-    onCheckedChange: (checked) => console.log("Checked:", checked),
-  },
-  parameters: {
-    backgrounds: { default: "dark" },
-  },
-};
-
-export const NotificationsDisabledLight: Story = {
-  args: {
-    icon: "notifications-outline",
-    title: "Push Notifications",
-    description: "Receive notifications about new posts and comments",
-    checked: false,
-    onCheckedChange: (checked) => console.log("Checked:", checked),
-  },
-  parameters: {
-    backgrounds: { default: "light" },
-    theme: "light",
-  },
-};
-
-export const PrivateAccountDark: Story = {
-  args: {
-    icon: "lock-closed-outline",
-    title: "Private Account",
-    description: "Only approved followers can see your posts",
-    checked: false,
-    onCheckedChange: (checked) => console.log("Checked:", checked),
-  },
-  parameters: {
-    backgrounds: { default: "dark" },
-  },
-};
-
-export const PrivateAccountLight: Story = {
-  args: {
-    icon: "lock-closed-outline",
-    title: "Private Account",
-    description: "Only approved followers can see your posts",
-    checked: false,
     onCheckedChange: (checked) => console.log("Checked:", checked),
   },
   parameters: {
