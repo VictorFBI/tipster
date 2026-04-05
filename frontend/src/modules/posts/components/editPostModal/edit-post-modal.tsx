@@ -169,7 +169,7 @@ export function EditPostModal({
                   onPress={pickImage}
                   backgroundColor="transparent"
                   borderWidth={1}
-                  borderColor="$border"
+                  borderColor="$darkBorder"
                   borderStyle="dashed"
                   padding="$2"
                   // minHeight={80}

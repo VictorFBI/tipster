@@ -40,7 +40,7 @@ export const Default: Story = {
   } as any,
 };
 
-export const EditOption: Story = {
+export const DefaultLight: Story = {
   render: (args) => (
     <YStack position="relative" height={300}>
       <PostEditMenu
@@ -60,4 +60,8 @@ export const EditOption: Story = {
     onEdit: () => {},
     onDelete: () => {},
   } as any,
+  parameters: {
+    backgrounds: { default: "light" },
+    theme: "light",
+  },
 };

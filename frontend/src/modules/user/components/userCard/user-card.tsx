@@ -119,7 +119,7 @@ export function UserCard({ user }: { user: User }) {
         <Text
           fontSize={14}
           fontWeight="600"
-          color={user.isSubscribed ? "$textSecondary" : "white"}
+          color={user.isSubscribed ? "$textSecondary2" : "white"}
         >
           {user.isSubscribed
             ? t("profile.unsubscribe")

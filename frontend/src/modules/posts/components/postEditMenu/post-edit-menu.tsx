@@ -50,6 +50,8 @@ export function PostEditMenu({
           borderRadius="$4"
           overflow="hidden"
           width={200}
+          borderWidth={2}
+          borderColor="$border"
           shadowColor="$shadowColor"
           shadowOffset={{ width: 0, height: 4 }}
           shadowOpacity={0.3}

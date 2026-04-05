@@ -19,6 +19,8 @@ const tamaguiConfig = createTamagui({
       placeholder: themes.light.placeholder,
       error: themes.light.error,
       input: themes.light.input,
+      textSecondary2: themes.light.textLight,
+      darkBorder: themes.light.textSecondary,
     },
     dark: {
       ...config.themes.dark,
@@ -33,6 +35,8 @@ const tamaguiConfig = createTamagui({
       placeholder: themes.dark.placeholder,
       error: themes.dark.error,
       input: themes.dark.input,
+      textSecondary2: themes.dark.textSecondary,
+      darkBorder: themes.dark.border,
     },
   },
 });
