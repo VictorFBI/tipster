@@ -6,6 +6,7 @@ interface Post {
   author: {
     name: string;
     avatar: string;
+    id?: string;
   };
   timestamp: string;
   content: string;
@@ -16,14 +17,19 @@ interface Post {
 
 interface PostsListProps {
   posts: Post[];
+  currentUserId?: string;
 }
 
-export function PostsList({ posts }: PostsListProps) {
+export function PostsList({ posts, currentUserId }: PostsListProps) {
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
       <YStack paddingBottom="$6">
         {posts.map((post) => (
-          <PostCard key={post.id} post={post} />
+          <PostCard
+            key={post.id}
+            post={post}
+            isOwnPost={currentUserId ? post.author.id === currentUserId : false}
+          />
         ))}
       </YStack>
     </ScrollView>

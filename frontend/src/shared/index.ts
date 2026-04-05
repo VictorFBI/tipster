@@ -5,3 +5,4 @@ export { ErrorMessage } from "./ui/errorMessage/errorMessage";
 export { Divider } from "./ui/divider/divider";
 export { Header } from "./components/header/header";
 export { InfoBlock } from "./components/infoBlock/info-block";
+export { ConfirmDialog } from "./ui/confirmDialog/confirm-dialog";

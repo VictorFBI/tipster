@@ -1,4 +1,5 @@
-import { Avatar, XStack, YStack, Text } from "tamagui";
+import { Avatar, XStack, YStack, Text, Button } from "tamagui";
+import { Ionicons } from "@expo/vector-icons";
 import { useThemeStore } from "@/src/core/store/themeStore";
 import { themes } from "@/src/core/theme/themes";
 
@@ -6,12 +7,16 @@ interface PostHeaderProps {
   authorName: string;
   authorAvatar: string;
   timestamp: string;
+  isOwnPost?: boolean;
+  onEdit?: () => void;
 }
 
 export function PostHeader({
   authorName,
   authorAvatar,
   timestamp,
+  isOwnPost = false,
+  onEdit,
 }: PostHeaderProps) {
   const { theme } = useThemeStore();
   const currentTheme = themes[theme];
@@ -32,6 +37,22 @@ export function PostHeader({
           </Text>
         </YStack>
       </XStack>
+      {isOwnPost && onEdit && (
+        <Button
+          unstyled
+          onPress={onEdit}
+          pressStyle={{ opacity: 0.7 }}
+          backgroundColor="transparent"
+          borderWidth={0}
+          padding="$2"
+        >
+          <Ionicons
+            name="ellipsis-horizontal"
+            size={20}
+            color={currentTheme.muted}
+          />
+        </Button>
+      )}
     </XStack>
   );
 }

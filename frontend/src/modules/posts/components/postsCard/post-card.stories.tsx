@@ -21,6 +21,7 @@ type Story = StoryObj<typeof meta>;
 const mockPost = {
   id: "1",
   author: {
+    id: "user123",
     name: "CryptoKing",
     avatar: "https://i.pravatar.cc/150?img=1",
   },
@@ -30,6 +31,7 @@ const mockPost = {
   tipAmount: 150,
   likes: 42,
   comments: 8,
+  reposts: 15,
   commentsList: [
     {
       id: "c1",
@@ -58,6 +60,7 @@ const mockPost = {
 export const DefaultDark: Story = {
   args: {
     post: mockPost,
+    isOwnPost: false,
   },
   parameters: {
     backgrounds: { default: "dark" },
@@ -67,9 +70,20 @@ export const DefaultDark: Story = {
 export const DefaultLight: Story = {
   args: {
     post: mockPost,
+    isOwnPost: false,
   },
   parameters: {
     backgrounds: { default: "light" },
     theme: "light",
+  },
+};
+
+export const OwnPost: Story = {
+  args: {
+    post: mockPost,
+    isOwnPost: true,
+  },
+  parameters: {
+    backgrounds: { default: "dark" },
   },
 };

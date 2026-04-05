@@ -7,10 +7,12 @@ import { useTranslation } from "react-i18next";
 import { useThemeStore } from "@/src/core/store/themeStore";
 import { themes } from "@/src/core/theme/themes";
 import { useRouter } from "expo-router";
+import { useAuthStore } from "@/src/modules/auth/store/authStore";
 
 interface Post {
   id: string;
   author: {
+    id?: string;
     name: string;
     avatar: string;
   };
@@ -25,6 +27,7 @@ const mockPosts: Post[] = [
   {
     id: "1",
     author: {
+      id: "current-user",
       name: "CryptoKing",
       avatar: "https://i.pravatar.cc/150?img=1",
     },
@@ -37,6 +40,7 @@ const mockPosts: Post[] = [
   {
     id: "2",
     author: {
+      id: "user-2",
       name: "TokenHunter",
       avatar: "https://i.pravatar.cc/150?img=2",
     },
@@ -50,6 +54,7 @@ const mockPosts: Post[] = [
   {
     id: "3",
     author: {
+      id: "user-3",
       name: "AirdropMaster",
       avatar: "https://i.pravatar.cc/150?img=3",
     },
@@ -66,6 +71,7 @@ export default function Feed() {
   const { t } = useTranslation();
   const { theme } = useThemeStore();
   const currentTheme = themes[theme];
+  const { user } = useAuthStore();
 
   const router = useRouter();
 
@@ -93,7 +99,10 @@ export default function Feed() {
         </StyledButton>
       </YStack>
 
-      <PostsList posts={mockPosts} />
+      <PostsList
+        posts={mockPosts}
+        currentUserId={user?.accountId || "current-user"}
+      />
     </YStack>
   );
 }

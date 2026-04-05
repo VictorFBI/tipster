@@ -1,14 +1,17 @@
 export interface Post {
   id: string;
   author: {
+    id?: string;
     name: string;
     avatar: string;
   };
   timestamp: string;
   content: string;
+  image?: string;
   tipAmount: number;
   likes: number;
   comments: number;
+  reposts?: number;
   commentsList?: Comment[];
 }
 

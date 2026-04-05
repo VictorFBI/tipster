@@ -2,10 +2,11 @@ import { XStack, YStack, Text } from "tamagui";
 import { useTranslation } from "react-i18next";
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
-import { Modal, TouchableOpacity, StyleSheet, Pressable } from "react-native";
+import { Modal, TouchableOpacity, Pressable } from "react-native";
 import { changeLanguage } from "@/src/core/utils/i18n";
 import { useThemeStore } from "@/src/core/store/themeStore";
 import { themes } from "@/src/core/theme/themes";
+import { styles } from "./language-selector.styles";
 
 interface Language {
   code: string;
@@ -139,14 +140,3 @@ export function LanguageSelector() {
     </>
   );
 }
-
-const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    justifyContent: "flex-end",
-  },
-  modalContent: {
-    width: "100%",
-  },
-});
