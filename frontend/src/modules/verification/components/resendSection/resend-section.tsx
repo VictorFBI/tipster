@@ -7,15 +7,22 @@ interface ResendSectionProps {
   resendText: string;
   resendButtonText: string;
   onResend: () => void;
+  resendTimer?: number;
 }
 
 export function ResendSection({
   resendText,
   resendButtonText,
   onResend,
+  resendTimer = 0,
 }: ResendSectionProps) {
   const { t } = useTranslation();
   const router = useRouter();
+
+  const isDisabled = resendTimer > 0;
+  const buttonText = isDisabled
+    ? `${resendButtonText} (${resendTimer}${t("auth.seconds")})`
+    : resendButtonText;
 
   return (
     <>
@@ -28,9 +35,16 @@ export function ResendSection({
           onPress={onResend}
           backgroundColor="transparent"
           pressStyle={{ opacity: 0.7 }}
+          disabled={isDisabled}
+          opacity={isDisabled ? 0.5 : 1}
         >
-          <Text fontSize="$4" color="$accent" fontWeight="800">
-            {resendButtonText}
+          <Text
+            fontSize="$4"
+            color="$accent"
+            fontWeight="800"
+            opacity={isDisabled ? 0.5 : 1}
+          >
+            {buttonText}
           </Text>
         </Button>
       </YStack>

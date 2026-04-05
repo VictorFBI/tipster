@@ -3,11 +3,10 @@ import { StatusBar } from "expo-status-bar";
 import { YStack, Text, ScrollView } from "tamagui";
 import { useTranslation } from "react-i18next";
 import {
+  CodeInput,
+  ResendSection,
   useVerificationCode,
   VerificationIcon,
-  CodeInput,
-  VerifyButton,
-  ResendSection,
 } from "@/src/modules/verification";
 import { StyledButton } from "@/src/shared";
 
@@ -59,6 +58,7 @@ export function VerificationCodeScreen({
     isVerifying,
     error,
     inputRefs,
+    resendTimer,
     handleCodeChange,
     handleKeyPress,
     handleVerify,
@@ -134,6 +134,7 @@ export function VerificationCodeScreen({
               resendText={finalResendText}
               resendButtonText={finalResendButtonText}
               onResend={handleResendCode}
+              resendTimer={resendTimer}
             />
           </YStack>
         </YStack>
