@@ -12,8 +12,11 @@ type AccountProfileClaims struct {
 	AvatarUrl *string `json:"avatar_url,omitempty"`
 	Bio       *string `json:"bio,omitempty"`
 	FirstName *string `json:"first_name,omitempty"`
-	LastName  *string `json:"last_name,omitempty"`
-	Username  *string `json:"username,omitempty"`
+
+	// IsSubscribed Whether the authenticated user (JWT) is subscribed to the requested profile (account_id)
+	IsSubscribed bool    `json:"is_subscribed"`
+	LastName     *string `json:"last_name,omitempty"`
+	Username     *string `json:"username,omitempty"`
 }
 
 // AccountProfileClaimsWithSecureClaims defines model for AccountProfileClaimsWithSecureClaims.
@@ -31,10 +34,48 @@ type ErrorResponse struct {
 	Message string `json:"message"`
 }
 
+// SubscribeRequest defines model for SubscribeRequest.
+type SubscribeRequest struct {
+	UserId string `json:"user_id"`
+}
+
+// UnsubscribeRequest defines model for UnsubscribeRequest.
+type UnsubscribeRequest struct {
+	UserId string `json:"user_id"`
+}
+
+// UserSearchItem defines model for UserSearchItem.
+type UserSearchItem struct {
+	AvatarUrl *string `json:"avatar_url,omitempty"`
+	FirstName *string `json:"first_name,omitempty"`
+	LastName  *string `json:"last_name,omitempty"`
+	UserId    string  `json:"user_id"`
+	Username  string  `json:"username"`
+}
+
+// UserSearchResponse defines model for UserSearchResponse.
+type UserSearchResponse struct {
+	Items []UserSearchItem `json:"items"`
+}
+
 // GetUsersProfileParams defines parameters for GetUsersProfile.
 type GetUsersProfileParams struct {
 	AccountId string `form:"account_id" json:"account_id"`
 }
 
+// GetUsersSearchParams defines parameters for GetUsersSearch.
+type GetUsersSearchParams struct {
+	// Query Non-empty prefix; % and _ in the value are treated literally
+	Query  string `form:"query" json:"query"`
+	Limit  int    `form:"limit" json:"limit"`
+	Offset int    `form:"offset" json:"offset"`
+}
+
 // PatchUsersProfileJSONRequestBody defines body for PatchUsersProfile for application/json ContentType.
 type PatchUsersProfileJSONRequestBody = AccountProfileClaimsWithSecureClaims
+
+// PostUsersSubscribeJSONRequestBody defines body for PostUsersSubscribe for application/json ContentType.
+type PostUsersSubscribeJSONRequestBody = SubscribeRequest
+
+// PostUsersUnsubscribeJSONRequestBody defines body for PostUsersUnsubscribe for application/json ContentType.
+type PostUsersUnsubscribeJSONRequestBody = UnsubscribeRequest

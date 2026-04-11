@@ -5,6 +5,123 @@ info:
   description: API for users service
 
 paths:
+  /users/subscribe:
+    post:
+      summary: Subscribe to a user
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubscribeRequest'
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /users/unsubscribe:
+    post:
+      summary: Unsubscribe from a user
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UnsubscribeRequest'
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /users/search:
+    get:
+      summary: Search users by username prefix (case-insensitive)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: query
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Non-empty prefix; % and _ in the value are treated literally
+        - name: limit
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+        - name: offset
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserSearchResponse'
+        '400':
+          description: Bad request (invalid or missing query parameters)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: No users match the search
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /users/profile/me:
     get:
       summary: Read my account profile. Returns account profile with secure claims (wallet address). Should be used to read my own profile
@@ -162,6 +279,54 @@ components:
           type: string
         avatar_url:
           type: string
+        is_subscribed:
+          type: boolean
+          description: Whether the authenticated user (JWT) is subscribed to the requested profile (account_id)
+      required:
+        - is_subscribed
+
+    SubscribeRequest:
+      type: object
+      properties:
+        user_id:
+          type: string
+      required:
+        - user_id
+
+    UnsubscribeRequest:
+      type: object
+      properties:
+        user_id:
+          type: string
+      required:
+        - user_id
+
+    UserSearchItem:
+      type: object
+      properties:
+        user_id:
+          type: string
+        username:
+          type: string
+        first_name:
+          type: string
+        last_name:
+          type: string
+        avatar_url:
+          type: string
+      required:
+        - user_id
+        - username
+
+    UserSearchResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserSearchItem'
+      required:
+        - items
 
     ErrorResponse:
       type: object

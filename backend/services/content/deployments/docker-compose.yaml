@@ -1,0 +1,50 @@
+version: "3.9"
+name: tipster-content
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: content_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: content
+    ports:
+      - "5432:5432"
+    volumes:
+      - content_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d content"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  content:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    container_name: tipster_content
+    ports:
+      - "8083:8083"
+    env_file:
+      - ../.env
+    environment:
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_NAME: content
+      DB_PASSWORD: postgres
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - default
+      - tipster_infra
+
+volumes:
+  content_postgres_data:
+
+networks:
+  tipster_infra:
+    external: true
+    name: tipster-infra_default

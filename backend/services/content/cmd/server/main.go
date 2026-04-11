@@ -9,12 +9,11 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 
-	"tipster/backend/users/internal/consumers"
-	"tipster/backend/users/internal/db/kafka"
-	"tipster/backend/users/internal/db/postgresql"
-	"tipster/backend/users/internal/handlers"
-	applogging "tipster/backend/users/internal/logging"
-	middlewares "tipster/backend/users/internal/middlewares"
+	"tipster/backend/content/internal/db/kafka"
+	"tipster/backend/content/internal/db/postgresql"
+	"tipster/backend/content/internal/db/redis"
+	"tipster/backend/content/internal/handlers"
+	applogging "tipster/backend/content/internal/logging"
 
 	"github.com/joho/godotenv"
 	httpSwagger "github.com/swaggo/http-swagger"
@@ -38,6 +37,21 @@ func checkPostgreSQLConnection(ctx context.Context) {
 		os.Exit(1)
 	}
 	slog.Info("postgresql_ok")
+}
+
+func checkRedisConnection(ctx context.Context) {
+	slog.Info("checking_redis")
+	redisConn, err := redis.Connect(ctx)
+	if err != nil {
+		slog.Error("redis_failed", slog.String("error", err.Error()))
+		os.Exit(1)
+	}
+	err = redisConn.Close()
+	if err != nil {
+		slog.Error("redis_close_failed", slog.String("error", err.Error()))
+		os.Exit(1)
+	}
+	slog.Info("redis_ok")
 }
 
 func checkKafkaConnection(ctx context.Context) {
@@ -68,35 +82,32 @@ func main() {
 	slog.Info("migrations_ok")
 
 	checkPostgreSQLConnection(ctx)
+	checkRedisConnection(ctx)
 	checkKafkaConnection(ctx)
-
-	kafkaClient, err := kafka.Connect(ctx)
-	if err != nil {
-		slog.Error("kafka_consumer_connect_failed", slog.String("error", err.Error()))
-		os.Exit(1)
-	}
-	go consumers.RunAuthUserCreated(ctx, kafkaClient)
 
 	r := chi.NewRouter()
 	slog.Info("server_starting")
 	r.Use(middleware.RequestID)
-	r.Use(applogging.HTTPMiddleware("users"))
+	r.Use(applogging.HTTPMiddleware("content"))
 
 	r.Get("/swagger/doc.json", handlers.OpenAPIDoc)
 	r.Get("/swagger/*", httpSwagger.Handler(
 		httpSwagger.URL("/swagger/doc.json"),
 	))
 
-	r.With(middlewares.RequireAccessToken).Get("/users/search", handlers.GetUsersSearch)
-	r.With(middlewares.RequireAccessToken).Post("/users/subscribe", handlers.PostUsersSubscribe)
-	r.With(middlewares.RequireAccessToken).Post("/users/unsubscribe", handlers.PostUsersUnsubscribe)
-	r.With(middlewares.RequireAccessToken).Get("/users/profile", handlers.GetAccountProfile)
-	r.With(middlewares.RequireAccessToken).Patch("/users/profile", handlers.PatchAccountProfile)
-	r.With(middlewares.RequireAccessToken).Get("/users/profile/me", handlers.GetAccountProfileMe)
-	r.With(middlewares.RequireAccessToken).Delete("/users/profile/me", handlers.DeleteAccountProfileMe)
+	r.Get("/content/me", handlers.Me)
+	r.Post("/content/login", handlers.Login)
+	r.Post("/content/logout", handlers.Logout)
+	r.Post("/content/register", handlers.Register)
+	r.Post("/content/refresh", handlers.Refresh)
+	r.Post("/content/send-email/registration", handlers.SendEmailRegistration)
+	r.Post("/content/send-email/reset-password", handlers.SendEmailResetPassword)
+	r.Post("/content/confirm-email/registration", handlers.ConfirmEmailRegistration)
+	r.Post("/content/confirm-email/reset-password", handlers.ConfirmEmailResetPassword)
+	r.Post("/content/reset-password", handlers.ResetPassword)
 
-	slog.Info("server_listening", slog.String("addr", ":8081"))
-	err = http.ListenAndServe(":8081", r)
+	slog.Info("server_listening", slog.String("addr", ":8080"))
+	err := http.ListenAndServe(":8080", r)
 	if err != nil {
 		slog.Error("server_failed", slog.String("error", err.Error()))
 		os.Exit(1)

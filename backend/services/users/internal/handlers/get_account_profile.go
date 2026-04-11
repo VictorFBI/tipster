@@ -8,11 +8,18 @@ import (
 
 	api "tipster/backend/users/internal/generated"
 	"tipster/backend/users/internal/logging"
+	middlewares "tipster/backend/users/internal/middlewares"
 	usersservice "tipster/backend/users/internal/services/users"
 )
 
 func GetAccountProfile(w http.ResponseWriter, r *http.Request) {
 	log := logging.LoggerFromContext(r.Context()).With(slog.String("handler", "get_account_profile"))
+	viewerID, _ := r.Context().Value(middlewares.AccountIDContextKey).(string)
+	if viewerID == "" {
+		log.Warn("unauthorized", slog.String("reason", "missing_account_in_context"))
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
 	accountId := r.URL.Query().Get("account_id")
 	if accountId == "" {
 		log.Warn("bad_request", slog.String("reason", "missing_account_id"))
@@ -48,8 +55,30 @@ func GetAccountProfile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	isSubscribed, err := svc.IsSubscribed(r.Context(), viewerID, accountId)
+	if err != nil {
+		if errors.Is(err, usersservice.ErrInvalidAccountID) {
+			log.Warn("get_profile_failed", slog.String("reason", "invalid_subscription_ids"))
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(api.ErrorResponse{Message: "Invalid account ID"})
+			return
+		}
+		log.Error("get_profile_failed", slog.String("error", err.Error()))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	out := api.AccountProfileClaims{
+		FirstName:    account.FirstName,
+		LastName:     account.LastName,
+		Username:     account.Username,
+		Bio:          account.Bio,
+		AvatarUrl:    account.AvatarUrl,
+		IsSubscribed: isSubscribed,
+	}
+
 	log.Info("get_account_profile_ok")
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(account)
+	json.NewEncoder(w).Encode(out)
 }
