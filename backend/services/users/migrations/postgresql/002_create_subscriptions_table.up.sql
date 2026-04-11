@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS subscriptions (
+    id UUID PRIMARY KEY,
+    subscriber_id UUID NOT NULL REFERENCES users (id) ON DELETE CASCADE,
+    author_id UUID NOT NULL REFERENCES users (id) ON DELETE CASCADE
+);
