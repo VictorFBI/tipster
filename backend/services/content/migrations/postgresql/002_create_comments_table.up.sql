@@ -2,9 +2,9 @@ CREATE TABLE comments (
     id UUID PRIMARY KEY,
 
     post_id UUID NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
-    author_id UUID NOT NULL REFERENCES users(id),
+    author_id UUID NOT NULL,
 
-    content TEXT NOT NULL,
+    content VARCHAR(4096) NOT NULL,
 
     parent_id UUID REFERENCES comments(id),
 

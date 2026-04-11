@@ -1,119 +1,28 @@
 openapi: 3.0.0
 info:
-  title: Auth API
+  title: Content API
   version: 1.0.0
-  description: API for contententication service
+  description: API for the content service (posts, comments, likes)
 
 paths:
-  /content/me:
-    get:
-      summary: Get user information
+  /content/posts:
+    post:
+      summary: Create a post
       security:
         - bearerAuth: []
-      responses:
-        '200':
-          description: Success
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserId'
-        '401':
-          description: Uncontentorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-
-  /content/register:
-    post:
-      summary: Register a new user
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/RegisterRequest'
+              $ref: '#/components/schemas/CreatePostRequest'
       responses:
         '200':
-          description: Success
-        '400':
-          description: Bad request
+          description: Post created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-
-  /content/login:
-    post:
-      summary: Login and get contententication token
-      parameters:
-        - name: X-Device-Id
-          in: header
-          required: true
-          description: Device ID
-          schema:
-            type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/LoginRequest'
-      responses:
-        '200':
-          description: Success
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/LoginResponse'
-        '401':
-          description: Invalid credentials
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-
-  /content/logout:
-    post:
-      summary: Logout and invalidate refresh token
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/LogoutRequest'
-      responses:
-        '200':
-          description: Success
-        '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-
-  /content/refresh:
-    post:
-      summary: Refresh access token
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/RefreshRequest'
-      responses:
-        '200':
-          description: Success
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RefreshResponse'
+                $ref: '#/components/schemas/Post'
         '400':
           description: Bad request
           content:
@@ -121,138 +30,264 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '401':
-          description: Invalid refresh token
+          description: Unauthorized
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-
-  /content/send-email/registration:
-    post:
-      summary: Send email for registration
+    patch:
+      summary: Update a post
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SendEmailRequest'
+              $ref: '#/components/schemas/UpdatePostRequest'
       responses:
         '200':
-          description: Success
+          description: Post updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
         '400':
           description: Bad request
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        '404':
-          description: User not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-
-  /content/confirm-email/registration:
-    post:
-      summary: Confirm email for registration
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ConfirmEmailRequest'
-      responses:
-        '200':
-          description: Success
-        '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
-          description: Email verification code not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '429':
-          description: Too many attempts
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-
-  /content/send-email/reset-password:
-    post:
-      summary: Send email for reset password
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/SendEmailRequest'
-      responses:
-        '200':
-          description: Returns this code in all cases for security reasons
-
-  /content/confirm-email/reset-password:
-    post:
-      summary: Confirm email for reset password
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ConfirmEmailRequest'
-      responses:
-        '200':
-          description: Success
-        '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
-          description: Reset password verification code not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '429':
-          description: Too many attempts
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-
-  /content/reset-password:
-    post:
-      summary: Reset password
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ResetPasswordRequest'
-      responses:
-        '200':
-          description: Success
-        '400':
-          description: Bad request
+        '401':
+          description: Unauthorized
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '403':
-          description: Forbidden
+          description: Forbidden (not the post author)
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '404':
-          description: User not found
+          description: Post not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      summary: Delete a post
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeletePostRequest'
+      responses:
+        '200':
+          description: Post deleted
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden (not the post author)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Post not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /content/comments:
+    post:
+      summary: Create a comment on a post
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCommentRequest'
+      responses:
+        '200':
+          description: Comment created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Post not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    patch:
+      summary: Update a comment
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCommentRequest'
+      responses:
+        '200':
+          description: Comment updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden (not the comment author)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Comment not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      summary: Delete a comment
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeleteCommentRequest'
+      responses:
+        '200':
+          description: Comment deleted
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden (not the comment author)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Comment not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /content/likes:
+    post:
+      summary: Add a like on a post
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LikeRequest'
+      responses:
+        '200':
+          description: Like recorded (or already present, idempotent)
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Post not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      summary: Remove a like from a post
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LikeRequest'
+      responses:
+        '200':
+          description: Like removed (or was not present, idempotent)
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Post not found
           content:
             application/json:
               schema:
@@ -264,102 +299,142 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
-      description: JWT access token from content service
+      description: JWT access token (subject identifies the acting user)
+
   schemas:
-    ResetPasswordRequest:
+    Post:
       type: object
       properties:
-        email:
+        id:
           type: string
-        password:
+          format: uuid
+        author_id:
           type: string
+          format: uuid
+        content:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
       required:
-        - email
-        - password
-        
-    LoginRequest:
-      type: object
-      properties:
-        email:
-          type: string
-        password:
-          type: string
-      required:
-        - email
-        - password
+        - id
+        - author_id
+        - content
+        - created_at
+        - updated_at
 
-    LoginResponse:
+    CreatePostRequest:
       type: object
       properties:
-        access_token:
-          type: string
-        refresh_token:
+        content:
           type: string
       required:
-        - access_token
-        - refresh_token
+        - content
 
-    LogoutRequest:
+    UpdatePostRequest:
+      type: object
+      description: Partial update of a post; only sent fields are applied
+      properties:
+        post_id:
+          type: string
+          format: uuid
+        content:
+          type: string
+      required:
+        - post_id
+
+    DeletePostRequest:
       type: object
       properties:
-        refresh_token:
+        post_id:
           type: string
+          format: uuid
       required:
-        - refresh_token
+        - post_id
 
-    RefreshRequest:
+    Comment:
       type: object
       properties:
-        refresh_token:
+        id:
           type: string
+          format: uuid
+        post_id:
+          type: string
+          format: uuid
+        author_id:
+          type: string
+          format: uuid
+        content:
+          type: string
+        parent_id:
+          type: string
+          format: uuid
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
       required:
-        - refresh_token
+        - id
+        - post_id
+        - author_id
+        - content
+        - created_at
+        - updated_at
 
-    RefreshResponse:
+    CreateCommentRequest:
       type: object
       properties:
-        access_token:
+        post_id:
           type: string
-        refresh_token:
+          format: uuid
+        content:
+          type: string
+        parent_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: If set, this comment is a reply to another comment on the same post
+      required:
+        - post_id
+        - content
+
+    UpdateCommentRequest:
+      type: object
+      description: Partial update; only sent fields are applied
+      properties:
+        comment_id:
+          type: string
+          format: uuid
+        content:
           type: string
       required:
-        - access_token
-        - refresh_token
+        - comment_id
 
-    RegisterRequest:
+    DeleteCommentRequest:
       type: object
       properties:
-        email:
+        comment_id:
           type: string
-        password:
-          type: string
+          format: uuid
       required:
-        - email
-        - password
+        - comment_id
 
-    SendEmailRequest:
+    LikeRequest:
       type: object
+      description: Target post for like / unlike
       properties:
-        email:
+        post_id:
           type: string
+          format: uuid
       required:
-        - email
+        - post_id
 
-    ConfirmEmailRequest:
-      type: object
-      properties:
-        email:
-          type: string
-        code:
-          type: string
-      required:
-        - email
-        - code
-
-    UserId:
-      type: string
-      description: User ID
-        
     ErrorResponse:
       type: object
       properties:
@@ -367,4 +442,3 @@ components:
           type: string
       required:
         - message
-

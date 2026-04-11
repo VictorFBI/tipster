@@ -11,7 +11,7 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: content
     ports:
-      - "5432:5432"
+      - "5434:5432"
     volumes:
       - content_postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -34,6 +34,7 @@ services:
       DB_PORT: "5432"
       DB_NAME: content
       DB_PASSWORD: postgres
+      KAFKA_BROKERS: kafka:29092
     depends_on:
       postgres:
         condition: service_healthy

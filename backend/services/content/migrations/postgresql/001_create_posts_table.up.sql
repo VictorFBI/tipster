@@ -1,8 +1,8 @@
 CREATE TABLE posts (
     id UUID PRIMARY KEY,
-    author_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    author_id UUID NOT NULL,
 
-    content TEXT NOT NULL,
+    content VARCHAR(4096) NOT NULL,
 
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
