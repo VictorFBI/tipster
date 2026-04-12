@@ -1,4 +1,5 @@
 export {
+  useMe,
   useRegister,
   useLogin,
   useLogout,
@@ -14,4 +15,4 @@ export { PasswordInput } from "./components/passwordInput/passwordInput";
 
 export { useAuthStore } from "./store/authStore";
 export { STORAGE_KEYS } from "./api/client";
-export type { ApiError } from "./api/types";
+export type { ApiError, MeResponse } from "./api/types";

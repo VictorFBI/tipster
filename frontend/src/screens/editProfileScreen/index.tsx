@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { TouchableOpacity, ScrollView, Alert } from "react-native";
-import { Avatar, YStack, Text, TextArea, Button } from "tamagui";
+import { Avatar, YStack, Text, TextArea, Button, Spinner } from "tamagui";
 import { useTranslation } from "react-i18next";
 import * as ImagePicker from "expo-image-picker";
 import { Header } from "@/src/shared/components/header/header";
@@ -9,6 +9,7 @@ import { useRouter } from "expo-router";
 import { useThemeStore } from "@/src/core/store/themeStore";
 import { themes } from "@/src/core/theme/themes";
 import { StyledInput } from "@/src/shared";
+import { useMyProfile, useUpdateAccountProfile } from "@/src/modules/user";
 
 export default function EditProfileScreen() {
   const { t } = useTranslation();
@@ -16,32 +17,57 @@ export default function EditProfileScreen() {
   const { theme } = useThemeStore();
   const currentTheme = themes[theme];
 
-  // TODO: Load current profile data
-  const [displayName, setDisplayName] = useState("Павел Дуров");
-  const [username, setUsername] = useState("username");
-  const [bio, setBio] = useState(
-    "Активный участник Tipster. Заработал свой первый airdrop! 🚀",
-  );
-  const [avatar, setAvatar] = useState<string | null>(
-    "https://i.pravatar.cc/150?img=12",
-  );
+  const { data: profile, isLoading: isProfileLoading } = useMyProfile();
+
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [username, setUsername] = useState("");
+  const [bio, setBio] = useState("");
+  const [avatar, setAvatar] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (profile) {
+      setFirstName(profile.firstName ?? "");
+      setLastName(profile.lastName ?? "");
+      setUsername(profile.username ?? "");
+      setBio(profile.bio ?? "");
+      setAvatar(profile.avatarUrl ?? null);
+    }
+  }, [profile]);
+
+  const { mutate: updateProfile, isPending } = useUpdateAccountProfile({
+    onSuccess: () => {
+      Alert.alert(
+        t("profile.edit.successTitle") || "Успешно",
+        t("profile.edit.successMessage") || "Профиль обновлен",
+        [
+          {
+            text: "OK",
+            onPress: () => router.back(),
+          },
+        ],
+      );
+    },
+    onError: (error) => {
+      Alert.alert(
+        t("profile.filling.errorTitle") || "Ошибка",
+        error.message ||
+          t("profile.filling.updateError") ||
+          "Не удалось обновить профиль",
+      );
+    },
+  });
 
   const maxBioLength = 160;
-  const isPending = false;
 
   const handleSave = () => {
-    // TODO: Save profile changes via API
-    console.log("Saving profile:", { displayName, username, bio, avatar });
-    Alert.alert(
-      t("profile.edit.successTitle") || "Успешно",
-      t("profile.edit.successMessage") || "Профиль обновлен",
-      [
-        {
-          text: "OK",
-          onPress: () => router.back(),
-        },
-      ],
-    );
+    updateProfile({
+      first_name: firstName.trim(),
+      last_name: lastName.trim(),
+      username: username.trim(),
+      bio: bio.trim(),
+      avatar_url: avatar || undefined,
+    });
   };
 
   const handleAddAvatar = async () => {
@@ -77,7 +103,18 @@ export default function EditProfileScreen() {
     }
   };
 
-  const isFormValid = displayName.trim() && username.trim();
+  const isFormValid = firstName.trim() && username.trim();
+
+  if (isProfileLoading) {
+    return (
+      <YStack flex={1} backgroundColor="$background">
+        <Header headerText={t("profile.edit.title")} showBackButton />
+        <YStack flex={1} alignItems="center" justifyContent="center">
+          <Spinner size="large" color="$purple10" />
+        </YStack>
+      </YStack>
+    );
+  }
 
   return (
     <YStack flex={1} backgroundColor="$background">
@@ -118,17 +155,37 @@ export default function EditProfileScreen() {
             </Text>
           </YStack>
 
-          {/* Display Name */}
+          {/* First Name */}
           <YStack gap="$2">
             <Text fontSize={16} fontWeight="600" color="$text">
-              {t("profile.filling.displayName") || "Имя"}
+              {t("profile.filling.firstName") || "Имя"}
             </Text>
             <StyledInput
               placeholder={
-                t("profile.filling.displayNamePlaceholder") || "Введите имя"
+                t("profile.filling.firstNamePlaceholder") || "Введите имя"
               }
-              value={displayName}
-              onChangeText={setDisplayName}
+              value={firstName}
+              onChangeText={setFirstName}
+              backgroundColor={currentTheme.avatarBg}
+              borderColor={currentTheme.inputBorder}
+              color={currentTheme.text}
+              fontSize={16}
+              paddingVertical="$3"
+              paddingHorizontal="$4"
+            />
+          </YStack>
+
+          {/* Last Name */}
+          <YStack gap="$2">
+            <Text fontSize={16} fontWeight="600" color="$text">
+              {t("profile.filling.lastName") || "Фамилия"}
+            </Text>
+            <StyledInput
+              placeholder={
+                t("profile.filling.lastNamePlaceholder") || "Введите фамилию"
+              }
+              value={lastName}
+              onChangeText={setLastName}
               backgroundColor={currentTheme.avatarBg}
               borderColor={currentTheme.inputBorder}
               color={currentTheme.text}

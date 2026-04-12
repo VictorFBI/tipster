@@ -50,14 +50,14 @@ export function Registration() {
       setErrorMsg("");
 
       // TODO API
-      // await registerMutation.mutateAsync({
-      //   email: data.email,
-      //   password: data.password,
-      // });
+      await registerMutation.mutateAsync({
+        email: data.email,
+        password: data.password,
+      });
 
-      // await sendEmailMutation.mutateAsync({
-      //   email: data.email,
-      // });
+      await sendEmailMutation.mutateAsync({
+        email: data.email,
+      });
 
       router.push({
         pathname: "/verify-email",

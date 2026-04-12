@@ -21,10 +21,10 @@ export function VerifyEmail() {
   const handleVerifySuccess = async (code: string) => {
     try {
       // TODO API
-      // await confirmEmailMutation.mutateAsync({
-      //   email,
-      //   code,
-      // });
+      await confirmEmailMutation.mutateAsync({
+        email,
+        code,
+      });
 
       router.push({
         pathname: "/profile-filling",
@@ -39,7 +39,7 @@ export function VerifyEmail() {
   const handleResendCode = async () => {
     try {
       // TODO API
-      // await resendCodeMutation.mutateAsync({ email });
+      await resendCodeMutation.mutateAsync({ email });
       Alert.alert(
         t("auth.success") || "Успешно",
         t("auth.codeSent") || "Код отправлен на ваш email",

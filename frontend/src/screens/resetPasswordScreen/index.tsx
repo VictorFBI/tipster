@@ -43,10 +43,10 @@ export function ResetPassword() {
       setError("");
 
       // TODO API
-      // await resetPasswordMutation.mutateAsync({
-      //   email,
-      //   password: data.password,
-      // });
+      await resetPasswordMutation.mutateAsync({
+        email,
+        password: data.password,
+      });
     } catch (err) {
       setError(getErrorMessage(err));
     }

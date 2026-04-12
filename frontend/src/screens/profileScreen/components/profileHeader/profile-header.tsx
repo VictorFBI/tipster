@@ -1,19 +1,23 @@
 import { Avatar, YStack, Text, XStack, Spinner } from "tamagui";
 import { useTranslation } from "react-i18next";
-import { useAccountProfile } from "@/src/modules/user";
-import { useAuthStore } from "@/src/modules/auth";
+import { useMyProfile, useAccountProfile } from "@/src/modules/user";
 import { Ionicons } from "@expo/vector-icons";
 import { Pressable } from "react-native";
 import { useRouter } from "expo-router";
 import { useThemeStore, themes } from "@/src/core";
 import { StyledButton } from "@/src/shared";
 
-export function ProfileHeader() {
+interface ProfileHeaderProps {
+  userId?: string;
+}
+
+export function ProfileHeader({ userId }: ProfileHeaderProps) {
   const { t } = useTranslation();
   const router = useRouter();
   const { theme } = useThemeStore();
   const currentTheme = themes[theme];
-  // const user = useAuthStore((state) => state.user);
+
+  const isOwnProfile = !userId;
 
   const handleFollowersPress = () => {
     router.push("/users-list?type=followers");
@@ -27,75 +31,81 @@ export function ProfileHeader() {
     router.push("/edit-profile");
   };
 
-  // const {
-  //   data: profile,
-  //   isLoading,
-  //   isError,
-  // } = useAccountProfile(user?.accountId || "", {
-  //   enabled: !!user?.accountId, // Enable only if accountId exists
-  // });
+  const myProfileQuery = useMyProfile({ enabled: isOwnProfile });
+  const accountProfileQuery = useAccountProfile(userId ?? "", {
+    enabled: !isOwnProfile && !!userId,
+  });
 
-  // console.log(profile);
+  const {
+    data: profile,
+    isLoading,
+    isError,
+  } = isOwnProfile ? myProfileQuery : accountProfileQuery;
 
-  // if (isLoading) {
-  //   return (
-  //     <YStack paddingVertical="$8" alignItems="center" justifyContent="center">
-  //       <Spinner size="large" color="$purple10" />
-  //     </YStack>
-  //   );
-  // }
+  console.log("PROF", profile);
 
-  // if (isError || !profile) {
-  //   return (
-  //     <YStack paddingVertical="$2" alignItems="center" gap="$3">
-  //       <Avatar circular size="$10" backgroundColor={currentTheme.surface}>
-  //         <Avatar.Fallback backgroundColor={currentTheme.surface}>
-  //           <Ionicons name="person-outline" size={56} color={currentTheme.muted} />
-  //         </Avatar.Fallback>
-  //       </Avatar>
-  //       <Text fontSize={14} color={currentTheme.muted}>
-  //         {t("profile.loadError") || "Failed to load profile"}
-  //       </Text>
-  //     </YStack>
-  //   );
-  // }
+  if (isLoading) {
+    return (
+      <YStack paddingVertical="$8" alignItems="center" justifyContent="center">
+        <Spinner size="large" color="$purple10" />
+      </YStack>
+    );
+  }
 
-  // const displayName =
-  //   profile.first_name && profile.last_name
-  //     ? `${profile.first_name} ${profile.last_name}`
-  //     : profile.username || t("profile.anonymous") || "Anonymous";
+  if (isError || !profile) {
+    return (
+      <YStack paddingVertical="$2" alignItems="center" gap="$3">
+        <Avatar circular size="$10" backgroundColor={currentTheme.surface}>
+          <Avatar.Fallback backgroundColor={currentTheme.surface}>
+            <Ionicons
+              name="person-outline"
+              size={56}
+              color={currentTheme.muted}
+            />
+          </Avatar.Fallback>
+        </Avatar>
+        <Text fontSize={14} color={currentTheme.muted}>
+          {t("profile.loadError") || "Failed to load profile"}
+        </Text>
+      </YStack>
+    );
+  }
+
+  const displayName =
+    profile.firstName && profile.lastName
+      ? `${profile.firstName} ${profile.lastName}`
+      : profile.username || t("profile.anonymous") || "Anonymous";
 
   return (
     <YStack paddingVertical="$2" alignItems="center" gap="$3">
       <Avatar circular size="$10">
-        {/* {profile.avatar_url ? (
-          <Avatar.Image src={profile.avatar_url} />
+        {profile.avatarUrl ? (
+          <Avatar.Image src={profile.avatarUrl} />
         ) : (
           <Avatar.Fallback backgroundColor={currentTheme.surface}>
-            <Ionicons name="person-outline" size={56} color={currentTheme.muted} />
+            <Ionicons
+              name="person-outline"
+              size={56}
+              color={currentTheme.muted}
+            />
           </Avatar.Fallback>
-        )} */}
-        <Avatar.Image src="https://i.pravatar.cc/150?img=12" />
+        )}
         <Avatar.Fallback backgroundColor={currentTheme.surface} />
       </Avatar>
 
       <YStack alignItems="center" gap="$1">
         <Text fontSize={20} fontWeight="600" color="$text">
-          {/* {displayName} */}
-          Павел Дуров
+          {displayName}
         </Text>
 
-        {/* {profile.username && (
+        {profile.username && (
           <Text fontSize={15} fontWeight="600" color="$text">
             @{profile.username}
           </Text>
-        )} */}
-        <Text fontSize={15} fontWeight="600" color="$text">
-          @username
-        </Text>
+        )}
       </YStack>
 
-      {/* {profile.bio && (
+      {profile.bio && (
         <Text
           fontSize={14}
           color={currentTheme.muted}
@@ -105,32 +115,28 @@ export function ProfileHeader() {
         >
           {profile.bio}
         </Text>
-      )} */}
+      )}
 
-      <Text
-        fontSize={14}
-        color={currentTheme.muted}
-        textAlign="center"
-        paddingHorizontal="$6"
-        lineHeight={20}
-      >
-        Активный участник Tipster. Заработал свой первый airdrop! 🚀
-      </Text>
-
-      <StyledButton
-        onPress={handleEditProfile}
-        color="surface"
-        buttonSize="m"
-        borderRadius={8}
-        minWidth={400}
-      >
-        <XStack alignItems="center" gap="$2">
-          <Ionicons name="create-outline" size={18} color={currentTheme.text} />
-          <Text fontSize={15} fontWeight="600" color="$text">
-            {t("profile.edit.title")}
-          </Text>
-        </XStack>
-      </StyledButton>
+      {isOwnProfile && (
+        <StyledButton
+          onPress={handleEditProfile}
+          color="surface"
+          buttonSize="m"
+          borderRadius={8}
+          minWidth={400}
+        >
+          <XStack alignItems="center" gap="$2">
+            <Ionicons
+              name="create-outline"
+              size={18}
+              color={currentTheme.text}
+            />
+            <Text fontSize={15} fontWeight="600" color="$text">
+              {t("profile.edit.title")}
+            </Text>
+          </XStack>
+        </StyledButton>
+      )}
 
       <XStack gap="$8" marginTop="$4">
         <YStack alignItems="center" gap="$1">

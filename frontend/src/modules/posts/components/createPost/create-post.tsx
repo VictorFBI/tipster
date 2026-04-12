@@ -15,6 +15,7 @@ import { KeyboardAvoidingView, Platform, TouchableOpacity } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { useThemeStore } from "@/src/core/store/themeStore";
 import { themes } from "@/src/core/theme/themes";
+import { useCreatePost as useCreatePostMutation } from "../../hooks/useContent";
 
 export function CreatePost() {
   const { t } = useTranslation();
@@ -23,7 +24,6 @@ export function CreatePost() {
   const currentTheme = themes[theme];
   const [content, setContent] = useState("");
   const [images, setImages] = useState<string[]>([]);
-  const [isPosting, setIsPosting] = useState(false);
 
   const maxLength = 500;
   const maxImages = 4;
@@ -53,26 +53,24 @@ export function CreatePost() {
     setImages(images.filter((_, i) => i !== index));
   };
 
-  const handlePost = async () => {
+  const createPostMutation = useCreatePostMutation({
+    onSuccess: (data) => {
+      console.log("Post created successfully:", data);
+      router.back();
+    },
+    onError: (error) => {
+      console.error("Create post failed:", error);
+    },
+  });
+
+  const isPosting = createPostMutation.isPending;
+
+  const handlePost = () => {
     if (content.trim().length === 0 && images.length === 0) {
       return;
     }
 
-    setIsPosting(true);
-
-    try {
-      // TODO: Implement API call to create post with images
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API call
-
-      console.log("Post created:", { content, images });
-
-      // Navigate back to feed
-      router.back();
-    } catch (error) {
-      console.error("Error creating post:", error);
-    } finally {
-      setIsPosting(false);
-    }
+    createPostMutation.mutate({ content: content.trim() });
   };
 
   const canPost =
@@ -127,6 +125,14 @@ export function CreatePost() {
 
         <ScrollView flex={1}>
           <YStack padding="$4" gap="$3">
+            {createPostMutation.isError && (
+              <YStack backgroundColor="$red2" padding="$3" borderRadius="$3">
+                <Text fontSize={14} color="$red10">
+                  {(createPostMutation.error as any)?.response?.data?.message ||
+                    t("common.error")}
+                </Text>
+              </YStack>
+            )}
             <TextArea
               placeholder={t("createPost.placeholder")}
               value={content}

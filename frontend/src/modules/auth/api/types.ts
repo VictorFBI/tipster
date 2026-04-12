@@ -32,6 +32,8 @@ export interface ResetPasswordRequest {
 }
 
 // API Response Types
+export type MeResponse = string;
+
 export interface LoginResponse {
   access_token: string;
   refresh_token: string;

@@ -3,6 +3,7 @@ import { Alert } from "react-native";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import * as ImagePicker from "expo-image-picker";
+import { useUpdateAccountProfile } from "@/src/modules/user";
 
 const MAX_BIO_LENGTH = 160;
 
@@ -16,20 +17,19 @@ export function useProfileForm() {
   const [bio, setBio] = useState("");
   const [avatar, setAvatar] = useState<string | null>(null);
 
-  const isPending = undefined;
-  // const { mutate: updateProfile, isPending } = useUpdateAccountProfile({
-  //   onSuccess: () => {
-  //     router.replace("/(tabs)");
-  //   },
-  //   onError: (error) => {
-  //     Alert.alert(
-  //       t("profile.filling.errorTitle") || "Error",
-  //       error.message ||
-  //         t("profile.filling.updateError") ||
-  //         "Failed to update profile",
-  //     );
-  //   },
-  // });
+  const { mutate: updateProfile, isPending } = useUpdateAccountProfile({
+    onSuccess: () => {
+      router.replace("/(tabs)");
+    },
+    onError: (error) => {
+      Alert.alert(
+        t("profile.filling.errorTitle") || "Error",
+        error.message ||
+          t("profile.filling.updateError") ||
+          "Failed to update profile",
+      );
+    },
+  });
 
   const isFormValid = !!username.trim();
 
@@ -45,13 +45,13 @@ export function useProfileForm() {
       });
 
       // Update profile via API
-      // updateProfile({
-      //   username: username.trim(),
-      //   first_name: firstName.trim(),
-      //   last_name: lastName.trim(),
-      //   bio: bio.trim(),
-      //   avatar_url: avatar || undefined,
-      // });
+      updateProfile({
+        username: username.trim(),
+        first_name: firstName.trim(),
+        last_name: lastName.trim(),
+        bio: bio.trim(),
+        avatar_url: avatar || undefined,
+      });
 
       // Navigate to tabs after profile completion
       router.replace("/(tabs)");

@@ -3,13 +3,14 @@ import {
   withTheme,
   withSafeArea,
   withMobile,
+  withQueryClient,
 } from "@/src/shared/storybook/decorators";
 import Feed from "./index";
 
 const meta = {
   title: "Screens/Feed",
   component: Feed,
-  decorators: [withTheme, withSafeArea, withMobile],
+  decorators: [withTheme, withSafeArea, withMobile, withQueryClient],
 } satisfies Meta<typeof Feed>;
 
 export default meta;

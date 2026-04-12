@@ -1,4 +1,8 @@
-import { useMutation, UseMutationResult } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQuery,
+  UseMutationResult,
+} from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import authService from "../api/auth.service";
 import { setAuthTokens, clearAuthTokens } from "../api/client";
@@ -11,8 +15,24 @@ import {
   SendEmailRequest,
   ConfirmEmailRequest,
   ResetPasswordRequest,
+  MeResponse,
   ApiError,
 } from "../api/types";
+
+export const authKeys = {
+  all: ["auth"] as const,
+  me: () => [...authKeys.all, "me"] as const,
+};
+
+export const useMe = (options?: { enabled?: boolean }) => {
+  const setUser = useAuthStore((state) => state.setUser);
+
+  return useQuery<MeResponse, AxiosError<ApiError>>({
+    queryKey: authKeys.me(),
+    queryFn: authService.me,
+    enabled: options?.enabled,
+  });
+};
 
 export const useRegister = (): UseMutationResult<
   void,
@@ -41,11 +61,20 @@ export const useLogin = (): UseMutationResult<
       // Save tokens to storage
       await setAuthTokens(data.access_token, data.refresh_token);
 
-      // Update Zustand store with user data including accountId
-      useAuthStore.getState().setUser({
-        email: "", // TODO: extract from token or get from API
-        //accountId: accountId || undefined,
-      });
+      console.log(data);
+
+      // Fetch accountId from /auth/me
+      try {
+        const accountId = await authService.me();
+        useAuthStore.getState().setUser({
+          email: "",
+          accountId: accountId || undefined,
+        });
+      } catch {
+        useAuthStore.getState().setUser({
+          email: "",
+        });
+      }
     },
     onError: (error) => {
       console.error(

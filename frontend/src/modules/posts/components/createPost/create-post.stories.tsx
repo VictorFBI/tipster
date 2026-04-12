@@ -4,12 +4,13 @@ import {
   withTheme,
   withSafeArea,
   withMobile,
+  withQueryClient,
 } from "@/src/shared/storybook/decorators";
 
 const meta = {
   title: "Modules/Posts/CreatePost",
   component: CreatePost,
-  decorators: [withTheme, withSafeArea, withMobile],
+  decorators: [withTheme, withSafeArea, withMobile, withQueryClient],
 } satisfies Meta<typeof CreatePost>;
 
 export default meta;

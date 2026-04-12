@@ -6,6 +6,10 @@ const meta = {
   title: "Screens/Search/Components/SearchInput",
   component: SearchInput,
   decorators: [withTheme, withMobile],
+  args: {
+    value: "",
+    onChangeText: () => {},
+  },
 } satisfies Meta<typeof SearchInput>;
 
 export default meta;
@@ -21,5 +25,14 @@ export const Light: Story = {
   parameters: {
     backgrounds: { default: "light" },
     theme: "light",
+  },
+};
+
+export const WithValue: Story = {
+  args: {
+    value: "CryptoKing",
+  },
+  parameters: {
+    backgrounds: { default: "dark" },
   },
 };

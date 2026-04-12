@@ -81,8 +81,11 @@
   "search": {
     "title": "Search",
     "placeholder": "Find users...",
-    "noResults": "No results found",
-    "searchUsers": "Search users",
+    "emptyQuery": "Enter a username to find someone",
+    "noResults": "Nothing found",
+    "noResultsHint": "Try a different username or check the spelling",
+    "error": "Failed to load search results",
+    "searchUsers": "Find users",
     "subscribers": "subscribers",
     "subscriber": "subscriber"
   },

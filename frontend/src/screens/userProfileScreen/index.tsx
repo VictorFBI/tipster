@@ -2,7 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
 import { YStack, Text } from "tamagui";
 import { Header, Tabs } from "@/src/shared";
-import { ProfileHeader } from "@/src/screens";
+import { UserProfileHeader } from "./components/userProfileHeader/user-profile-header";
 import { PostsList } from "@/src/modules/posts";
 import { useLocalSearchParams } from "expo-router";
 import { useTranslation } from "react-i18next";
@@ -65,7 +65,7 @@ export default function UserProfileScreen() {
   return (
     <YStack flex={1} backgroundColor="$background">
       <Header headerText="" showBackButton />
-      <ProfileHeader />
+      <UserProfileHeader userId={userId} />
 
       <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
 

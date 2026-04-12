@@ -24,10 +24,10 @@ export function ForgotPasswordVerify() {
       setError("");
 
       // TODO API
-      // await confirmEmailMutation.mutateAsync({
-      //   email,
-      //   code,
-      // });
+      await confirmEmailMutation.mutateAsync({
+        email,
+        code,
+      });
 
       router.push({
         pathname: "/reset-password",
@@ -43,7 +43,7 @@ export function ForgotPasswordVerify() {
     try {
       setError("");
       // TODO API
-      // await sendEmailMutation.mutateAsync({ email });
+      await sendEmailMutation.mutateAsync({ email });
     } catch (err) {
       const errorMessage = getErrorMessage(err);
       setError(errorMessage);

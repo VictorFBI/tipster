@@ -1,16 +1,19 @@
 import { Ionicons } from "@expo/vector-icons";
 import { XStack, YStack } from "tamagui";
-import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useThemeStore } from "@/src/core/store/themeStore";
 import { themes } from "@/src/core/theme/themes";
 import { StyledInput } from "@/src/shared";
 
-export function SearchInput() {
+interface SearchInputProps {
+  value: string;
+  onChangeText: (text: string) => void;
+}
+
+export function SearchInput({ value, onChangeText }: SearchInputProps) {
   const { t } = useTranslation();
   const { theme } = useThemeStore();
   const currentTheme = themes[theme];
-  const [searchQuery, setSearchQuery] = useState("");
 
   return (
     <YStack paddingHorizontal="$4" paddingBottom="$4">
@@ -30,8 +33,8 @@ export function SearchInput() {
           // placeholderTextColor={currentTheme.muted}
           color={currentTheme.text}
           fontSize={16}
-          value={searchQuery}
-          onChangeText={setSearchQuery}
+          value={value}
+          onChangeText={onChangeText}
         />
       </XStack>
     </YStack>

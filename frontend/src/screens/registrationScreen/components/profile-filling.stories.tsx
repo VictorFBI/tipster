@@ -1,11 +1,15 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { ProfileFillingScreen } from "./profileFilling/profile-filling";
-import { withTheme, withMobile } from "@/src/shared/storybook/decorators";
+import {
+  withTheme,
+  withMobile,
+  withQueryClient,
+} from "@/src/shared/storybook/decorators";
 
 const meta = {
   title: "Screens/Registration/ProfileFilling",
   component: ProfileFillingScreen,
-  decorators: [withTheme, withMobile],
+  decorators: [withTheme, withMobile, withQueryClient],
 } satisfies Meta<typeof ProfileFillingScreen>;
 
 export default meta;
