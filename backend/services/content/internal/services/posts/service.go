@@ -7,9 +7,9 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"tipster/backend/content/internal/attachments"
 	"tipster/backend/content/internal/db/postgresql"
-	"tipster/backend/content/internal/mediaclient"
+	"tipster/backend/content/internal/services/helpers"
+	"tipster/backend/content/internal/clients/media"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
@@ -76,13 +76,6 @@ func validateContent(s string) error {
 	return nil
 }
 
-func normalizeImageKeysList(keys []string) ([]string, error) {
-	if len(keys) == 0 {
-		return []string{}, nil
-	}
-	return attachments.NormalizeAndValidateObjectKeys(keys)
-}
-
 func replacePostImagesTx(ctx context.Context, tx pgx.Tx, postID string, keys []string) error {
 	_, err := tx.Exec(ctx, `DELETE FROM post_images WHERE post_id = $1::uuid`, postID)
 	if err != nil {
@@ -128,12 +121,12 @@ func (s *Service) CreatePost(ctx context.Context, authorID, content string, imag
 	if err := validateContent(content); err != nil {
 		return nil, err
 	}
-	keysNorm, err := normalizeImageKeysList(imageKeys)
+	keysNorm, err := helpers.NormalizeAndValidateObjectKeys(imageKeys)
 	if err != nil {
 		return nil, err
 	}
 	if len(keysNorm) > 0 {
-		if err := mediaclient.Commit(ctx, keysNorm, authorization); err != nil {
+		if err := media.Commit(ctx, keysNorm, authorization); err != nil {
 			return nil, err
 		}
 	}
@@ -187,13 +180,13 @@ func (s *Service) UpdatePost(ctx context.Context, authorID, postID string, conte
 	keysProvided := imageKeys != nil
 	if keysProvided {
 		var err error
-		keysNorm, err = normalizeImageKeysList(*imageKeys)
+		keysNorm, err = helpers.NormalizeAndValidateObjectKeys(*imageKeys)
 		if err != nil {
 			return nil, err
 		}
 	}
 	if keysProvided && len(keysNorm) > 0 {
-		if err := mediaclient.Commit(ctx, keysNorm, authorization); err != nil {
+		if err := media.Commit(ctx, keysNorm, authorization); err != nil {
 			return nil, err
 		}
 	}

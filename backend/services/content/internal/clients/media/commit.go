@@ -1,4 +1,4 @@
-package mediaclient
+package media
 
 import (
 	"bytes"

@@ -5,16 +5,16 @@ import (
 	"net/http"
 	"strings"
 
-	"tipster/backend/content/internal/mediaclient"
+	"tipster/backend/content/internal/clients/media"
 )
 
 func MapMediaCommitErr(err error) (status int, message string, ok bool) {
 	switch {
-	case errors.Is(err, mediaclient.ErrTempImageNotFound):
+	case errors.Is(err, media.ErrTempImageNotFound):
 		return http.StatusNotFound, "One or more image objects were not found in temporary storage", true
-	case errors.Is(err, mediaclient.ErrNotConfigured):
+	case errors.Is(err, media.ErrNotConfigured):
 		return http.StatusInternalServerError, "Media service URL is not configured (MEDIA_SERVICE_BASE_URL)", true
-	case errors.Is(err, mediaclient.ErrMissingAuthorization):
+	case errors.Is(err, media.ErrMissingAuthorization):
 		return http.StatusUnauthorized, "Authorization is required to commit images", true
 	default:
 		if err == nil {
