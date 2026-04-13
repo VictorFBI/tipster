@@ -1,4 +1,4 @@
-package handlers
+package comments
 
 import (
 	"encoding/json"
@@ -6,7 +6,6 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
-	"strings"
 
 	"github.com/google/uuid"
 
@@ -16,8 +15,8 @@ import (
 	commentsservice "tipster/backend/content/internal/services/comments"
 )
 
-func PatchContentComments(w http.ResponseWriter, r *http.Request) {
-	log := logging.LoggerFromContext(r.Context()).With(slog.String("handler", "patch_content_comments"))
+func DeleteContentComments(w http.ResponseWriter, r *http.Request) {
+	log := logging.LoggerFromContext(r.Context()).With(slog.String("handler", "delete_content_comments"))
 	authorID, ok := r.Context().Value(middlewares.AccountIDContextKey).(string)
 	if !ok || authorID == "" {
 		log.Warn("unauthorized", slog.String("reason", "missing_account_in_context"))
@@ -32,7 +31,7 @@ func PatchContentComments(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var req api.UpdateCommentRequest
+	var req api.DeleteCommentRequest
 	if err := json.Unmarshal(body, &req); err != nil {
 		log.Warn("bad_request", slog.String("reason", "invalid_json"), slog.String("error", err.Error()))
 		w.Header().Set("Content-Type", "application/json")
@@ -46,28 +45,12 @@ func PatchContentComments(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(api.ErrorResponse{Message: "comment_id is required"})
 		return
 	}
-	if req.Content == nil || strings.TrimSpace(*req.Content) == "" {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(api.ErrorResponse{Message: "content is required"})
-		return
-	}
 
 	svc := commentsservice.New(r.Context())
 	defer svc.Close(r.Context())
 
-	comment, err := svc.UpdateComment(r.Context(), authorID, req.CommentId.String(), *req.Content)
+	err = svc.DeleteComment(r.Context(), authorID, req.CommentId.String())
 	if err != nil {
-		if errors.Is(err, commentsservice.ErrContentEmpty) || errors.Is(err, commentsservice.ErrContentTooLong) {
-			msg := "content must be between 1 and 4096 characters"
-			if errors.Is(err, commentsservice.ErrContentTooLong) {
-				msg = "content must be at most 4096 characters"
-			}
-			w.Header().Set("Content-Type", "application/json")
-			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(api.ErrorResponse{Message: msg})
-			return
-		}
 		if errors.Is(err, commentsservice.ErrInvalidCommentID) {
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusBadRequest)
@@ -83,22 +66,14 @@ func PatchContentComments(w http.ResponseWriter, r *http.Request) {
 		if errors.Is(err, commentsservice.ErrForbiddenComment) {
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusForbidden)
-			json.NewEncoder(w).Encode(api.ErrorResponse{Message: "You are not allowed to update this comment"})
+			json.NewEncoder(w).Encode(api.ErrorResponse{Message: "You are not allowed to delete this comment"})
 			return
 		}
-		log.Error("update_comment_failed", slog.String("error", err.Error()))
+		log.Error("delete_comment_failed", slog.String("error", err.Error()))
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	out, convErr := apiCommentFromService(comment)
-	if convErr != nil {
-		log.Error("update_comment_response_failed", slog.String("error", convErr.Error()))
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	log.Info("patch_content_comments_ok")
-	w.Header().Set("Content-Type", "application/json")
+	log.Info("delete_content_comments_ok")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(out)
 }

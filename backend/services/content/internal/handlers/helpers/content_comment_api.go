@@ -1,4 +1,4 @@
-package handlers
+package helpers
 
 import (
 	"fmt"
@@ -9,7 +9,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func apiCommentFromService(c *commentsservice.Comment) (api.Comment, error) {
+func CommentFromService(c *commentsservice.Comment) (api.Comment, error) {
 	id, err := uuid.Parse(c.ID)
 	if err != nil {
 		return api.Comment{}, fmt.Errorf("id: %w", err)
@@ -38,13 +38,18 @@ func apiCommentFromService(c *commentsservice.Comment) (api.Comment, error) {
 	if err != nil {
 		return api.Comment{}, fmt.Errorf("updated_at: %w", err)
 	}
+	imgs := c.ImageObjectIds
+	if imgs == nil {
+		imgs = []string{}
+	}
 	out := api.Comment{
-		Id:        id,
-		PostId:    postID,
-		AuthorId:  authorID,
-		Content:   c.Content,
-		CreatedAt: createdAt,
-		UpdatedAt: updatedAt,
+		Id:             id,
+		PostId:         postID,
+		AuthorId:       authorID,
+		Content:        c.Content,
+		ImageObjectIds: imgs,
+		CreatedAt:       createdAt,
+		UpdatedAt:       updatedAt,
 	}
 	if parentID != nil {
 		out.ParentId = parentID

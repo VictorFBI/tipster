@@ -1,4 +1,4 @@
-package handlers
+package comments
 
 import (
 	"encoding/json"
@@ -11,6 +11,7 @@ import (
 	"github.com/google/uuid"
 
 	api "tipster/backend/content/internal/generated"
+	"tipster/backend/content/internal/handlers/helpers"
 	"tipster/backend/content/internal/logging"
 	middlewares "tipster/backend/content/internal/middlewares"
 	commentsservice "tipster/backend/content/internal/services/comments"
@@ -61,11 +62,31 @@ func PostContentComments(w http.ResponseWriter, r *http.Request) {
 		parentOpt = &s
 	}
 
+	var imgKeys []string
+	if req.ImageObjectIds != nil {
+		imgKeys = *req.ImageObjectIds
+	}
+
 	svc := commentsservice.New(r.Context())
 	defer svc.Close(r.Context())
 
-	comment, err := svc.CreateComment(r.Context(), authorID, req.PostId.String(), req.Content, parentOpt)
+	auth := r.Header.Get("Authorization")
+	comment, err := svc.CreateComment(r.Context(), authorID, req.PostId.String(), req.Content, parentOpt, imgKeys, auth)
 	if err != nil {
+		if st, msg, ok := helpers.MapMediaCommitErr(err); ok {
+			log.Warn("create_comment_failed", slog.String("reason", "media_commit"))
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(st)
+			json.NewEncoder(w).Encode(api.ErrorResponse{Message: msg})
+			return
+		}
+		if msg, ok := helpers.MapAttachmentValidationErr(err); ok {
+			log.Warn("create_comment_failed", slog.String("reason", "image_keys"))
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(api.ErrorResponse{Message: msg})
+			return
+		}
 		if errors.Is(err, commentsservice.ErrContentEmpty) || errors.Is(err, commentsservice.ErrContentTooLong) {
 			msg := "content must be between 1 and 4096 characters"
 			if errors.Is(err, commentsservice.ErrContentTooLong) {
@@ -105,7 +126,7 @@ func PostContentComments(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	out, convErr := apiCommentFromService(comment)
+	out, convErr := helpers.CommentFromService(comment)
 	if convErr != nil {
 		log.Error("create_comment_response_failed", slog.String("error", convErr.Error()))
 		w.WriteHeader(http.StatusInternalServerError)

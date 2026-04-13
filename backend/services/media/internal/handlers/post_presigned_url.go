@@ -28,7 +28,7 @@ func PostPresignedUrl(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if req.Purpose != "post_images" {
+	if req.Purpose != "post_images" && req.Purpose != "comment_images" {
 		log.Warn("bad_request", slog.String("reason", "invalid_purpose"), slog.String("purpose", req.Purpose))
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(api.ErrorResponse{Message: "Invalid purpose"})

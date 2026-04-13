@@ -1,4 +1,4 @@
-package handlers
+package posts
 
 import (
 	"encoding/json"
@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	api "tipster/backend/content/internal/generated"
+	"tipster/backend/content/internal/handlers/helpers"
 	"tipster/backend/content/internal/logging"
 	middlewares "tipster/backend/content/internal/middlewares"
 	postsservice "tipster/backend/content/internal/services/posts"
@@ -46,11 +47,31 @@ func PostContentPosts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var imgKeys []string
+	if req.ImageObjectIds != nil {
+		imgKeys = *req.ImageObjectIds
+	}
+
 	svc := postsservice.New(r.Context())
 	defer svc.Close(r.Context())
 
-	post, err := svc.CreatePost(r.Context(), authorID, req.Content)
+	auth := r.Header.Get("Authorization")
+	post, err := svc.CreatePost(r.Context(), authorID, req.Content, imgKeys, auth)
 	if err != nil {
+		if st, msg, ok := helpers.MapMediaCommitErr(err); ok {
+			log.Warn("create_post_failed", slog.String("reason", "media_commit"))
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(st)
+			json.NewEncoder(w).Encode(api.ErrorResponse{Message: msg})
+			return
+		}
+		if msg, ok := helpers.MapAttachmentValidationErr(err); ok {
+			log.Warn("create_post_failed", slog.String("reason", "image_keys"))
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(api.ErrorResponse{Message: msg})
+			return
+		}
 		if errors.Is(err, postsservice.ErrContentEmpty) || errors.Is(err, postsservice.ErrContentTooLong) {
 			msg := "content must be between 1 and 4096 characters"
 			if errors.Is(err, postsservice.ErrContentTooLong) {
@@ -81,7 +102,7 @@ func PostContentPosts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	out, convErr := apiPostFromService(post)
+	out, convErr := helpers.PostFromService(post)
 	if convErr != nil {
 		log.Error("create_post_response_failed", slog.String("error", convErr.Error()))
 		w.WriteHeader(http.StatusInternalServerError)

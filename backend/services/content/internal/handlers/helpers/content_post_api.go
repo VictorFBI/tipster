@@ -1,4 +1,4 @@
-package handlers
+package helpers
 
 import (
 	"fmt"
@@ -10,7 +10,9 @@ import (
 	"github.com/google/uuid"
 )
 
-func apiPostFromService(p *postsservice.Post) (api.Post, error) {
+const ListPostsMaxLimit = 100
+
+func PostFromService(p *postsservice.Post) (api.Post, error) {
 	id, err := uuid.Parse(p.ID)
 	if err != nil {
 		return api.Post{}, fmt.Errorf("id: %w", err)
@@ -27,12 +29,17 @@ func apiPostFromService(p *postsservice.Post) (api.Post, error) {
 	if err != nil {
 		return api.Post{}, fmt.Errorf("updated_at: %w", err)
 	}
+	imgs := p.ImageObjectIds
+	if imgs == nil {
+		imgs = []string{}
+	}
 	return api.Post{
-		Id:        id,
-		AuthorId:  authorID,
-		Content:   p.Content,
-		CreatedAt: createdAt,
-		UpdatedAt: updatedAt,
+		Id:             id,
+		AuthorId:       authorID,
+		Content:        p.Content,
+		ImageObjectIds: imgs,
+		CreatedAt:       createdAt,
+		UpdatedAt:       updatedAt,
 	}, nil
 }
 

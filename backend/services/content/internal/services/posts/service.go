@@ -7,7 +7,9 @@ import (
 	"time"
 	"unicode/utf8"
 
+	"tipster/backend/content/internal/attachments"
 	"tipster/backend/content/internal/db/postgresql"
+	"tipster/backend/content/internal/mediaclient"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
@@ -15,21 +17,37 @@ import (
 
 const MaxContentRunes = 4096
 
+const postSelectWithImagesSQL = `
+SELECT p.id::text, p.author_id::text, p.content, p.created_at, p.updated_at,
+	COALESCE(
+		(SELECT array_agg(pi.object_key ORDER BY pi.sort_index)
+		 FROM post_images pi WHERE pi.post_id = p.id),
+		'{}'::text[]
+	)
+FROM posts p`
+
 var (
-	ErrPostNotFound    = errors.New("post not found")
-	ErrForbiddenPost   = errors.New("forbidden")
-	ErrInvalidPostID   = errors.New("invalid post id")
-	ErrContentTooLong  = errors.New("content too long")
-	ErrContentEmpty    = errors.New("content empty")
-	ErrAuthorMissing   = errors.New("author not found in database")
+	ErrPostNotFound   = errors.New("post not found")
+	ErrForbiddenPost  = errors.New("forbidden")
+	ErrInvalidPostID  = errors.New("invalid post id")
+	ErrContentTooLong = errors.New("content too long")
+	ErrContentEmpty   = errors.New("content empty")
+	ErrAuthorMissing  = errors.New("author not found in database")
+	ErrNoUpdateFields = errors.New("no update fields")
 )
 
 type Post struct {
-	ID        string
-	AuthorID  string
-	Content   string
-	CreatedAt string
-	UpdatedAt string
+	ID             string
+	AuthorID       string
+	Content        string
+	ImageObjectIds []string
+	CreatedAt      string
+	UpdatedAt      string
+}
+
+type LikedPostRow struct {
+	Post    Post
+	LikedAt time.Time
 }
 
 type Service struct {
@@ -49,7 +67,6 @@ func (s *Service) Close(ctx context.Context) error {
 }
 
 func validateContent(s string) error {
-	s = strings.TrimSpace(s)
 	if s == "" {
 		return ErrContentEmpty
 	}
@@ -59,24 +76,79 @@ func validateContent(s string) error {
 	return nil
 }
 
+func normalizeImageKeysList(keys []string) ([]string, error) {
+	if len(keys) == 0 {
+		return []string{}, nil
+	}
+	return attachments.NormalizeAndValidateObjectKeys(keys)
+}
+
+func replacePostImagesTx(ctx context.Context, tx pgx.Tx, postID string, keys []string) error {
+	_, err := tx.Exec(ctx, `DELETE FROM post_images WHERE post_id = $1::uuid`, postID)
+	if err != nil {
+		return err
+	}
+	for i := range keys {
+		_, err := tx.Exec(ctx,
+			`INSERT INTO post_images (post_id, sort_index, object_key) VALUES ($1::uuid, $2, $3)`,
+			postID, i, keys[i])
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func scanPostWithImages(row pgx.Row) (*Post, error) {
+	var p Post
+	var createdAt, updatedAt time.Time
+	var keys []string
+	err := row.Scan(&p.ID, &p.AuthorID, &p.Content, &createdAt, &updatedAt, &keys)
+	if err != nil {
+		return nil, err
+	}
+	p.CreatedAt = createdAt.UTC().Format(time.RFC3339Nano)
+	p.UpdatedAt = updatedAt.UTC().Format(time.RFC3339Nano)
+	if keys == nil {
+		p.ImageObjectIds = []string{}
+	} else {
+		p.ImageObjectIds = keys
+	}
+	return &p, nil
+}
+
+func (s *Service) loadPostWithImages(ctx context.Context, postID string) (*Post, error) {
+	row := s.postgres.QueryRow(ctx, postSelectWithImagesSQL+` WHERE p.id = $1::uuid`, postID)
+	return scanPostWithImages(row)
+}
+
 // CreatePost inserts a new post; authorID is the JWT subject (user UUID).
-func (s *Service) CreatePost(ctx context.Context, authorID, content string) (*Post, error) {
-	content = strings.TrimSpace(content)
+// authorization is the raw Authorization header (Bearer ...) for media /media/commit when imageKeys is non-empty.
+func (s *Service) CreatePost(ctx context.Context, authorID, content string, imageKeys []string, authorization string) (*Post, error) {
 	if err := validateContent(content); err != nil {
 		return nil, err
 	}
-	var createdAt, updatedAt time.Time
-	var p Post
-	err := s.postgres.QueryRow(ctx,
+	keysNorm, err := normalizeImageKeysList(imageKeys)
+	if err != nil {
+		return nil, err
+	}
+	if len(keysNorm) > 0 {
+		if err := mediaclient.Commit(ctx, keysNorm, authorization); err != nil {
+			return nil, err
+		}
+	}
+	tx, err := s.postgres.Begin(ctx)
+	if err != nil {
+		return nil, err
+	}
+	defer tx.Rollback(ctx)
+	var postID string
+	err = tx.QueryRow(ctx,
 		`INSERT INTO posts (id, author_id, content)
 		 VALUES (gen_random_uuid(), $1, $2)
-		 RETURNING id::text, author_id::text, content, created_at, updated_at`,
+		 RETURNING id::text`,
 		authorID, content,
-	).Scan(&p.ID, &p.AuthorID, &p.Content, &createdAt, &updatedAt)
-	if err == nil {
-		p.CreatedAt = createdAt.UTC().Format(time.RFC3339Nano)
-		p.UpdatedAt = updatedAt.UTC().Format(time.RFC3339Nano)
-	}
+	).Scan(&postID)
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) && pgErr.Code == "22P02" {
@@ -87,38 +159,92 @@ func (s *Service) CreatePost(ctx context.Context, authorID, content string) (*Po
 		}
 		return nil, err
 	}
-	return &p, nil
+	if len(keysNorm) > 0 {
+		if err := replacePostImagesTx(ctx, tx, postID, keysNorm); err != nil {
+			return nil, err
+		}
+	}
+	if err := tx.Commit(ctx); err != nil {
+		return nil, err
+	}
+	return s.loadPostWithImages(ctx, postID)
 }
 
-// UpdatePost updates post text; only the author may update.
-func (s *Service) UpdatePost(ctx context.Context, authorID, postID, content string) (*Post, error) {
-	content = strings.TrimSpace(content)
-	if err := validateContent(content); err != nil {
+// UpdatePost updates text and/or images; only the author may update.
+func (s *Service) UpdatePost(ctx context.Context, authorID, postID string, content *string, imageKeys *[]string, authorization string) (*Post, error) {
+	if content == nil && imageKeys == nil {
+		return nil, ErrNoUpdateFields
+	}
+	var newContent string
+	if content != nil {
+		c := strings.TrimSpace(*content)
+		if err := validateContent(c); err != nil {
+			return nil, err
+		}
+		newContent = c
+	}
+	var keysNorm []string
+	keysProvided := imageKeys != nil
+	if keysProvided {
+		var err error
+		keysNorm, err = normalizeImageKeysList(*imageKeys)
+		if err != nil {
+			return nil, err
+		}
+	}
+	if keysProvided && len(keysNorm) > 0 {
+		if err := mediaclient.Commit(ctx, keysNorm, authorization); err != nil {
+			return nil, err
+		}
+	}
+	tx, err := s.postgres.Begin(ctx)
+	if err != nil {
 		return nil, err
 	}
-	var createdAt, updatedAt time.Time
-	var p Post
-	err := s.postgres.QueryRow(ctx,
-		`UPDATE posts SET content = $1, updated_at = NOW()
-		 WHERE id = $2 AND author_id = $3
-		 RETURNING id::text, author_id::text, content, created_at, updated_at`,
-		content, postID, authorID,
-	).Scan(&p.ID, &p.AuthorID, &p.Content, &createdAt, &updatedAt)
-	if err == nil {
-		p.CreatedAt = createdAt.UTC().Format(time.RFC3339Nano)
-		p.UpdatedAt = updatedAt.UTC().Format(time.RFC3339Nano)
-	}
-	if err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
+	defer tx.Rollback(ctx)
+	didContent := false
+	if content != nil {
+		ct, err := tx.Exec(ctx,
+			`UPDATE posts SET content = $1, updated_at = NOW() WHERE id = $2::uuid AND author_id = $3::uuid`,
+			newContent, postID, authorID,
+		)
+		if err != nil {
+			var pgErr *pgconn.PgError
+			if errors.As(err, &pgErr) && pgErr.Code == "22P02" {
+				return nil, ErrInvalidPostID
+			}
+			return nil, err
+		}
+		if ct.RowsAffected() == 0 {
 			return nil, s.classifyPostAccess(ctx, authorID, postID)
 		}
-		var pgErr *pgconn.PgError
-		if errors.As(err, &pgErr) && pgErr.Code == "22P02" {
-			return nil, ErrInvalidPostID
+		didContent = true
+	}
+	if keysProvided {
+		if !didContent {
+			ct, err := tx.Exec(ctx,
+				`UPDATE posts SET updated_at = NOW() WHERE id = $1::uuid AND author_id = $2::uuid`,
+				postID, authorID,
+			)
+			if err != nil {
+				var pgErr *pgconn.PgError
+				if errors.As(err, &pgErr) && pgErr.Code == "22P02" {
+					return nil, ErrInvalidPostID
+				}
+				return nil, err
+			}
+			if ct.RowsAffected() == 0 {
+				return nil, s.classifyPostAccess(ctx, authorID, postID)
+			}
 		}
+		if err := replacePostImagesTx(ctx, tx, postID, keysNorm); err != nil {
+			return nil, err
+		}
+	}
+	if err := tx.Commit(ctx); err != nil {
 		return nil, err
 	}
-	return &p, nil
+	return s.loadPostWithImages(ctx, postID)
 }
 
 func (s *Service) classifyPostAccess(ctx context.Context, authorID, postID string) error {
@@ -154,4 +280,75 @@ func (s *Service) DeletePost(ctx context.Context, authorID, postID string) error
 		return s.classifyPostAccess(ctx, authorID, postID)
 	}
 	return nil
+}
+
+// ListPostsByAuthor returns posts for authorID (JWT subject), newest first.
+func (s *Service) ListPostsByAuthor(ctx context.Context, authorID string, limit, offset int) ([]Post, error) {
+	rows, err := s.postgres.Query(ctx,
+		postSelectWithImagesSQL+`
+		 WHERE p.author_id = $1::uuid
+		 ORDER BY p.created_at DESC, p.id DESC
+		 LIMIT $2 OFFSET $3`,
+		authorID, limit, offset,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	out := make([]Post, 0)
+	for rows.Next() {
+		p, err := scanPostWithImages(rows)
+		if err != nil {
+			return nil, err
+		}
+		out = append(out, *p)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// ListPostsLikedByUser returns posts liked by userID, newest like first.
+func (s *Service) ListPostsLikedByUser(ctx context.Context, userID string, limit, offset int) ([]LikedPostRow, error) {
+	rows, err := s.postgres.Query(ctx,
+		`SELECT p.id::text, p.author_id::text, p.content, p.created_at, p.updated_at,
+			COALESCE(
+				(SELECT array_agg(pi.object_key ORDER BY pi.sort_index)
+				 FROM post_images pi WHERE pi.post_id = p.id),
+				'{}'::text[]
+			),
+			l.created_at
+		 FROM likes l
+		 INNER JOIN posts p ON p.id = l.post_id
+		 WHERE l.user_id = $1::uuid
+		 ORDER BY l.created_at DESC, l.id DESC
+		 LIMIT $2 OFFSET $3`,
+		userID, limit, offset,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	out := make([]LikedPostRow, 0)
+	for rows.Next() {
+		var p Post
+		var createdAt, updatedAt, likedAt time.Time
+		var keys []string
+		if err := rows.Scan(&p.ID, &p.AuthorID, &p.Content, &createdAt, &updatedAt, &keys, &likedAt); err != nil {
+			return nil, err
+		}
+		p.CreatedAt = createdAt.UTC().Format(time.RFC3339Nano)
+		p.UpdatedAt = updatedAt.UTC().Format(time.RFC3339Nano)
+		if keys == nil {
+			p.ImageObjectIds = []string{}
+		} else {
+			p.ImageObjectIds = keys
+		}
+		out = append(out, LikedPostRow{Post: p, LikedAt: likedAt.UTC()})
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return out, nil
 }

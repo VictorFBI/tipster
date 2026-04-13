@@ -12,6 +12,10 @@ import (
 	"tipster/backend/content/internal/db/kafka"
 	"tipster/backend/content/internal/db/postgresql"
 	"tipster/backend/content/internal/handlers"
+	"tipster/backend/content/internal/handlers/comments"
+	"tipster/backend/content/internal/handlers/likes"
+	"tipster/backend/content/internal/handlers/posts"
+	likedhandlers "tipster/backend/content/internal/handlers/posts/liked"
 	applogging "tipster/backend/content/internal/logging"
 	middlewares "tipster/backend/content/internal/middlewares"
 
@@ -54,8 +58,24 @@ func checkKafkaConnection(ctx context.Context) {
 	slog.Info("kafka_ok")
 }
 
+func checkMediaServiceURL() {
+	if os.Getenv("MEDIA_SERVICE_BASE_URL") == "" {
+		slog.Warn("media_service_skipped", slog.String("reason", "MEDIA_SERVICE_BASE_URL unset; image attachments will fail until configured"))
+		return
+	}
+	slog.Info("media_service_url_ok", slog.String("base", os.Getenv("MEDIA_SERVICE_BASE_URL")))
+}
+
 func main() {
-	h := slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelInfo})
+	h := slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
+		Level: slog.LevelInfo,
+		ReplaceAttr: func(groups []string, a slog.Attr) slog.Attr {
+			if a.Key == slog.TimeKey {
+				return slog.Attr{}
+			}
+			return a
+		},
+	})
 	slog.SetDefault(slog.New(h))
 
 	ctx := context.Background()
@@ -68,6 +88,7 @@ func main() {
 
 	checkPostgreSQLConnection(ctx)
 	checkKafkaConnection(ctx)
+	checkMediaServiceURL()
 
 	r := chi.NewRouter()
 	slog.Info("server_starting")
@@ -79,16 +100,18 @@ func main() {
 		httpSwagger.URL("/swagger/doc.json"),
 	))
 
-	r.With(middlewares.RequireAccessToken).Post("/content/posts", handlers.PostContentPosts)
-	r.With(middlewares.RequireAccessToken).Patch("/content/posts", handlers.PatchContentPosts)
-	r.With(middlewares.RequireAccessToken).Delete("/content/posts", handlers.DeleteContentPosts)
+	r.With(middlewares.RequireAccessToken).Get("/content/posts/liked", likedhandlers.GetContentPostsLiked)
+	r.With(middlewares.RequireAccessToken).Get("/content/posts", posts.GetContentPosts)
+	r.With(middlewares.RequireAccessToken).Post("/content/posts", posts.PostContentPosts)
+	r.With(middlewares.RequireAccessToken).Patch("/content/posts", posts.PatchContentPosts)
+	r.With(middlewares.RequireAccessToken).Delete("/content/posts", posts.DeleteContentPosts)
 
-	r.With(middlewares.RequireAccessToken).Post("/content/comments", handlers.PostContentComments)
-	r.With(middlewares.RequireAccessToken).Patch("/content/comments", handlers.PatchContentComments)
-	r.With(middlewares.RequireAccessToken).Delete("/content/comments", handlers.DeleteContentComments)
+	r.With(middlewares.RequireAccessToken).Post("/content/comments", comments.PostContentComments)
+	r.With(middlewares.RequireAccessToken).Patch("/content/comments", comments.PatchContentComments)
+	r.With(middlewares.RequireAccessToken).Delete("/content/comments", comments.DeleteContentComments)
 
-	r.With(middlewares.RequireAccessToken).Post("/content/likes", handlers.PostContentLikes)
-	r.With(middlewares.RequireAccessToken).Delete("/content/likes", handlers.DeleteContentLikes)
+	r.With(middlewares.RequireAccessToken).Post("/content/likes", likes.PostContentLikes)
+	r.With(middlewares.RequireAccessToken).Delete("/content/likes", likes.DeleteContentLikes)
 
 	slog.Info("server_listening", slog.String("addr", ":8083"))
 	err := http.ListenAndServe(":8083", r)

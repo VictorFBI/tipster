@@ -15,18 +15,24 @@ const (
 
 // Comment defines model for Comment.
 type Comment struct {
-	AuthorId  openapi_types.UUID  `json:"author_id"`
-	Content   string              `json:"content"`
-	CreatedAt time.Time           `json:"created_at"`
-	Id        openapi_types.UUID  `json:"id"`
-	ParentId  *openapi_types.UUID `json:"parent_id"`
-	PostId    openapi_types.UUID  `json:"post_id"`
-	UpdatedAt time.Time           `json:"updated_at"`
+	AuthorId  openapi_types.UUID `json:"author_id"`
+	Content   string             `json:"content"`
+	CreatedAt time.Time          `json:"created_at"`
+	Id        openapi_types.UUID `json:"id"`
+
+	// ImageObjectIds Object ids in permanent storage; display order
+	ImageObjectIds []string            `json:"image_object_ids"`
+	ParentId       *openapi_types.UUID `json:"parent_id"`
+	PostId         openapi_types.UUID  `json:"post_id"`
+	UpdatedAt      time.Time           `json:"updated_at"`
 }
 
 // CreateCommentRequest defines model for CreateCommentRequest.
 type CreateCommentRequest struct {
 	Content string `json:"content"`
+
+	// ImageObjectIds Optional; temp-bucket object ids from presigned upload; content service commits to permanent storage when creating the comment
+	ImageObjectIds *[]string `json:"image_object_ids,omitempty"`
 
 	// ParentId If set, this comment is a reply to another comment on the same post
 	ParentId *openapi_types.UUID `json:"parent_id"`
@@ -36,6 +42,9 @@ type CreateCommentRequest struct {
 // CreatePostRequest defines model for CreatePostRequest.
 type CreatePostRequest struct {
 	Content string `json:"content"`
+
+	// ImageObjectIds Optional; up to 10 object ids in the temporary upload bucket (from media presigned upload). Content service moves them to permanent storage when creating the post.
+	ImageObjectIds *[]string `json:"image_object_ids,omitempty"`
 }
 
 // DeleteCommentRequest defines model for DeleteCommentRequest.
@@ -58,25 +67,62 @@ type LikeRequest struct {
 	PostId openapi_types.UUID `json:"post_id"`
 }
 
+// LikedPostItem A post the user has liked, with the time the like was recorded
+type LikedPostItem struct {
+	LikedAt time.Time `json:"liked_at"`
+	Post    Post      `json:"post"`
+}
+
+// LikedPostsPage Paginated list of posts the authenticated user has liked
+type LikedPostsPage struct {
+	Items  []LikedPostItem `json:"items"`
+	Limit  int             `json:"limit"`
+	Offset int             `json:"offset"`
+}
+
+// MyPostsPage Paginated list of posts for the authenticated author
+type MyPostsPage struct {
+	Items  []Post `json:"items"`
+	Limit  int    `json:"limit"`
+	Offset int    `json:"offset"`
+}
+
 // Post defines model for Post.
 type Post struct {
 	AuthorId  openapi_types.UUID `json:"author_id"`
 	Content   string             `json:"content"`
 	CreatedAt time.Time          `json:"created_at"`
 	Id        openapi_types.UUID `json:"id"`
-	UpdatedAt time.Time          `json:"updated_at"`
+
+	// ImageObjectIds Object ids in permanent storage (same values as after content commit from temp); display order
+	ImageObjectIds []string  `json:"image_object_ids"`
+	UpdatedAt      time.Time `json:"updated_at"`
 }
 
-// UpdateCommentRequest Partial update; only sent fields are applied
+// UpdateCommentRequest Partial update; send content and/or image_object_ids (replaces image set when sent)
 type UpdateCommentRequest struct {
-	CommentId openapi_types.UUID `json:"comment_id"`
-	Content   *string            `json:"content,omitempty"`
+	CommentId      openapi_types.UUID `json:"comment_id"`
+	Content        *string            `json:"content,omitempty"`
+	ImageObjectIds *[]string          `json:"image_object_ids,omitempty"`
 }
 
-// UpdatePostRequest Partial update of a post; only sent fields are applied
+// UpdatePostRequest Partial update; send content and/or image_object_ids (replaces image set when sent)
 type UpdatePostRequest struct {
-	Content *string            `json:"content,omitempty"`
-	PostId  openapi_types.UUID `json:"post_id"`
+	Content        *string            `json:"content,omitempty"`
+	ImageObjectIds *[]string          `json:"image_object_ids,omitempty"`
+	PostId         openapi_types.UUID `json:"post_id"`
+}
+
+// GetContentPostsParams defines parameters for GetContentPosts.
+type GetContentPostsParams struct {
+	Limit  int `form:"limit" json:"limit"`
+	Offset int `form:"offset" json:"offset"`
+}
+
+// GetContentPostsLikedParams defines parameters for GetContentPostsLiked.
+type GetContentPostsLikedParams struct {
+	Limit  int `form:"limit" json:"limit"`
+	Offset int `form:"offset" json:"offset"`
 }
 
 // DeleteContentCommentsJSONRequestBody defines body for DeleteContentComments for application/json ContentType.

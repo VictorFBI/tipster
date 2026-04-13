@@ -1,4 +1,4 @@
-package handlers
+package posts
 
 import (
 	"encoding/json"
@@ -6,6 +6,7 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
+
 	"github.com/google/uuid"
 
 	api "tipster/backend/content/internal/generated"

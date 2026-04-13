@@ -100,6 +100,7 @@ components:
             $ref: '#/components/schemas/PresignedUploadFile'
         purpose:
           type: string
+          description: post_images or comment_images (for content service attachments)
           example: post_images
       required:
         - files

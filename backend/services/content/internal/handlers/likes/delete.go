@@ -1,4 +1,4 @@
-package handlers
+package likes
 
 import (
 	"encoding/json"
@@ -15,8 +15,8 @@ import (
 	likesservice "tipster/backend/content/internal/services/likes"
 )
 
-func PostContentLikes(w http.ResponseWriter, r *http.Request) {
-	log := logging.LoggerFromContext(r.Context()).With(slog.String("handler", "post_content_likes"))
+func DeleteContentLikes(w http.ResponseWriter, r *http.Request) {
+	log := logging.LoggerFromContext(r.Context()).With(slog.String("handler", "delete_content_likes"))
 	userID, ok := r.Context().Value(middlewares.AccountIDContextKey).(string)
 	if !ok || userID == "" {
 		log.Warn("unauthorized", slog.String("reason", "missing_account_in_context"))
@@ -49,7 +49,7 @@ func PostContentLikes(w http.ResponseWriter, r *http.Request) {
 	svc := likesservice.New(r.Context())
 	defer svc.Close(r.Context())
 
-	err = svc.LikePost(r.Context(), userID, req.PostId.String())
+	err = svc.UnlikePost(r.Context(), userID, req.PostId.String())
 	if err != nil {
 		if errors.Is(err, likesservice.ErrInvalidPostID) {
 			w.Header().Set("Content-Type", "application/json")
@@ -63,11 +63,11 @@ func PostContentLikes(w http.ResponseWriter, r *http.Request) {
 			json.NewEncoder(w).Encode(api.ErrorResponse{Message: "Post not found"})
 			return
 		}
-		log.Error("like_post_failed", slog.String("error", err.Error()))
+		log.Error("unlike_post_failed", slog.String("error", err.Error()))
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	log.Info("post_content_likes_ok")
+	log.Info("delete_content_likes_ok")
 	w.WriteHeader(http.StatusOK)
 }

@@ -6,6 +6,47 @@ info:
 
 paths:
   /content/posts:
+    get:
+      summary: List the authenticated user's posts
+      description: >
+        Posts where author_id equals the JWT subject. Ordered by created_at
+        descending, then id descending. The client may treat fewer than `limit`
+        items as the last page.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: limit
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+        - name: offset
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MyPostsPage'
+        '400':
+          description: Bad request (invalid or missing query parameters)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     post:
       summary: Create a post
       security:
@@ -109,6 +150,50 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         '404':
           description: Post not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /content/posts/liked:
+    get:
+      summary: List posts liked by the authenticated user
+      description: >
+        Joins likes for the JWT subject with posts. Each item includes the post
+        and liked_at from the like row. Ordered by like time descending, then
+        like id descending. The client may treat fewer than `limit` items as
+        the last page.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: limit
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+        - name: offset
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LikedPostsPage'
+        '400':
+          description: Bad request (invalid or missing query parameters)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
           content:
             application/json:
               schema:
@@ -313,6 +398,14 @@ components:
           format: uuid
         content:
           type: string
+        image_object_ids:
+          type: array
+          description: Object ids in permanent storage (same values as after content commit from temp); display order
+          maxItems: 10
+          items:
+            type: string
+            minLength: 1
+            maxLength: 512
         created_at:
           type: string
           format: date-time
@@ -323,6 +416,7 @@ components:
         - id
         - author_id
         - content
+        - image_object_ids
         - created_at
         - updated_at
 
@@ -331,18 +425,33 @@ components:
       properties:
         content:
           type: string
+        image_object_ids:
+          type: array
+          description: Optional; up to 10 object ids in the temporary upload bucket (from media presigned upload). Content service moves them to permanent storage when creating the post.
+          maxItems: 10
+          items:
+            type: string
+            minLength: 1
+            maxLength: 512
       required:
         - content
 
     UpdatePostRequest:
       type: object
-      description: Partial update of a post; only sent fields are applied
+      description: Partial update; send content and/or image_object_ids (replaces image set when sent)
       properties:
         post_id:
           type: string
           format: uuid
         content:
           type: string
+        image_object_ids:
+          type: array
+          maxItems: 10
+          items:
+            type: string
+            minLength: 1
+            maxLength: 512
       required:
         - post_id
 
@@ -354,6 +463,59 @@ components:
           format: uuid
       required:
         - post_id
+
+    MyPostsPage:
+      type: object
+      description: Paginated list of posts for the authenticated author
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Post'
+        limit:
+          type: integer
+          minimum: 1
+          maximum: 100
+        offset:
+          type: integer
+          minimum: 0
+      required:
+        - items
+        - limit
+        - offset
+
+    LikedPostItem:
+      type: object
+      description: A post the user has liked, with the time the like was recorded
+      properties:
+        post:
+          $ref: '#/components/schemas/Post'
+        liked_at:
+          type: string
+          format: date-time
+      required:
+        - post
+        - liked_at
+
+    LikedPostsPage:
+      type: object
+      description: Paginated list of posts the authenticated user has liked
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/LikedPostItem'
+        limit:
+          type: integer
+          minimum: 1
+          maximum: 100
+        offset:
+          type: integer
+          minimum: 0
+      required:
+        - items
+        - limit
+        - offset
 
     Comment:
       type: object
@@ -369,6 +531,14 @@ components:
           format: uuid
         content:
           type: string
+        image_object_ids:
+          type: array
+          description: Object ids in permanent storage; display order
+          maxItems: 10
+          items:
+            type: string
+            minLength: 1
+            maxLength: 512
         parent_id:
           type: string
           format: uuid
@@ -384,6 +554,7 @@ components:
         - post_id
         - author_id
         - content
+        - image_object_ids
         - created_at
         - updated_at
 
@@ -395,6 +566,14 @@ components:
           format: uuid
         content:
           type: string
+        image_object_ids:
+          type: array
+          description: Optional; temp-bucket object ids from presigned upload; content service commits to permanent storage when creating the comment
+          maxItems: 10
+          items:
+            type: string
+            minLength: 1
+            maxLength: 512
         parent_id:
           type: string
           format: uuid
@@ -406,13 +585,20 @@ components:
 
     UpdateCommentRequest:
       type: object
-      description: Partial update; only sent fields are applied
+      description: Partial update; send content and/or image_object_ids (replaces image set when sent)
       properties:
         comment_id:
           type: string
           format: uuid
         content:
           type: string
+        image_object_ids:
+          type: array
+          maxItems: 10
+          items:
+            type: string
+            minLength: 1
+            maxLength: 512
       required:
         - comment_id
 
