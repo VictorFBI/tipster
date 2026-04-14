@@ -8,7 +8,8 @@
     "delete": "Удалить",
     "edit": "Редактировать",
     "search": "Поиск",
-    "you": "Вы"
+    "you": "Вы",
+    "confirm": "Подтвердить"
   },
   "auth": {
     "login": "Войти",
@@ -159,9 +160,16 @@
     "appearance": "Внешний вид",
     "about": "О приложении",
     "logout": "Выйти из аккаунта",
+    "loggingOut": "Выход...",
+    "deleteAccount": "Удалить аккаунт",
+    "deletingAccount": "Удаление...",
+    "deleteAccountTitle": "Удалить аккаунт?",
+    "deleteAccountDescription": "Это действие необратимо. Все ваши данные, посты и подписки будут удалены навсегда.",
+    "deleteAccountConfirm": "Удалить",
     "balance": "Баланс",
     "tokenBalance": "Баланс токенов",
     "connectWallet": "Подключить кошелек",
+    "disconnectWallet": "Отключить кошелек",
     "security": "Безопасность",
     "securityInfo": "Мы не храним приватные ключи. Ваши токены будут отправлены напрямую на ваш кошелек во время airdrop.",
     "referral": "Реферальная программа",

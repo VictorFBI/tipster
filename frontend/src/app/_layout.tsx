@@ -14,7 +14,15 @@ import { useThemeStore } from "../core/store/themeStore";
 import { QueryProvider } from "../core/providers/QueryProvider";
 import { ENABLE_STORYBOOK } from "../core/config/storybook";
 import { useStorybookDevMenu } from "../core/config/devMenu";
-import { LogBox } from "react-native";
+import { LogBox, BackHandler } from "react-native";
+
+// Polyfill for BackHandler.removeEventListener removed in newer React Native versions.
+// Required by react-native-modal (used inside @walletconnect/modal-react-native).
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const bh = BackHandler as any;
+if (typeof bh.removeEventListener !== "function") {
+  bh.removeEventListener = () => {};
+}
 
 LogBox.ignoreLogs([
   "react-native-compat",

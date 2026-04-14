@@ -8,7 +8,8 @@
     "delete": "Delete",
     "edit": "Edit",
     "search": "Search",
-    "you": "You"
+    "you": "You",
+    "confirm": "Confirm"
   },
   "auth": {
     "login": "Login",
@@ -157,9 +158,16 @@
     "appearance": "Appearance",
     "about": "About",
     "logout": "Logout",
+    "loggingOut": "Logging out...",
+    "deleteAccount": "Delete Account",
+    "deletingAccount": "Deleting...",
+    "deleteAccountTitle": "Delete Account?",
+    "deleteAccountDescription": "This action is irreversible. All your data, posts and subscriptions will be permanently deleted.",
+    "deleteAccountConfirm": "Delete",
     "balance": "Balance",
     "tokenBalance": "Token Balance",
     "connectWallet": "Connect Wallet",
+    "disconnectWallet": "Disconnect Wallet",
     "security": "Security",
     "securityInfo": "We don't store private keys. Your tokens will be sent directly to your wallet during the airdrop.",
     "referral": "Referral Program",
