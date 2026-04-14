@@ -5,6 +5,7 @@ export interface PostResponse {
   id: string;
   author_id: string;
   content: string;
+  image_object_ids: string[];
   created_at: string;
   updated_at: string;
 }
@@ -15,6 +16,7 @@ export interface CommentResponse {
   post_id: string;
   author_id: string;
   content: string;
+  image_object_ids: string[];
   parent_id: string | null;
   created_at: string;
   updated_at: string;
@@ -25,12 +27,14 @@ export interface CommentResponse {
 /** POST /content/posts */
 export interface CreatePostRequest {
   content: string;
+  image_object_ids?: string[];
 }
 
 /** PATCH /content/posts */
 export interface UpdatePostRequest {
   post_id: string;
   content?: string;
+  image_object_ids?: string[];
 }
 
 /** DELETE /content/posts */
@@ -42,6 +46,7 @@ export interface DeletePostRequest {
 export interface CreateCommentRequest {
   post_id: string;
   content: string;
+  image_object_ids?: string[];
   parent_id?: string | null;
 }
 
@@ -49,6 +54,7 @@ export interface CreateCommentRequest {
 export interface UpdateCommentRequest {
   comment_id: string;
   content?: string;
+  image_object_ids?: string[];
 }
 
 /** DELETE /content/comments */

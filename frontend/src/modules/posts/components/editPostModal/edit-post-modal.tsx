@@ -1,10 +1,17 @@
 import { useState } from "react";
-import { Modal, TouchableOpacity, TextInput, Image } from "react-native";
+import {
+  Modal,
+  TouchableOpacity,
+  TextInput,
+  Image,
+  ActivityIndicator,
+} from "react-native";
 import { YStack, XStack, Text, Button } from "tamagui";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { useThemeStore } from "@/src/core/store/themeStore";
 import { themes } from "@/src/core/theme/themes";
+import { useMediaUpload } from "@/src/modules/media";
 import { styles } from "./edit-post-modal.styles";
 
 interface EditPostModalProps {
@@ -12,7 +19,7 @@ interface EditPostModalProps {
   onOpenChange: (open: boolean) => void;
   initialContent: string;
   initialImage?: string;
-  onSave: (content: string, image?: string) => void;
+  onSave: (content: string, imageObjectIds?: string[]) => void;
 }
 
 export function EditPostModal({
@@ -25,18 +32,48 @@ export function EditPostModal({
   const { theme } = useThemeStore();
   const currentTheme = themes[theme];
   const [content, setContent] = useState(initialContent);
-  const [image, setImage] = useState<string | undefined>(initialImage);
+  const [imageAsset, setImageAsset] =
+    useState<ImagePicker.ImagePickerAsset | null>(null);
+  const [existingImage, setExistingImage] = useState<string | undefined>(
+    initialImage,
+  );
 
-  const handleSave = () => {
-    if (content.trim()) {
-      onSave(content, image);
+  const {
+    uploadImages,
+    isUploading,
+    progress,
+    error: uploadError,
+  } = useMediaUpload();
+
+  const handleSave = async () => {
+    if (!content.trim()) return;
+
+    try {
+      let imageObjectIds: string[] | undefined;
+
+      // Upload new image if one was picked
+      if (imageAsset) {
+        const result = await uploadImages([imageAsset], "post_images");
+        imageObjectIds = result.objectKeys;
+      } else if (existingImage) {
+        // Keep existing image — pass undefined to not change images
+        imageObjectIds = undefined;
+      } else {
+        // Image was removed — pass empty array to clear images
+        imageObjectIds = [];
+      }
+
+      onSave(content, imageObjectIds);
       onOpenChange(false);
+    } catch (err) {
+      console.warn("Image upload failed during edit:", err);
     }
   };
 
   const handleClose = () => {
     setContent(initialContent);
-    setImage(initialImage);
+    setImageAsset(null);
+    setExistingImage(initialImage);
     onOpenChange(false);
   };
 
@@ -56,13 +93,19 @@ export function EditPostModal({
     });
 
     if (!result.canceled && result.assets[0]) {
-      setImage(result.assets[0].uri);
+      setImageAsset(result.assets[0]);
+      setExistingImage(undefined);
     }
   };
 
   const removeImage = () => {
-    setImage(undefined);
+    setImageAsset(null);
+    setExistingImage(undefined);
   };
+
+  const displayImageUri = imageAsset?.uri ?? existingImage;
+  const isSaving = isUploading;
+  const uploadProgressPercent = Math.round(progress * 100);
 
   return (
     <Modal
@@ -131,8 +174,27 @@ export function EditPostModal({
                 {content.length} символов
               </Text>
 
+              {/* Upload error */}
+              {uploadError && (
+                <YStack backgroundColor="$red2" padding="$3" borderRadius="$3">
+                  <Text fontSize={14} color="$red10">
+                    {uploadError.message || "Ошибка загрузки"}
+                  </Text>
+                </YStack>
+              )}
+
+              {/* Upload progress */}
+              {isUploading && (
+                <XStack alignItems="center" gap="$2" paddingVertical="$2">
+                  <ActivityIndicator size="small" color={currentTheme.accent} />
+                  <Text fontSize={14} color="$textSecondary">
+                    Загрузка изображения... {uploadProgressPercent}%
+                  </Text>
+                </XStack>
+              )}
+
               {/* Image Section */}
-              {image ? (
+              {displayImageUri ? (
                 <YStack gap="$2">
                   <XStack justifyContent="space-between" alignItems="center">
                     <Text fontSize={14} fontWeight="500" color="$text">
@@ -145,6 +207,7 @@ export function EditPostModal({
                       borderWidth={0}
                       padding="$2"
                       pressStyle={{ opacity: 0.7 }}
+                      disabled={isSaving}
                     >
                       <Ionicons
                         name="close-circle"
@@ -154,7 +217,7 @@ export function EditPostModal({
                     </Button>
                   </XStack>
                   <Image
-                    source={{ uri: image }}
+                    source={{ uri: displayImageUri }}
                     style={{
                       width: "100%",
                       height: 200,
@@ -172,9 +235,9 @@ export function EditPostModal({
                   borderColor="$darkBorder"
                   borderStyle="dashed"
                   padding="$2"
-                  // minHeight={80}
                   minHeight={55}
                   borderRadius="$3"
+                  disabled={isSaving}
                   pressStyle={{
                     opacity: 0.7,
                     backgroundColor: "$backgroundHover",
@@ -204,6 +267,7 @@ export function EditPostModal({
                 paddingHorizontal="$5"
                 paddingVertical="$3"
                 borderRadius="$3"
+                disabled={isSaving}
                 pressStyle={{
                   opacity: 0.7,
                   backgroundColor: "$backgroundHover",
@@ -221,14 +285,14 @@ export function EditPostModal({
                 paddingHorizontal="$5"
                 paddingVertical="$3"
                 borderRadius="$3"
-                disabled={!content.trim()}
-                opacity={!content.trim() ? 0.5 : 1}
+                disabled={!content.trim() || isSaving}
+                opacity={!content.trim() || isSaving ? 0.5 : 1}
                 pressStyle={{
                   opacity: 0.8,
                 }}
               >
                 <Text fontSize={16} fontWeight="600" color="white">
-                  Сохранить
+                  {isSaving ? "Загрузка..." : "Сохранить"}
                 </Text>
               </Button>
             </XStack>

@@ -11,11 +11,17 @@ import {
 } from "tamagui";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
-import { KeyboardAvoidingView, Platform, TouchableOpacity } from "react-native";
+import {
+  KeyboardAvoidingView,
+  Platform,
+  TouchableOpacity,
+  ActivityIndicator,
+} from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { useThemeStore } from "@/src/core/store/themeStore";
 import { themes } from "@/src/core/theme/themes";
 import { useCreatePost as useCreatePostMutation } from "../../hooks/useContent";
+import { useMediaUpload } from "@/src/modules/media";
 
 export function CreatePost() {
   const { t } = useTranslation();
@@ -23,7 +29,14 @@ export function CreatePost() {
   const { theme } = useThemeStore();
   const currentTheme = themes[theme];
   const [content, setContent] = useState("");
-  const [images, setImages] = useState<string[]>([]);
+  const [images, setImages] = useState<ImagePicker.ImagePickerAsset[]>([]);
+
+  const {
+    uploadImages,
+    isUploading,
+    progress,
+    error: uploadError,
+  } = useMediaUpload();
 
   const maxLength = 500;
   const maxImages = 4;
@@ -42,10 +55,7 @@ export function CreatePost() {
     });
 
     if (!result.canceled) {
-      const newImages = result.assets.map(
-        (asset: ImagePicker.ImagePickerAsset) => asset.uri,
-      );
-      setImages([...images, ...newImages].slice(0, maxImages));
+      setImages([...images, ...result.assets].slice(0, maxImages));
     }
   };
 
@@ -63,19 +73,37 @@ export function CreatePost() {
     },
   });
 
-  const isPosting = createPostMutation.isPending;
+  const isPosting = createPostMutation.isPending || isUploading;
 
-  const handlePost = () => {
+  const handlePost = async () => {
     if (content.trim().length === 0 && images.length === 0) {
       return;
     }
 
-    createPostMutation.mutate({ content: content.trim() });
+    try {
+      let imageObjectIds: string[] | undefined;
+
+      // Upload images via presigned URLs if any are selected
+      if (images.length > 0) {
+        const result = await uploadImages(images, "post_images");
+        imageObjectIds = result.objectKeys;
+      }
+
+      // Create the post with content and optional image object keys
+      createPostMutation.mutate({
+        content: content.trim(),
+        image_object_ids: imageObjectIds,
+      });
+    } catch (err) {
+      console.warn("Image upload failed:", err);
+    }
   };
 
   const canPost =
     (content.trim().length > 0 || images.length > 0) &&
     content.length <= maxLength;
+
+  const uploadProgressPercent = Math.round(progress * 100);
 
   return (
     <KeyboardAvoidingView
@@ -133,6 +161,15 @@ export function CreatePost() {
                 </Text>
               </YStack>
             )}
+
+            {uploadError && (
+              <YStack backgroundColor="$red2" padding="$3" borderRadius="$3">
+                <Text fontSize={14} color="$red10">
+                  {uploadError.message || t("common.error")}
+                </Text>
+              </YStack>
+            )}
+
             <TextArea
               placeholder={t("createPost.placeholder")}
               value={content}
@@ -152,10 +189,10 @@ export function CreatePost() {
 
             {images.length > 0 && (
               <XStack flexWrap="wrap" gap="$2">
-                {images.map((uri, index) => (
+                {images.map((asset, index) => (
                   <YStack key={index} position="relative">
                     <Image
-                      source={{ uri }}
+                      source={{ uri: asset.uri }}
                       width={images.length === 1 ? 300 : 145}
                       height={images.length === 1 ? 300 : 145}
                       borderRadius="$3"
@@ -180,6 +217,16 @@ export function CreatePost() {
                 ))}
               </XStack>
             )}
+
+            {isUploading && (
+              <XStack alignItems="center" gap="$2" paddingVertical="$2">
+                <ActivityIndicator size="small" color={currentTheme.accent} />
+                <Text fontSize={14} color={currentTheme.muted}>
+                  {t("createPost.uploading")} {uploadProgressPercent}%
+                </Text>
+              </XStack>
+            )}
+
             <XStack justifyContent="flex-end">
               <Text
                 fontSize={14}
@@ -202,6 +249,7 @@ export function CreatePost() {
                 paddingVertical="$2"
                 borderRadius="$3"
                 onPress={pickImage}
+                disabled={isPosting}
                 pressStyle={{ opacity: 0.7 }}
               >
                 <XStack alignItems="center" gap="$2">

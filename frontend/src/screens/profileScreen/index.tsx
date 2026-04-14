@@ -80,7 +80,7 @@ export default function Profile() {
 
       <YStack paddingBottom="$6">
         {activeTab === "posts" ? (
-          <PostsList posts={mockUserPosts} />
+          <PostsList posts={mockUserPosts} isOwnPosts />
         ) : (
           <YStack
             alignItems="center"
