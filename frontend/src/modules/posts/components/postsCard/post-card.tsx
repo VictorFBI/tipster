@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Image } from "react-native";
+import { Image, Alert } from "react-native";
 import { YStack, Text } from "tamagui";
 import { CommentsSection } from "../commentsSection/comments-section";
 import { PostHeader } from "../postHeader/post-header";
@@ -7,6 +7,7 @@ import { PostActions } from "../postActions/post-actions";
 import { PostEditMenu } from "../postEditMenu/post-edit-menu";
 import { EditPostModal } from "../editPostModal/edit-post-modal";
 import { usePostComments, type Post } from "@/src/modules/posts";
+import { useUpdatePost, useDeletePost } from "../../hooks/useContent";
 import { ConfirmDialog } from "@/src/shared/ui/confirmDialog/confirm-dialog";
 
 export type { Post };
@@ -14,9 +15,14 @@ export type { Post };
 interface PostCardProps {
   post: Post;
   isOwnPost?: boolean;
+  onDeleted?: () => void;
 }
 
-export function PostCard({ post, isOwnPost = false }: PostCardProps) {
+export function PostCard({
+  post,
+  isOwnPost = false,
+  onDeleted,
+}: PostCardProps) {
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(post.likes);
   const [reposted, setReposted] = useState(false);
@@ -31,6 +37,28 @@ export function PostCard({ post, isOwnPost = false }: PostCardProps) {
   const { comments, handleAddComment, handleAddReply } = usePostComments(
     post.commentsList || [],
   );
+
+  const { mutate: updatePost } = useUpdatePost({
+    onSuccess: (data) => {
+      setPostContent(data.content);
+      // Update local image from the response (first image or undefined)
+      setPostImage(
+        data.image_object_ids.length > 0 ? data.image_object_ids[0] : undefined,
+      );
+    },
+    onError: () => {
+      Alert.alert("Ошибка", "Не удалось обновить пост. Попробуйте ещё раз.");
+    },
+  });
+
+  const { mutate: deletePost } = useDeletePost({
+    onSuccess: () => {
+      onDeleted?.();
+    },
+    onError: () => {
+      Alert.alert("Ошибка", "Не удалось удалить пост. Попробуйте ещё раз.");
+    },
+  });
 
   const handleLike = () => {
     if (liked) {
@@ -69,11 +97,12 @@ export function PostCard({ post, isOwnPost = false }: PostCardProps) {
     setShowEditModal(true);
   };
 
-  const handleSaveEdit = (newContent: string, newImage?: string) => {
-    setPostContent(newContent);
-    setPostImage(newImage);
-    // TODO: Implement API call to save edited post
-    console.log("Save edited post:", post.id, newContent, newImage);
+  const handleSaveEdit = (newContent: string, imageObjectIds?: string[]) => {
+    updatePost({
+      post_id: post.id,
+      content: newContent,
+      ...(imageObjectIds !== undefined && { image_object_ids: imageObjectIds }),
+    });
   };
 
   const handleDeleteRequest = () => {
@@ -81,8 +110,7 @@ export function PostCard({ post, isOwnPost = false }: PostCardProps) {
   };
 
   const confirmDelete = () => {
-    // TODO: Implement delete functionality
-    console.log("Delete post:", post.id);
+    deletePost({ post_id: post.id });
   };
 
   return (
