@@ -1,6 +1,5 @@
 import axios, { AxiosInstance } from "axios";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { STORAGE_KEYS } from "@/src/modules/auth";
+import { setupAuthInterceptors } from "@/src/core/api/authInterceptor";
 
 // Accounts API base URL
 const ACCOUNTS_API_URL =
@@ -15,20 +14,7 @@ export const accountsClient: AxiosInstance = axios.create({
   },
 });
 
-// Request interceptor to add auth token
-accountsClient.interceptors.request.use(
-  async (config) => {
-    const token = await AsyncStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
-
-    if (token && config.headers) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  },
-);
+// Attach shared auth interceptors (request token injection + 401 refresh)
+setupAuthInterceptors(accountsClient);
 
 export default accountsClient;

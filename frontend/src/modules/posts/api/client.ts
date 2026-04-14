@@ -1,6 +1,5 @@
 import axios, { AxiosInstance } from "axios";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { STORAGE_KEYS } from "@/src/modules/auth";
+import { setupAuthInterceptors } from "@/src/core/api/authInterceptor";
 
 // Content API base URL
 const CONTENT_API_URL =
@@ -15,20 +14,7 @@ export const contentClient: AxiosInstance = axios.create({
   },
 });
 
-// Request interceptor to add auth token
-contentClient.interceptors.request.use(
-  async (config) => {
-    const token = await AsyncStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
-
-    if (token && config.headers) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  },
-);
+// Attach shared auth interceptors (request token injection + 401 refresh)
+setupAuthInterceptors(contentClient);
 
 export default contentClient;
