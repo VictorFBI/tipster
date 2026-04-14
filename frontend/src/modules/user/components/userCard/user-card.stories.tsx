@@ -21,10 +21,7 @@ const mockUser = {
   id: "1",
   username: "CryptoKing",
   avatar: "https://i.pravatar.cc/150?img=1",
-  tipBalance: 12450,
   subscribers: 2340,
-  weeklyGrowth: 15,
-  isSubscribed: false,
 };
 
 export const DefaultDark: Story = {
@@ -50,7 +47,6 @@ export const SubscribedDark: Story = {
   args: {
     user: {
       ...mockUser,
-      isSubscribed: true,
     },
   },
   parameters: {
@@ -62,7 +58,6 @@ export const SubscribedLight: Story = {
   args: {
     user: {
       ...mockUser,
-      isSubscribed: true,
     },
   },
   parameters: {

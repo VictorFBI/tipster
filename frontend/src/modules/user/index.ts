@@ -7,5 +7,5 @@ export {
   useSubscribe,
   useUnsubscribe,
 } from "./hooks/useUser";
-export { UserCard } from "./components/userCard/user-card";
+export { UserCard, type UserCardUser } from "./components/userCard/user-card";
 export { UsersList } from "./components/usersList/users-list";

@@ -18,10 +18,6 @@ function mapSearchItemToUser(item: UserSearchItem) {
     id: item.user_id,
     username: item.username ?? "",
     avatar: item.avatar_url ?? "",
-    tipBalance: 0,
-    subscribers: 0,
-    weeklyGrowth: 0,
-    isSubscribed: false,
   };
 }
 

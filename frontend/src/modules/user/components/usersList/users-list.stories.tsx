@@ -26,19 +26,13 @@ const mockUsers = [
     id: "1",
     username: "CryptoKing",
     avatar: "https://i.pravatar.cc/150?img=1",
-    tipBalance: 12450,
     subscribers: 2340,
-    weeklyGrowth: 15,
-    isSubscribed: false,
   },
   {
     id: "2",
     username: "TokenHunter",
     avatar: "https://i.pravatar.cc/150?img=2",
-    tipBalance: 8920,
     subscribers: 1567,
-    weeklyGrowth: 8,
-    isSubscribed: true,
   },
 ];
 

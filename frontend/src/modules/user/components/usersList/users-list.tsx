@@ -1,23 +1,13 @@
 import { YStack, Text, ScrollView, Spinner } from "tamagui";
-import { UserCard } from "../userCard/user-card";
+import { UserCard, type UserCardUser } from "../userCard/user-card";
 import { useTranslation } from "react-i18next";
 import { Pressable } from "react-native";
 import { useRouter } from "expo-router";
 import { useThemeStore } from "@/src/core/store/themeStore";
 import { themes } from "@/src/core/theme/themes";
 
-interface User {
-  id: string;
-  username: string;
-  avatar: string;
-  tipBalance: number;
-  subscribers: number;
-  weeklyGrowth: number;
-  isSubscribed: boolean;
-}
-
 interface UsersListProps {
-  users: User[];
+  users: UserCardUser[];
   isLoading?: boolean;
   emptyMessage?: string;
 }
