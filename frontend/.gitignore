@@ -14,6 +14,9 @@ npm-debug.*
 *.orig.*
 web-build/
 
+# Jest coverage
+coverage/
+
 # macOS
 .DS_Store
 .yarn/*
