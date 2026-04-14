@@ -42,7 +42,7 @@ export const useRegister = (): UseMutationResult<
   return useMutation({
     mutationFn: authService.register,
     onError: (error) => {
-      console.error(
+      console.warn(
         "Registration error:",
         error.response?.data?.message || error.message,
       );
@@ -77,7 +77,7 @@ export const useLogin = (): UseMutationResult<
       }
     },
     onError: (error) => {
-      console.error(
+      console.warn(
         "Login error:",
         error.response?.data?.message || error.message,
       );
@@ -99,7 +99,7 @@ export const useLogout = (): UseMutationResult<
       useAuthStore.getState().logout();
     },
     onError: (error) => {
-      console.error(
+      console.warn(
         "Logout error:",
         error.response?.data?.message || error.message,
       );
@@ -118,7 +118,7 @@ export const useSendEmailRegistration = (): UseMutationResult<
   return useMutation({
     mutationFn: authService.sendEmailRegistration,
     onError: (error) => {
-      console.error(
+      console.warn(
         "Send email registration error:",
         error.response?.data?.message || error.message,
       );
@@ -134,7 +134,7 @@ export const useConfirmEmailRegistration = (): UseMutationResult<
   return useMutation({
     mutationFn: authService.confirmEmailRegistration,
     onError: (error) => {
-      console.error(
+      console.warn(
         "Confirm email registration error:",
         error.response?.data?.message || error.message,
       );
@@ -150,7 +150,7 @@ export const useSendEmailResetPassword = (): UseMutationResult<
   return useMutation({
     mutationFn: authService.sendEmailResetPassword,
     onError: (error) => {
-      console.error(
+      console.warn(
         "Send email reset password error:",
         error.response?.data?.message || error.message,
       );
@@ -166,7 +166,7 @@ export const useConfirmEmailResetPassword = (): UseMutationResult<
   return useMutation({
     mutationFn: authService.confirmEmailResetPassword,
     onError: (error) => {
-      console.error(
+      console.warn(
         "Confirm email reset password error:",
         error.response?.data?.message || error.message,
       );
@@ -182,7 +182,7 @@ export const useResetPassword = (): UseMutationResult<
   return useMutation({
     mutationFn: authService.resetPassword,
     onError: (error) => {
-      console.error(
+      console.warn(
         "Reset password error:",
         error.response?.data?.message || error.message,
       );

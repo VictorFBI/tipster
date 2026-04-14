@@ -85,7 +85,7 @@ export function useProfileForm() {
         setAvatar(result.assets[0].uri);
       }
     } catch (error) {
-      console.error("Error picking image:", error);
+      console.warn("Error picking image:", error);
       Alert.alert(
         t("profile.filling.errorTitle") || "Error",
         t("profile.filling.errorMessage") || "Failed to pick image",

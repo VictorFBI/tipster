@@ -79,7 +79,7 @@ export function useVerificationCode({
     try {
       await onVerifySuccess(verificationCode);
     } catch (err) {
-      console.error("Verification error:", err);
+      console.warn("Verification error:", err);
       setError(errorInvalidCode);
       setCode(["", "", "", "", "", ""]);
       inputRefs.current[0]?.focus();
@@ -94,7 +94,7 @@ export function useVerificationCode({
         await onResendCode();
         setResendTimer(resendCooldown);
       } catch (err) {
-        console.error("Resend error:", err);
+        console.warn("Resend error:", err);
       }
     }
   };

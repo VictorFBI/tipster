@@ -22,7 +22,7 @@
     "invalidEmail": "Неверный формат email",
     "password": "Пароль",
     "passwordRequired": "Пароль обязателен",
-    "passwordMinLength": "Пароль должен быть минимум 6 символов",
+    "passwordMinLength": "Пароль должен быть минимум 12 символов",
     "confirmPassword": "Подтвердите пароль",
     "username": "Имя пользователя",
     "forgotPassword": "Забыли пароль?",

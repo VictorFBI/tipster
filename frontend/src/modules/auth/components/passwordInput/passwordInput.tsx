@@ -64,6 +64,7 @@ export function PasswordInput({
               onChangeText={onChange}
               onBlur={onBlur}
               secureTextEntry={!isPasswordVisible}
+              autoCapitalize="none"
               hasError={!!errors}
               paddingRight="$10"
               inputSize="l"

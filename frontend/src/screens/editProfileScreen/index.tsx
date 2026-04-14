@@ -95,7 +95,7 @@ export default function EditProfileScreen() {
         setAvatar(result.assets[0].uri);
       }
     } catch (error) {
-      console.error("Error picking image:", error);
+      console.warn("Error picking image:", error);
       Alert.alert(
         t("profile.filling.errorTitle") || "Ошибка",
         t("profile.filling.errorMessage") || "Не удалось выбрать изображение",

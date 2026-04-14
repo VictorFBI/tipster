@@ -11,6 +11,7 @@ interface StyledInputProps {
   disabled?: boolean;
   secureTextEntry?: boolean;
   keyboardType?: "default" | "email-address" | "numeric" | "phone-pad";
+  autoCapitalize?: "none" | "sentences" | "words" | "characters";
   autoComplete?: string;
   flex?: number;
   backgroundColor?: string;
@@ -40,6 +41,7 @@ export function StyledInput({
   disabled = false,
   secureTextEntry = false,
   keyboardType = "default",
+  autoCapitalize,
   autoComplete,
   flex,
   backgroundColor = "$background2",
@@ -62,6 +64,7 @@ export function StyledInput({
       onBlur={onBlur}
       secureTextEntry={secureTextEntry}
       keyboardType={keyboardType}
+      autoCapitalize={autoCapitalize}
       autoComplete={autoComplete}
       disabled={disabled}
       size={inputSizes[inputSize]}

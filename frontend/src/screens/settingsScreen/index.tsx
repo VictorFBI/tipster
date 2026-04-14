@@ -41,7 +41,7 @@ export default function Settings() {
     } catch (error) {
       const errorMessage = getErrorMessage(error);
       Alert.alert(t("auth.error") || "Ошибка", errorMessage);
-      console.error("Logout error:", error);
+      console.warn("Logout error:", error);
     }
   };
 

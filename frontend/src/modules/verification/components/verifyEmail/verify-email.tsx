@@ -32,7 +32,7 @@ export function VerifyEmail() {
     } catch (error) {
       const errorMessage = getErrorMessage(error);
       Alert.alert(t("auth.error") || "Ошибка", errorMessage);
-      console.error("Email verification error:", error);
+      console.warn("Email verification error:", error);
     }
   };
 
@@ -47,7 +47,7 @@ export function VerifyEmail() {
     } catch (error) {
       const errorMessage = getErrorMessage(error);
       Alert.alert(t("auth.error") || "Ошибка", errorMessage);
-      console.error("Resend code error:", error);
+      console.warn("Resend code error:", error);
     }
   };
 

@@ -59,7 +59,7 @@ export function CreatePost() {
       router.back();
     },
     onError: (error) => {
-      console.error("Create post failed:", error);
+      console.warn("Create post failed:", error);
     },
   });
 

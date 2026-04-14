@@ -4,13 +4,17 @@ import type { ApiError } from "@/src/modules/auth";
 export const getErrorMessage = (error: unknown): string => {
   if (error instanceof AxiosError) {
     const apiError = error.response?.data as ApiError | undefined;
-    console.log("error", error);
-    console.log("apiError", apiError);
 
-    // // Return API error message if available
-    // if (apiError?.message) {
-    //   return apiError.message;
-    // }
+    // Check for specific API error messages first
+    if (apiError?.message) {
+      const msg = apiError.message.toLowerCase();
+      if (
+        msg.includes("user already exists") ||
+        msg.includes("already registered")
+      ) {
+        return "Пользователь с таким email уже зарегистрирован.";
+      }
+    }
 
     switch (error.response?.status) {
       case 400:

@@ -30,7 +30,7 @@ export function ReferalBlock({
 
       setTimeout(() => setCopied(false), 2000);
     } catch (error) {
-      console.error("Failed to copy:", error);
+      console.warn("Failed to copy:", error);
     }
   };
 

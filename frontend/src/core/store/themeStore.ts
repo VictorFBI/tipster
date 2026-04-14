@@ -22,7 +22,7 @@ export const useThemeStore = create<ThemeState>((set, get) => ({
       await AsyncStorage.setItem(THEME_STORAGE_KEY, newTheme);
       set({ theme: newTheme });
     } catch (error) {
-      console.error("Error saving theme:", error);
+      console.warn("Error saving theme:", error);
     }
   },
 
@@ -40,7 +40,7 @@ export const useThemeStore = create<ThemeState>((set, get) => ({
         set({ theme: savedTheme });
       }
     } catch (error) {
-      console.error("Error loading theme:", error);
+      console.warn("Error loading theme:", error);
     } finally {
       set({ isLoading: false });
     }

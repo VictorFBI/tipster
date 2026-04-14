@@ -22,7 +22,7 @@
     "invalidEmail": "Invalid email format",
     "password": "Password",
     "passwordRequired": "Password is required",
-    "passwordMinLength": "Password must be at least 6 characters",
+    "passwordMinLength": "Password must be at least 12 characters",
     "confirmPassword": "Confirm Password",
     "username": "Username",
     "forgotPassword": "Forgot Password?",

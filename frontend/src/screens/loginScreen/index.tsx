@@ -45,9 +45,8 @@ export function Login() {
       router.replace("/(tabs)");
     } catch (error) {
       const errorMessage = getErrorMessage(error);
-      console.log("fa", errorMessage);
       setErrorMsg(errorMessage);
-      console.error("Login error:", error);
+      console.warn("Login error:", error);
     }
   };
 

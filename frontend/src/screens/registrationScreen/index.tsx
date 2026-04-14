@@ -66,7 +66,7 @@ export function Registration() {
     } catch (error) {
       const errorMessage = getErrorMessage(error);
       setErrorMsg(errorMessage);
-      console.error("Registration error:", error);
+      console.warn("Registration error:", error);
     }
   };
 

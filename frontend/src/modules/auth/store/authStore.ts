@@ -67,7 +67,7 @@ export const useAuthStore = create<AuthState>((set) => ({
         });
       }
     } catch (error) {
-      console.error("Error checking auth:", error);
+      console.warn("Error checking auth:", error);
       set({
         user: null,
         isAuthenticated: false,
