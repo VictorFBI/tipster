@@ -9,16 +9,28 @@ import type {
   UpdateCommentRequest,
   DeleteCommentRequest,
   LikeRequest,
+  PaginationParams,
+  MyPostsPage,
+  LikedPostsPage,
 } from "./types";
 
 const contentService = {
   // ── Posts ──
 
-  /** GET /content/posts?author_id=<id> — get posts by author */
-  getUserPosts: async (authorId: string): Promise<PostResponse[]> => {
-    const response = await contentClient.get<PostResponse[]>("/content/posts", {
-      params: { author_id: authorId },
+  /** GET /content/posts — list the authenticated user's posts (paginated) */
+  getMyPosts: async (params: PaginationParams): Promise<MyPostsPage> => {
+    const response = await contentClient.get<MyPostsPage>("/content/posts", {
+      params,
     });
+    return response.data;
+  },
+
+  /** GET /content/posts/liked — list posts liked by the authenticated user (paginated) */
+  getLikedPosts: async (params: PaginationParams): Promise<LikedPostsPage> => {
+    const response = await contentClient.get<LikedPostsPage>(
+      "/content/posts/liked",
+      { params },
+    );
     return response.data;
   },
 

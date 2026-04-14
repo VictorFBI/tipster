@@ -12,6 +12,9 @@ export type { Post } from "./types";
 export { EditPostModal } from "./components/editPostModal/edit-post-modal";
 export { PostEditMenu } from "./components/postEditMenu/post-edit-menu";
 
+// Mappers
+export { mapPostResponseToPost } from "./utils/mappers";
+
 // Content API hooks
 export {
   useCreatePost,
@@ -22,7 +25,8 @@ export {
   useDeleteComment,
   useLikePost,
   useUnlikePost,
-  useUserPosts,
+  useMyPosts,
+  useLikedPosts,
   contentKeys,
 } from "./hooks/useContent";
 
@@ -37,5 +41,9 @@ export type {
   UpdateCommentRequest,
   DeleteCommentRequest,
   LikeRequest,
+  PaginationParams,
+  MyPostsPage,
+  LikedPostItem,
+  LikedPostsPage,
   ContentApiError,
 } from "./api/types";

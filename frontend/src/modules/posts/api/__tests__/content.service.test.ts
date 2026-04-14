@@ -22,28 +22,72 @@ beforeEach(() => {
 describe("contentService", () => {
   // ── Posts ──
 
-  describe("getUserPosts", () => {
-    it("calls GET /content/posts with author_id param", async () => {
-      const mockPosts = [
-        {
-          id: "p1",
-          author_id: "a1",
-          content: "Hello",
-          image_object_ids: [],
-          created_at: "2024-01-01T00:00:00Z",
-          updated_at: "2024-01-01T00:00:00Z",
-        },
-      ];
+  describe("getMyPosts", () => {
+    it("calls GET /content/posts with limit and offset params", async () => {
+      const mockPage = {
+        items: [
+          {
+            id: "p1",
+            author_id: "a1",
+            content: "Hello",
+            image_object_ids: [],
+            created_at: "2024-01-01T00:00:00Z",
+            updated_at: "2024-01-01T00:00:00Z",
+          },
+        ],
+        limit: 20,
+        offset: 0,
+      };
       (contentClient.get as jest.Mock).mockResolvedValueOnce({
-        data: mockPosts,
+        data: mockPage,
       });
 
-      const result = await contentService.getUserPosts("a1");
+      const result = await contentService.getMyPosts({
+        limit: 20,
+        offset: 0,
+      });
 
       expect(contentClient.get).toHaveBeenCalledWith("/content/posts", {
-        params: { author_id: "a1" },
+        params: { limit: 20, offset: 0 },
       });
-      expect(result).toEqual(mockPosts);
+      expect(result).toEqual(mockPage);
+      expect(result.items).toHaveLength(1);
+    });
+  });
+
+  describe("getLikedPosts", () => {
+    it("calls GET /content/posts/liked with limit and offset params", async () => {
+      const mockPage = {
+        items: [
+          {
+            post: {
+              id: "p1",
+              author_id: "a1",
+              content: "Liked post",
+              image_object_ids: [],
+              created_at: "2024-01-01T00:00:00Z",
+              updated_at: "2024-01-01T00:00:00Z",
+            },
+            liked_at: "2024-01-02T00:00:00Z",
+          },
+        ],
+        limit: 10,
+        offset: 0,
+      };
+      (contentClient.get as jest.Mock).mockResolvedValueOnce({
+        data: mockPage,
+      });
+
+      const result = await contentService.getLikedPosts({
+        limit: 10,
+        offset: 0,
+      });
+
+      expect(contentClient.get).toHaveBeenCalledWith("/content/posts/liked", {
+        params: { limit: 10, offset: 0 },
+      });
+      expect(result).toEqual(mockPage);
+      expect(result.items[0].liked_at).toBe("2024-01-02T00:00:00Z");
     });
   });
 

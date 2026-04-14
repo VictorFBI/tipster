@@ -10,6 +10,26 @@ export interface PostResponse {
   updated_at: string;
 }
 
+/** Paginated list of posts for the authenticated author (GET /content/posts) */
+export interface MyPostsPage {
+  items: PostResponse[];
+  limit: number;
+  offset: number;
+}
+
+/** A post the user has liked, with the time the like was recorded */
+export interface LikedPostItem {
+  post: PostResponse;
+  liked_at: string;
+}
+
+/** Paginated list of posts the authenticated user has liked (GET /content/posts/liked) */
+export interface LikedPostsPage {
+  items: LikedPostItem[];
+  limit: number;
+  offset: number;
+}
+
 /** Comment response from POST/PATCH /content/comments */
 export interface CommentResponse {
   id: string;
@@ -23,6 +43,12 @@ export interface CommentResponse {
 }
 
 // ── Request types ──
+
+/** Pagination query parameters for GET endpoints */
+export interface PaginationParams {
+  limit: number;
+  offset: number;
+}
 
 /** POST /content/posts */
 export interface CreatePostRequest {

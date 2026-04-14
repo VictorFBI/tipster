@@ -10,32 +10,52 @@ import type {
   UpdateCommentRequest,
   DeleteCommentRequest,
   LikeRequest,
+  PaginationParams,
+  MyPostsPage,
+  LikedPostsPage,
   ContentApiError,
 } from "../api/types";
 
 export const contentKeys = {
   all: ["content"] as const,
   posts: () => [...contentKeys.all, "posts"] as const,
-  userPosts: (authorId: string) =>
-    [...contentKeys.all, "posts", "user", authorId] as const,
+  myPosts: (limit: number, offset: number) =>
+    [...contentKeys.all, "posts", "my", limit, offset] as const,
+  likedPosts: (limit: number, offset: number) =>
+    [...contentKeys.all, "posts", "liked", limit, offset] as const,
   comments: (postId: string) =>
     [...contentKeys.all, "comments", postId] as const,
 };
 
 // ── Posts ──
 
-/** GET /content/posts?author_id=<id> — fetch posts by author */
-export const useUserPosts = (
-  authorId: string,
+/** GET /content/posts — list the authenticated user's posts (paginated) */
+export const useMyPosts = (
+  params: PaginationParams,
   options?: {
     enabled?: boolean;
     onError?: (error: ContentApiError) => void;
   },
 ) => {
   return useQuery({
-    queryKey: contentKeys.userPosts(authorId),
-    queryFn: () => contentService.getUserPosts(authorId),
-    enabled: options?.enabled ?? !!authorId,
+    queryKey: contentKeys.myPosts(params.limit, params.offset),
+    queryFn: () => contentService.getMyPosts(params),
+    enabled: options?.enabled,
+  });
+};
+
+/** GET /content/posts/liked — list posts liked by the authenticated user (paginated) */
+export const useLikedPosts = (
+  params: PaginationParams,
+  options?: {
+    enabled?: boolean;
+    onError?: (error: ContentApiError) => void;
+  },
+) => {
+  return useQuery({
+    queryKey: contentKeys.likedPosts(params.limit, params.offset),
+    queryFn: () => contentService.getLikedPosts(params),
+    enabled: options?.enabled,
   });
 };
 
