@@ -36,7 +36,6 @@ export function Login() {
     try {
       setErrorMsg("");
 
-      // TODO API
       await loginMutation.mutateAsync({
         email: data.email,
         password: data.password,

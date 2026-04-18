@@ -10,3 +10,4 @@ export {
 } from "./utils";
 export { changeLanguage } from "./utils/i18n";
 export { QueryProvider } from "./providers/QueryProvider";
+export { showAlert, useAlertStore } from "./utils/alertService";

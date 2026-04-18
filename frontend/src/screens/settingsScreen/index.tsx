@@ -8,7 +8,7 @@ import { Header, InfoBlock, ConfirmDialog } from "@/src/shared";
 import { BalanceBlock } from "./components/balanceBlock/balance-block";
 import { SettingsBlock } from "./components/settingsBlock/settings-block";
 import { useTranslation } from "react-i18next";
-import { useThemeStore, themes, getErrorMessage } from "@/src/core";
+import { useThemeStore, themes, getErrorMessage, showAlert } from "@/src/core";
 import {
   useLogout,
   useAuthStore,
@@ -53,7 +53,7 @@ export default function Settings() {
       router.replace("/(auth)/login");
     } catch (error) {
       const errorMessage = getErrorMessage(error);
-      Alert.alert(t("auth.error") || "Ошибка", errorMessage);
+      showAlert(t("common.error") || "Ошибка", errorMessage);
       console.warn("Logout error:", error);
       // useLogout onError already clears tokens and store, just navigate
       router.replace("/(auth)/login");
@@ -72,7 +72,7 @@ export default function Settings() {
       router.replace("/(auth)/login");
     } catch (error) {
       const errorMessage = getErrorMessage(error);
-      Alert.alert(t("common.error") || "Ошибка", errorMessage);
+      showAlert(t("common.error") || "Ошибка", errorMessage);
       console.warn("Delete account error:", error);
     }
   };

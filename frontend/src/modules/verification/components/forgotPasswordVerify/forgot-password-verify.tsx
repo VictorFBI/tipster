@@ -20,23 +20,18 @@ export function ForgotPasswordVerify() {
   const sendEmailMutation = useSendEmailResetPassword();
 
   const handleVerifySuccess = async (code: string) => {
-    try {
-      setError("");
+    setError("");
 
-      // TODO API
-      await confirmEmailMutation.mutateAsync({
-        email,
-        code,
-      });
+    const res = await confirmEmailMutation.mutateAsync({
+      email,
+      code,
+    });
+    console.log("Confirm email response:", res);
 
-      router.push({
-        pathname: "/reset-password",
-        params: { email, code },
-      });
-    } catch (err) {
-      const errorMessage = getErrorMessage(err);
-      setError(errorMessage);
-    }
+    router.push({
+      pathname: "/reset-password",
+      params: { email, code },
+    });
   };
 
   const handleResendCode = async () => {

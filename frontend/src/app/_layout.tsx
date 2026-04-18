@@ -15,6 +15,7 @@ import { QueryProvider } from "../core/providers/QueryProvider";
 import { ENABLE_STORYBOOK } from "../core/config/storybook";
 import { useStorybookDevMenu } from "../core/config/devMenu";
 import { LogBox, BackHandler } from "react-native";
+import { AlertProvider } from "../shared";
 
 // Polyfill for BackHandler.removeEventListener removed in newer React Native versions.
 // Required by react-native-modal (used inside @walletconnect/modal-react-native).
@@ -61,6 +62,7 @@ function RootLayoutContent() {
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           </Stack>
           <StatusBar style={theme === "dark" ? "light" : "dark"} />
+          <AlertProvider />
         </ThemeProvider>
       </PortalProvider>
     </TamaguiProvider>

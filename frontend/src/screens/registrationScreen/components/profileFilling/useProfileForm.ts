@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { Alert } from "react-native";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import * as ImagePicker from "expo-image-picker";
 import { useUpdateAccountProfile } from "@/src/modules/user";
+import { showAlert } from "@/src/core";
 
 const MAX_BIO_LENGTH = 160;
 
@@ -22,7 +22,7 @@ export function useProfileForm() {
       router.replace("/(tabs)");
     },
     onError: (error) => {
-      Alert.alert(
+      showAlert(
         t("profile.filling.errorTitle") || "Error",
         error.message ||
           t("profile.filling.updateError") ||
@@ -35,7 +35,6 @@ export function useProfileForm() {
 
   const handleSave = () => {
     if (username.trim()) {
-      // TODO: Save profile data to backend
       console.log("Profile data:", {
         username: username.trim(),
         firstName: firstName.trim(),
@@ -44,7 +43,6 @@ export function useProfileForm() {
         avatar,
       });
 
-      // Update profile via API
       updateProfile({
         username: username.trim(),
         first_name: firstName.trim(),
@@ -65,7 +63,7 @@ export function useProfileForm() {
         await ImagePicker.requestMediaLibraryPermissionsAsync();
 
       if (permissionResult.granted === false) {
-        Alert.alert(
+        showAlert(
           t("profile.filling.permissionTitle") || "Permission Required",
           t("profile.filling.permissionMessage") ||
             "Permission to access camera roll is required!",
@@ -86,7 +84,7 @@ export function useProfileForm() {
       }
     } catch (error) {
       console.warn("Error picking image:", error);
-      Alert.alert(
+      showAlert(
         t("profile.filling.errorTitle") || "Error",
         t("profile.filling.errorMessage") || "Failed to pick image",
       );

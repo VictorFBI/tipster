@@ -49,7 +49,6 @@ export function Registration() {
     try {
       setErrorMsg("");
 
-      // TODO API
       await registerMutation.mutateAsync({
         email: data.email,
         password: data.password,

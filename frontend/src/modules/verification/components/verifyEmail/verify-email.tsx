@@ -1,12 +1,11 @@
-import React, { useState } from "react";
+import React from "react";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { useTranslation } from "react-i18next";
 import {
   useConfirmEmailRegistration,
   useSendEmailRegistration,
 } from "@/src/modules/auth";
-import { getErrorMessage } from "@/src/core/utils";
-import { Alert } from "react-native";
+import { getErrorMessage, showAlert } from "@/src/core";
 import { VerificationCodeScreen } from "../verificationCodeScreen/verification-code-screen";
 
 export function VerifyEmail() {
@@ -19,34 +18,23 @@ export function VerifyEmail() {
   const resendCodeMutation = useSendEmailRegistration();
 
   const handleVerifySuccess = async (code: string) => {
-    try {
-      // TODO API
-      await confirmEmailMutation.mutateAsync({
-        email,
-        code,
-      });
+    await confirmEmailMutation.mutateAsync({
+      email,
+      code,
+    });
 
-      router.push({
-        pathname: "/profile-filling",
-      });
-    } catch (error) {
-      const errorMessage = getErrorMessage(error);
-      Alert.alert(t("auth.error") || "Ошибка", errorMessage);
-      console.warn("Email verification error:", error);
-    }
+    router.push({
+      pathname: "/profile-filling",
+    });
   };
 
   const handleResendCode = async () => {
     try {
-      // TODO API
       await resendCodeMutation.mutateAsync({ email });
-      Alert.alert(
-        t("auth.success") || "Успешно",
-        t("auth.codeSent") || "Код отправлен на ваш email",
-      );
+      showAlert(t("common.success"), t("auth.verificationCodeSent"));
     } catch (error) {
       const errorMessage = getErrorMessage(error);
-      Alert.alert(t("auth.error") || "Ошибка", errorMessage);
+      showAlert(t("common.error") || "Ошибка", errorMessage);
       console.warn("Resend code error:", error);
     }
   };

@@ -5,3 +5,4 @@ export {
   isValidationError,
   formatErrorForDisplay,
 } from "./errorHandler";
+export { showAlert, useAlertStore } from "./alertService";

@@ -10,6 +10,7 @@ import { useThemeStore } from "@/src/core/store/themeStore";
 import { themes } from "@/src/core/theme/themes";
 import { StyledInput } from "@/src/shared";
 import { useMyProfile, useUpdateAccountProfile } from "@/src/modules/user";
+import { showAlert } from "@/src/core";
 
 export default function EditProfileScreen() {
   const { t } = useTranslation();
@@ -37,7 +38,7 @@ export default function EditProfileScreen() {
 
   const { mutate: updateProfile, isPending } = useUpdateAccountProfile({
     onSuccess: () => {
-      Alert.alert(
+      showAlert(
         t("profile.edit.successTitle") || "Успешно",
         t("profile.edit.successMessage") || "Профиль обновлен",
         [
@@ -49,7 +50,7 @@ export default function EditProfileScreen() {
       );
     },
     onError: (error) => {
-      Alert.alert(
+      showAlert(
         t("profile.filling.errorTitle") || "Ошибка",
         error.message ||
           t("profile.filling.updateError") ||
@@ -76,7 +77,7 @@ export default function EditProfileScreen() {
         await ImagePicker.requestMediaLibraryPermissionsAsync();
 
       if (permissionResult.granted === false) {
-        Alert.alert(
+        showAlert(
           t("profile.filling.permissionTitle") || "Требуется разрешение",
           t("profile.filling.permissionMessage") ||
             "Необходимо разрешение на доступ к галерее!",
@@ -96,7 +97,7 @@ export default function EditProfileScreen() {
       }
     } catch (error) {
       console.warn("Error picking image:", error);
-      Alert.alert(
+      showAlert(
         t("profile.filling.errorTitle") || "Ошибка",
         t("profile.filling.errorMessage") || "Не удалось выбрать изображение",
       );

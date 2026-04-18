@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Image, Alert } from "react-native";
+import { Image } from "react-native";
 import { YStack, Text } from "tamagui";
 import { CommentsSection } from "../commentsSection/comments-section";
 import { PostHeader } from "../postHeader/post-header";
@@ -9,6 +9,7 @@ import { EditPostModal } from "../editPostModal/edit-post-modal";
 import { usePostComments, type Post } from "@/src/modules/posts";
 import { useUpdatePost, useDeletePost } from "../../hooks/useContent";
 import { ConfirmDialog } from "@/src/shared/ui/confirmDialog/confirm-dialog";
+import { showAlert } from "@/src/core";
 
 export type { Post };
 
@@ -47,7 +48,7 @@ export function PostCard({
       );
     },
     onError: () => {
-      Alert.alert("Ошибка", "Не удалось обновить пост. Попробуйте ещё раз.");
+      showAlert("Ошибка", "Не удалось обновить пост. Попробуйте ещё раз.");
     },
   });
 
@@ -56,7 +57,7 @@ export function PostCard({
       onDeleted?.();
     },
     onError: () => {
-      Alert.alert("Ошибка", "Не удалось удалить пост. Попробуйте ещё раз.");
+      showAlert("Ошибка", "Не удалось удалить пост. Попробуйте ещё раз.");
     },
   });
 

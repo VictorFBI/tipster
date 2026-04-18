@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Platform, KeyboardAvoidingView, Alert } from "react-native";
+import { Platform, KeyboardAvoidingView } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useForm } from "react-hook-form";
@@ -7,7 +7,7 @@ import { YStack, Text, ScrollView } from "tamagui";
 import { PasswordInput, useResetPassword } from "@/src/modules/auth";
 import { ErrorMessage, StyledButton } from "@/src/shared";
 import { useTranslation } from "react-i18next";
-import { getErrorMessage } from "@/src/core";
+import { getErrorMessage, showAlert } from "@/src/core";
 
 type ResetPasswordFormData = {
   password: string;
@@ -42,11 +42,18 @@ export function ResetPassword() {
     try {
       setError("");
 
-      // TODO API
       await resetPasswordMutation.mutateAsync({
         email,
         password: data.password,
       });
+
+      // Успешный сброс пароля - перенаправляем на логин
+      showAlert(t("common.success"), t("auth.passwordResetSuccess"), [
+        {
+          text: t("common.ok"),
+          onPress: () => router.replace("/login"),
+        },
+      ]);
     } catch (err) {
       setError(getErrorMessage(err));
     }

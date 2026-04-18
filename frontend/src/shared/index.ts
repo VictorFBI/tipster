@@ -6,3 +6,5 @@ export { Divider } from "./ui/divider/divider";
 export { Header } from "./components/header/header";
 export { InfoBlock } from "./components/infoBlock/info-block";
 export { ConfirmDialog } from "./ui/confirmDialog/confirm-dialog";
+export { AlertProvider } from "./ui/customAlert/alert-provider";
+export { CustomAlert } from "./ui/customAlert/custom-alert";

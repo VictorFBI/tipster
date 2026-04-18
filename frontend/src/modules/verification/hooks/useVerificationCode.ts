@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { TextInput } from "react-native";
+import { getErrorMessage } from "@/src/core/utils";
 
 interface UseVerificationCodeOptions {
   onVerifySuccess: (code: string) => void | Promise<void>;
@@ -80,7 +81,8 @@ export function useVerificationCode({
       await onVerifySuccess(verificationCode);
     } catch (err) {
       console.warn("Verification error:", err);
-      setError(errorInvalidCode);
+      const errorMessage = getErrorMessage(err);
+      setError(errorMessage);
       setCode(["", "", "", "", "", ""]);
       inputRefs.current[0]?.focus();
     } finally {

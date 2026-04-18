@@ -121,7 +121,9 @@ describe("useVerificationCode", () => {
     });
 
     it("sets error and resets code on verification failure", async () => {
-      const onVerifySuccess = jest.fn().mockRejectedValue(new Error("Invalid"));
+      const onVerifySuccess = jest
+        .fn()
+        .mockRejectedValue(new Error("Invalid code"));
       const { result } = renderHook(() =>
         useVerificationCode({ ...defaultOptions, onVerifySuccess }),
       );

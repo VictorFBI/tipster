@@ -9,7 +9,8 @@
     "edit": "Edit",
     "search": "Search",
     "you": "You",
-    "confirm": "Confirm"
+    "confirm": "Confirm",
+    "ok": "OK"
   },
   "auth": {
     "login": "Login",
@@ -64,7 +65,8 @@
     "sendingCode": "Sending code to email...",
     "termsAgreement": "By registering, you agree to the terms of use and privacy policy",
     "usernamePattern": "Only letters, numbers and underscores",
-    "minLength3": "Minimum 3 characters"
+    "minLength3": "Minimum 3 characters",
+    "passwordResetSuccess": "Password successfully reset"
   },
   "tabs": {
     "feed": "Feed",
@@ -104,6 +106,8 @@
     "subscribe": "Subscribe",
     "unsubscribe": "Unsubscribe",
     "noPosts": "No posts yet",
+    "loadError": "Failed to load profile",
+    "anonymous": "Anonymous",
     "filling": {
       "welcome": "Set up your profile",
       "completeProfile": "Tell the Tipster community about yourself",
@@ -128,7 +132,8 @@
       "permissionTitle": "Permission Required",
       "permissionMessage": "Permission to access camera roll is required!",
       "errorTitle": "Error",
-      "errorMessage": "Failed to pick image"
+      "errorMessage": "Failed to pick image",
+      "updateError": "Failed to update profile"
     },
     "editProfile": "Edit Profile",
     "edit": {
@@ -140,6 +145,11 @@
       "successTitle": "Success",
       "successMessage": "Profile updated"
     }
+  },
+  "users": {
+    "noFollowers": "No followers yet",
+    "noFollowing": "No subscriptions yet",
+    "noUsers": "No users found"
   },
   "settings": {
     "title": "Settings",
