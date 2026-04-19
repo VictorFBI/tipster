@@ -44,6 +44,14 @@ type UnsubscribeRequest struct {
 	UserId string `json:"user_id"`
 }
 
+// UserConnectionsPage Paginated list of users (followers or following); total is the full row count for stable paging
+type UserConnectionsPage struct {
+	Items  []UserSearchItem `json:"items"`
+	Limit  int              `json:"limit"`
+	Offset int              `json:"offset"`
+	Total  int              `json:"total"`
+}
+
 // UserSearchItem defines model for UserSearchItem.
 type UserSearchItem struct {
 	AvatarUrl *string `json:"avatar_url,omitempty"`
@@ -58,6 +66,31 @@ type UserSearchResponse struct {
 	Items []UserSearchItem `json:"items"`
 }
 
+// UserStats Follower count (users subscribed to this account) and subscription count (accounts this user follows)
+type UserStats struct {
+	// FollowersCount Number of users subscribed to this account (author side)
+	FollowersCount int `json:"followers_count"`
+
+	// SubscriptionsCount Number of accounts this user is subscribed to (subscriber side)
+	SubscriptionsCount int `json:"subscriptions_count"`
+}
+
+// GetUsersFollowersParams defines parameters for GetUsersFollowers.
+type GetUsersFollowersParams struct {
+	// AccountId User id whose followers are returned (subscriptions where this user is the author). If omitted, the JWT subject (current user) is used
+	AccountId *string `form:"account_id,omitempty" json:"account_id,omitempty"`
+	Limit     int     `form:"limit" json:"limit"`
+	Offset    int     `form:"offset" json:"offset"`
+}
+
+// GetUsersFollowingParams defines parameters for GetUsersFollowing.
+type GetUsersFollowingParams struct {
+	// AccountId User id whose outgoing subscriptions are returned (this user is the subscriber). If omitted, the JWT subject (current user) is used
+	AccountId *string `form:"account_id,omitempty" json:"account_id,omitempty"`
+	Limit     int     `form:"limit" json:"limit"`
+	Offset    int     `form:"offset" json:"offset"`
+}
+
 // GetUsersProfileParams defines parameters for GetUsersProfile.
 type GetUsersProfileParams struct {
 	AccountId string `form:"account_id" json:"account_id"`
@@ -69,6 +102,12 @@ type GetUsersSearchParams struct {
 	Query  string `form:"query" json:"query"`
 	Limit  int    `form:"limit" json:"limit"`
 	Offset int    `form:"offset" json:"offset"`
+}
+
+// GetUsersStatsParams defines parameters for GetUsersStats.
+type GetUsersStatsParams struct {
+	// AccountId User id to get stats for. If omitted, the JWT subject (current user) is used
+	AccountId *string `form:"account_id,omitempty" json:"account_id,omitempty"`
 }
 
 // PatchUsersProfileJSONRequestBody defines body for PatchUsersProfile for application/json ContentType.

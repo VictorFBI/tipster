@@ -254,6 +254,127 @@ func (as *UsersService) Unsubscribe(ctx context.Context, subscriberID, authorID 
 	return err
 }
 
+// ListFollowers returns users subscribed to authorID (subscriber_id side), paginated. Order is stable by username then id.
+func (as *UsersService) ListFollowers(ctx context.Context, authorID string, limit, offset int) ([]UserSearchRow, int, error) {
+	var total int64
+	err := as.postgres.QueryRow(ctx,
+		"SELECT COUNT(*) FROM subscriptions WHERE author_id = $1",
+		authorID,
+	).Scan(&total)
+	if err != nil {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) && pgErr.Code == "22P02" {
+			return nil, 0, ErrInvalidAccountID
+		}
+		return nil, 0, err
+	}
+
+	rows, err := as.postgres.Query(ctx,
+		`SELECT u.id::text,
+			COALESCE(u.username, ''),
+			u.first_name,
+			u.last_name,
+			u.avatar_url
+		 FROM subscriptions s
+		 INNER JOIN users u ON u.id = s.subscriber_id
+		 WHERE s.author_id = $1
+		 ORDER BY lower(COALESCE(u.username, '')) ASC, u.id::text ASC
+		 LIMIT $2 OFFSET $3`,
+		authorID, limit, offset,
+	)
+	if err != nil {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) && pgErr.Code == "22P02" {
+			return nil, 0, ErrInvalidAccountID
+		}
+		return nil, 0, err
+	}
+	defer rows.Close()
+
+	var out []UserSearchRow
+	for rows.Next() {
+		var r UserSearchRow
+		if err := rows.Scan(&r.UserId, &r.Username, &r.FirstName, &r.LastName, &r.AvatarUrl); err != nil {
+			return nil, 0, err
+		}
+		out = append(out, r)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, 0, err
+	}
+	return out, int(total), nil
+}
+
+// ListFollowing returns authors that subscriberID is subscribed to, paginated. Order is stable by username then id.
+func (as *UsersService) ListFollowing(ctx context.Context, subscriberID string, limit, offset int) ([]UserSearchRow, int, error) {
+	var total int64
+	err := as.postgres.QueryRow(ctx,
+		"SELECT COUNT(*) FROM subscriptions WHERE subscriber_id = $1",
+		subscriberID,
+	).Scan(&total)
+	if err != nil {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) && pgErr.Code == "22P02" {
+			return nil, 0, ErrInvalidAccountID
+		}
+		return nil, 0, err
+	}
+
+	rows, err := as.postgres.Query(ctx,
+		`SELECT u.id::text,
+			COALESCE(u.username, ''),
+			u.first_name,
+			u.last_name,
+			u.avatar_url
+		 FROM subscriptions s
+		 INNER JOIN users u ON u.id = s.author_id
+		 WHERE s.subscriber_id = $1
+		 ORDER BY lower(COALESCE(u.username, '')) ASC, u.id::text ASC
+		 LIMIT $2 OFFSET $3`,
+		subscriberID, limit, offset,
+	)
+	if err != nil {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) && pgErr.Code == "22P02" {
+			return nil, 0, ErrInvalidAccountID
+		}
+		return nil, 0, err
+	}
+	defer rows.Close()
+
+	var out []UserSearchRow
+	for rows.Next() {
+		var r UserSearchRow
+		if err := rows.Scan(&r.UserId, &r.Username, &r.FirstName, &r.LastName, &r.AvatarUrl); err != nil {
+			return nil, 0, err
+		}
+		out = append(out, r)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, 0, err
+	}
+	return out, int(total), nil
+}
+
+// GetSubscriptionStats returns follower count (subscriptions where user is author) and subscriptions count (where user is subscriber).
+func (as *UsersService) GetSubscriptionStats(ctx context.Context, accountID string) (followers int, subscriptions int, err error) {
+	var followersCount, subscriptionsCount int64
+	err = as.postgres.QueryRow(ctx,
+		`SELECT
+			(SELECT COUNT(*)::bigint FROM subscriptions WHERE author_id = $1),
+			(SELECT COUNT(*)::bigint FROM subscriptions WHERE subscriber_id = $1)`,
+		accountID,
+	).Scan(&followersCount, &subscriptionsCount)
+	if err != nil {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) && pgErr.Code == "22P02" {
+			return 0, 0, ErrInvalidAccountID
+		}
+		return 0, 0, err
+	}
+	return int(followersCount), int(subscriptionsCount), nil
+}
+
 // DeleteAccountById removes the user row. Id must match JWT subject (caller responsibility).
 func (as *UsersService) DeleteAccountById(ctx context.Context, id string) error {
 	ct, err := as.postgres.Exec(ctx, "DELETE FROM users WHERE id = $1", id)

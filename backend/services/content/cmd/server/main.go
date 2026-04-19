@@ -16,6 +16,7 @@ import (
 	"tipster/backend/content/internal/handlers/likes"
 	"tipster/backend/content/internal/handlers/posts"
 	likedhandlers "tipster/backend/content/internal/handlers/posts/liked"
+	"tipster/backend/content/internal/handlers/stats"
 	applogging "tipster/backend/content/internal/logging"
 	middlewares "tipster/backend/content/internal/middlewares"
 
@@ -93,6 +94,7 @@ func main() {
 	))
 
 	r.With(middlewares.RequireAccessToken).Get("/content/posts/liked", likedhandlers.GetContentPostsLiked)
+	r.With(middlewares.RequireAccessToken).Get("/content/stats", stats.GetContentStats)
 	r.With(middlewares.RequireAccessToken).Get("/content/posts", posts.GetContentPosts)
 	r.With(middlewares.RequireAccessToken).Post("/content/posts", posts.PostContentPosts)
 	r.With(middlewares.RequireAccessToken).Patch("/content/posts", posts.PatchContentPosts)

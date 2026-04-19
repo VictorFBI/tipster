@@ -34,6 +34,7 @@ var (
 	ErrPostNotFound   = errors.New("post not found")
 	ErrForbiddenPost  = errors.New("forbidden")
 	ErrInvalidPostID  = errors.New("invalid post id")
+	ErrInvalidAuthorID = errors.New("invalid author id")
 	ErrContentTooLong = errors.New("content too long")
 	ErrContentEmpty   = errors.New("content empty")
 	ErrAuthorMissing  = errors.New("author not found in database")
@@ -307,6 +308,23 @@ func (s *Service) ListPostsByAuthor(ctx context.Context, viewerID, authorID stri
 		return nil, err
 	}
 	return out, nil
+}
+
+// GetStatsByAuthor returns the number of posts whose author_id equals authorID.
+func (s *Service) GetStatsByAuthor(ctx context.Context, authorID string) (int, error) {
+	var n int64
+	err := s.postgres.QueryRow(ctx,
+		`SELECT COUNT(*)::bigint FROM posts WHERE author_id = $1::uuid`,
+		authorID,
+	).Scan(&n)
+	if err != nil {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) && pgErr.Code == "22P02" {
+			return 0, ErrInvalidAuthorID
+		}
+		return 0, err
+	}
+	return int(n), nil
 }
 
 // ListPostsLikedByUser returns posts liked by userID, newest like first.

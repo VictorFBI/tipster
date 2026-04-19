@@ -27,6 +27,11 @@ type Comment struct {
 	UpdatedAt      time.Time           `json:"updated_at"`
 }
 
+// ContentStats Number of posts whose author_id matches the requested user
+type ContentStats struct {
+	PostsCount int `json:"posts_count"`
+}
+
 // CreateCommentRequest defines model for CreateCommentRequest.
 type CreateCommentRequest struct {
 	Content string `json:"content"`
@@ -129,6 +134,12 @@ type GetContentPostsParams struct {
 type GetContentPostsLikedParams struct {
 	Limit  int `form:"limit" json:"limit"`
 	Offset int `form:"offset" json:"offset"`
+}
+
+// GetContentStatsParams defines parameters for GetContentStats.
+type GetContentStatsParams struct {
+	// AccountId User id (post author) to count posts for. If omitted, the JWT subject (current user) is used
+	AccountId *string `form:"account_id,omitempty" json:"account_id,omitempty"`
 }
 
 // DeleteContentCommentsJSONRequestBody defines body for DeleteContentComments for application/json ContentType.

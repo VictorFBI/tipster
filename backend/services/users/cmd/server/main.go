@@ -96,6 +96,9 @@ func main() {
 	))
 
 	r.With(middlewares.RequireAccessToken).Get("/users/search", handlers.GetUsersSearch)
+	r.With(middlewares.RequireAccessToken).Get("/users/followers", handlers.GetUsersFollowers)
+	r.With(middlewares.RequireAccessToken).Get("/users/following", handlers.GetUsersFollowing)
+	r.With(middlewares.RequireAccessToken).Get("/users/stats", handlers.GetUsersStats)
 	r.With(middlewares.RequireAccessToken).Post("/users/subscribe", handlers.PostUsersSubscribe)
 	r.With(middlewares.RequireAccessToken).Post("/users/unsubscribe", handlers.PostUsersUnsubscribe)
 	r.With(middlewares.RequireAccessToken).Get("/users/profile", handlers.GetAccountProfile)
