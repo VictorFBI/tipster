@@ -77,7 +77,7 @@ func GetContentPosts(w http.ResponseWriter, r *http.Request) {
 	svc := postsservice.New(r.Context())
 	defer svc.Close(r.Context())
 
-	rows, err := svc.ListPostsByAuthor(r.Context(), authorID, limit, offset)
+	rows, err := svc.ListPostsByAuthor(r.Context(), authorID, authorID, limit, offset)
 	if err != nil {
 		log.Error("list_posts_failed", slog.String("error", err.Error()))
 		w.WriteHeader(http.StatusInternalServerError)

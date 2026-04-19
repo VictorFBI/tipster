@@ -22,16 +22,16 @@ func MapMediaCommitErr(err error) (status int, message string, ok bool) {
 		}
 		s := err.Error()
 		if strings.HasPrefix(s, "media service request:") {
-			return http.StatusBadGateway, "Media service is unreachable", true
+			return http.StatusBadGateway, "Media service is unreachable: " + strings.TrimPrefix(s, "media service request:") + err.Error(), true
 		}
 		if strings.HasPrefix(s, "media commit unauthorized:") {
-			return http.StatusBadGateway, "Media service rejected the token", true
+			return http.StatusBadGateway, "Media service rejected the token: " + strings.TrimPrefix(s, "media commit unauthorized:") + err.Error(), true
 		}
 		if strings.HasPrefix(s, "media commit failed:") {
-			return http.StatusBadGateway, "Media service error", true
+			return http.StatusBadGateway, "Media service error: " + strings.TrimPrefix(s, "media commit failed:") + err.Error(), true
 		}
 		if strings.HasPrefix(s, "media commit bad request:") {
-			return http.StatusBadRequest, strings.TrimPrefix(s, "media commit bad request: "), true
+			return http.StatusBadRequest, "Media service bad request: " + strings.TrimPrefix(s, "media commit bad request:") + err.Error(), true
 		}
 		return 0, "", false
 	}

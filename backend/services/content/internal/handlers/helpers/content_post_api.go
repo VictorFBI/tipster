@@ -40,6 +40,8 @@ func PostFromService(p *postsservice.Post) (api.Post, error) {
 		ImageObjectIds: imgs,
 		CreatedAt:       createdAt,
 		UpdatedAt:       updatedAt,
+		LikesCount:      int(p.LikesCount),
+		LikedByMe:       p.LikedByMe,
 	}, nil
 }
 

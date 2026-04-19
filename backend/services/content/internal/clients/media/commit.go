@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log/slog"
 	"net/http"
 	"os"
 	"strings"
@@ -42,6 +43,10 @@ func Commit(ctx context.Context, objectKeys []string, authorization string) erro
 	if err != nil {
 		return err
 	}
+
+	slog.Info("media_service_request", "url", req.URL.String(), "authorization", authorization)
+	slog.Info("media_service_request", "payload", string(payload))
+	
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", authorization)
 

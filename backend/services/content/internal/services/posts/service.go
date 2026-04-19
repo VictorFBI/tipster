@@ -17,13 +17,17 @@ import (
 
 const MaxContentRunes = 4096
 
+const postLikeStatsSQL = `,
+	(SELECT COUNT(*)::bigint FROM likes lk WHERE lk.post_id = p.id),
+	EXISTS (SELECT 1 FROM likes lk WHERE lk.post_id = p.id AND lk.user_id = $1::uuid)`
+
 const postSelectWithImagesSQL = `
 SELECT p.id::text, p.author_id::text, p.content, p.created_at, p.updated_at,
 	COALESCE(
 		(SELECT array_agg(pi.object_key ORDER BY pi.sort_index)
 		 FROM post_images pi WHERE pi.post_id = p.id),
 		'{}'::text[]
-	)
+	)` + postLikeStatsSQL + `
 FROM posts p`
 
 var (
@@ -43,6 +47,8 @@ type Post struct {
 	ImageObjectIds []string
 	CreatedAt      string
 	UpdatedAt      string
+	LikesCount     int64
+	LikedByMe      bool
 }
 
 type LikedPostRow struct {
@@ -96,7 +102,7 @@ func scanPostWithImages(row pgx.Row) (*Post, error) {
 	var p Post
 	var createdAt, updatedAt time.Time
 	var keys []string
-	err := row.Scan(&p.ID, &p.AuthorID, &p.Content, &createdAt, &updatedAt, &keys)
+	err := row.Scan(&p.ID, &p.AuthorID, &p.Content, &createdAt, &updatedAt, &keys, &p.LikesCount, &p.LikedByMe)
 	if err != nil {
 		return nil, err
 	}
@@ -110,8 +116,8 @@ func scanPostWithImages(row pgx.Row) (*Post, error) {
 	return &p, nil
 }
 
-func (s *Service) loadPostWithImages(ctx context.Context, postID string) (*Post, error) {
-	row := s.postgres.QueryRow(ctx, postSelectWithImagesSQL+` WHERE p.id = $1::uuid`, postID)
+func (s *Service) loadPostWithImages(ctx context.Context, postID, viewerID string) (*Post, error) {
+	row := s.postgres.QueryRow(ctx, postSelectWithImagesSQL+` WHERE p.id = $2::uuid`, viewerID, postID)
 	return scanPostWithImages(row)
 }
 
@@ -160,7 +166,7 @@ func (s *Service) CreatePost(ctx context.Context, authorID, content string, imag
 	if err := tx.Commit(ctx); err != nil {
 		return nil, err
 	}
-	return s.loadPostWithImages(ctx, postID)
+	return s.loadPostWithImages(ctx, postID, authorID)
 }
 
 // UpdatePost updates text and/or images; only the author may update.
@@ -237,7 +243,7 @@ func (s *Service) UpdatePost(ctx context.Context, authorID, postID string, conte
 	if err := tx.Commit(ctx); err != nil {
 		return nil, err
 	}
-	return s.loadPostWithImages(ctx, postID)
+	return s.loadPostWithImages(ctx, postID, authorID)
 }
 
 func (s *Service) classifyPostAccess(ctx context.Context, authorID, postID string) error {
@@ -276,13 +282,14 @@ func (s *Service) DeletePost(ctx context.Context, authorID, postID string) error
 }
 
 // ListPostsByAuthor returns posts for authorID (JWT subject), newest first.
-func (s *Service) ListPostsByAuthor(ctx context.Context, authorID string, limit, offset int) ([]Post, error) {
+// viewerID is the authenticated user (for liked_by_me and likes_count).
+func (s *Service) ListPostsByAuthor(ctx context.Context, viewerID, authorID string, limit, offset int) ([]Post, error) {
 	rows, err := s.postgres.Query(ctx,
 		postSelectWithImagesSQL+`
-		 WHERE p.author_id = $1::uuid
+		 WHERE p.author_id = $2::uuid
 		 ORDER BY p.created_at DESC, p.id DESC
-		 LIMIT $2 OFFSET $3`,
-		authorID, limit, offset,
+		 LIMIT $3 OFFSET $4`,
+		viewerID, authorID, limit, offset,
 	)
 	if err != nil {
 		return nil, err
@@ -311,6 +318,8 @@ func (s *Service) ListPostsLikedByUser(ctx context.Context, userID string, limit
 				 FROM post_images pi WHERE pi.post_id = p.id),
 				'{}'::text[]
 			),
+			(SELECT COUNT(*)::bigint FROM likes lk WHERE lk.post_id = p.id),
+			EXISTS (SELECT 1 FROM likes lk WHERE lk.post_id = p.id AND lk.user_id = $1::uuid),
 			l.created_at
 		 FROM likes l
 		 INNER JOIN posts p ON p.id = l.post_id
@@ -328,7 +337,7 @@ func (s *Service) ListPostsLikedByUser(ctx context.Context, userID string, limit
 		var p Post
 		var createdAt, updatedAt, likedAt time.Time
 		var keys []string
-		if err := rows.Scan(&p.ID, &p.AuthorID, &p.Content, &createdAt, &updatedAt, &keys, &likedAt); err != nil {
+		if err := rows.Scan(&p.ID, &p.AuthorID, &p.Content, &createdAt, &updatedAt, &keys, &p.LikesCount, &p.LikedByMe, &likedAt); err != nil {
 			return nil, err
 		}
 		p.CreatedAt = createdAt.UTC().Format(time.RFC3339Nano)

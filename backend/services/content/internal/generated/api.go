@@ -95,8 +95,14 @@ type Post struct {
 	Id        openapi_types.UUID `json:"id"`
 
 	// ImageObjectIds Object ids in permanent storage (same values as after content commit from temp); display order
-	ImageObjectIds []string  `json:"image_object_ids"`
-	UpdatedAt      time.Time `json:"updated_at"`
+	ImageObjectIds []string `json:"image_object_ids"`
+
+	// LikedByMe Whether the authenticated user has liked this post
+	LikedByMe bool `json:"liked_by_me"`
+
+	// LikesCount Total number of likes on this post
+	LikesCount int       `json:"likes_count"`
+	UpdatedAt  time.Time `json:"updated_at"`
 }
 
 // UpdateCommentRequest Partial update; send content and/or image_object_ids (replaces image set when sent)

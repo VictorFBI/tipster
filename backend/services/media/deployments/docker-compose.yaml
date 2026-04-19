@@ -31,6 +31,14 @@ services:
       - "tipster.minio:host-gateway"
     depends_on:
       - minio
+    networks:
+      - default
+      - tipster_apps
 
 volumes:
   minio-data:
+
+networks:
+  tipster_apps:
+    external: true
+    name: tipster_apps

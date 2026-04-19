@@ -412,6 +412,13 @@ components:
         updated_at:
           type: string
           format: date-time
+        likes_count:
+          type: integer
+          minimum: 0
+          description: Total number of likes on this post
+        liked_by_me:
+          type: boolean
+          description: Whether the authenticated user has liked this post
       required:
         - id
         - author_id
@@ -419,6 +426,8 @@ components:
         - image_object_ids
         - created_at
         - updated_at
+        - likes_count
+        - liked_by_me
 
     CreatePostRequest:
       type: object
