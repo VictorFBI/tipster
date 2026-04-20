@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	api "tipster/backend/content/internal/generated"
+	handlerutils "tipster/backend/content/internal/handlers/utils"
 	"tipster/backend/content/internal/handlers/helpers"
 	"tipster/backend/content/internal/logging"
 	middlewares "tipster/backend/content/internal/middlewares"
@@ -28,6 +29,20 @@ func GetContentPosts(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(api.ErrorResponse{Message: "Invalid user id"})
+		return
+	}
+
+	accountID, errMsg := handlerutils.ResolveAccountIDFromQueryOrJWT(r, authorID)
+	if errMsg != "" {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(api.ErrorResponse{Message: errMsg})
+		return
+	}
+	if _, err := uuid.Parse(accountID); err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(api.ErrorResponse{Message: "Invalid account id"})
 		return
 	}
 
@@ -77,7 +92,7 @@ func GetContentPosts(w http.ResponseWriter, r *http.Request) {
 	svc := postsservice.New(r.Context())
 	defer svc.Close(r.Context())
 
-	rows, err := svc.ListPostsByAuthor(r.Context(), authorID, authorID, limit, offset)
+	rows, err := svc.ListPostsByAuthor(r.Context(), authorID, accountID, limit, offset)
 	if err != nil {
 		log.Error("list_posts_failed", slog.String("error", err.Error()))
 		w.WriteHeader(http.StatusInternalServerError)

@@ -7,14 +7,21 @@ info:
 paths:
   /content/posts:
     get:
-      summary: List the authenticated user's posts
+      summary: List posts for a user (author)
       description: >
-        Posts where author_id equals the JWT subject. Ordered by created_at
-        descending, then id descending. The client may treat fewer than `limit`
-        items as the last page.
+        Posts where author_id equals the requested account. Pass `account_id` to
+        list another user's posts; if omitted, the JWT subject (current user) is
+        used. Ordered by created_at descending, then id descending. The client
+        may treat fewer than `limit` items as the last page.
       security:
         - bearerAuth: []
       parameters:
+        - name: account_id
+          in: query
+          required: false
+          schema:
+            type: string
+          description: User id (post author) to list posts for. If omitted, the JWT subject (current user) is used
         - name: limit
           in: query
           required: true

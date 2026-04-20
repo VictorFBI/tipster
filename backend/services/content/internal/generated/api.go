@@ -161,8 +161,10 @@ type GetContentFeedParams struct {
 
 // GetContentPostsParams defines parameters for GetContentPosts.
 type GetContentPostsParams struct {
-	Limit  int `form:"limit" json:"limit"`
-	Offset int `form:"offset" json:"offset"`
+	// AccountId User id (post author) to list posts for. If omitted, the JWT subject (current user) is used
+	AccountId *string `form:"account_id,omitempty" json:"account_id,omitempty"`
+	Limit     int     `form:"limit" json:"limit"`
+	Offset    int     `form:"offset" json:"offset"`
 }
 
 // GetContentPostsLikedParams defines parameters for GetContentPostsLiked.
