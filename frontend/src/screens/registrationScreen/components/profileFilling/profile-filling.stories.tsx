@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { ProfileFillingScreen } from "./profileFilling/profile-filling";
+import { ProfileFillingScreen } from "./profile-filling";
 import {
   withTheme,
   withMobile,

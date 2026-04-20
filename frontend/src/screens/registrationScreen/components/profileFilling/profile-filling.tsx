@@ -1,9 +1,9 @@
 import { YStack, Text, Button, ScrollView } from "tamagui";
 import { useTranslation } from "react-i18next";
 import { useProfileForm } from "./useProfileForm";
-import { WelcomeHeader } from "./welcomeHeader/welcome-header";
-import { AvatarPicker } from "./avatarPicker/avatar-picker";
-import { ProfileFormFields } from "./profileFormFields/profile-form-fields";
+import { WelcomeHeader } from "../welcomeHeader/welcome-header";
+import { AvatarPicker } from "../avatarPicker/avatar-picker";
+import { ProfileFormFields } from "../profileFormFields/profile-form-fields";
 import { StyledButton } from "@/src/shared";
 
 export function ProfileFillingScreen() {

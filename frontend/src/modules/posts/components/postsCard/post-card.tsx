@@ -7,7 +7,13 @@ import { PostActions } from "../postActions/post-actions";
 import { PostEditMenu } from "../postEditMenu/post-edit-menu";
 import { EditPostModal } from "../editPostModal/edit-post-modal";
 import { usePostComments, type Post } from "@/src/modules/posts";
-import { useUpdatePost, useDeletePost } from "../../hooks/useContent";
+import {
+  useUpdatePost,
+  useDeletePost,
+  useLikePost,
+  useUnlikePost,
+  useCreateComment,
+} from "../../hooks/useContent";
 import { ConfirmDialog } from "@/src/shared/ui/confirmDialog/confirm-dialog";
 import { showAlert } from "@/src/core";
 
@@ -61,13 +67,45 @@ export function PostCard({
     },
   });
 
+  const { mutate: likePost } = useLikePost({
+    onSuccess: () => {
+      setLiked(true);
+      setLikeCount(likeCount + 1);
+    },
+    onError: () => {
+      showAlert("Ошибка", "Не удалось поставить лайк. Попробуйте ещё раз.");
+    },
+  });
+
+  const { mutate: unlikePost } = useUnlikePost({
+    onSuccess: () => {
+      setLiked(false);
+      setLikeCount(likeCount - 1);
+    },
+    onError: () => {
+      showAlert("Ошибка", "Не удалось убрать лайк. Попробуйте ещё раз.");
+    },
+  });
+
+  const { mutate: createComment } = useCreateComment({
+    onSuccess: () => {
+      // Comment successfully created, the hook will invalidate queries
+      // and the UI will update through usePostComments
+    },
+    onError: () => {
+      showAlert(
+        "Ошибка",
+        "Не удалось добавить комментарий. Попробуйте ещё раз.",
+      );
+    },
+  });
+
   const handleLike = () => {
     if (liked) {
-      setLikeCount(likeCount - 1);
+      unlikePost({ post_id: post.id });
     } else {
-      setLikeCount(likeCount + 1);
+      likePost({ post_id: post.id });
     }
-    setLiked(!liked);
   };
 
   const handleRepost = () => {
@@ -88,6 +126,25 @@ export function PostCard({
 
   const toggleComments = () => {
     setShowComments(!showComments);
+  };
+
+  const handleCommentSubmit = (content: string) => {
+    createComment({
+      post_id: post.id,
+      content,
+    });
+    // Also update local state for immediate UI feedback
+    handleAddComment(content);
+  };
+
+  const handleReplySubmit = (parentId: string, content: string) => {
+    createComment({
+      post_id: post.id,
+      content,
+      parent_id: parentId,
+    });
+    // Also update local state for immediate UI feedback
+    handleAddReply(parentId, content);
   };
 
   const handleEditMenuOpen = () => {
@@ -162,8 +219,8 @@ export function PostCard({
       {showComments && (
         <CommentsSection
           comments={comments}
-          onAddComment={handleAddComment}
-          onAddReply={handleAddReply}
+          onAddComment={handleCommentSubmit}
+          onAddReply={handleReplySubmit}
         />
       )}
 

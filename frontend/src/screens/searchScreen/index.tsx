@@ -1,7 +1,7 @@
 import { ScrollView, Spinner, Text, YStack } from "tamagui";
 import { Header } from "@/src/shared";
 import { UserCard, useSearchUsers } from "@/src/modules/user";
-import { SearchInput } from "./components/search-input";
+import { SearchInput } from "./components/searchInput/search-input";
 import { useTranslation } from "react-i18next";
 import { Pressable } from "react-native";
 import { useRouter } from "expo-router";

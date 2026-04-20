@@ -2,8 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { TouchableOpacity } from "react-native";
 import { Avatar, YStack, Text } from "tamagui";
 import { useTranslation } from "react-i18next";
-import { useThemeStore } from "@/src/core/store/themeStore";
-import { themes } from "@/src/core/theme/themes";
+import { useThemeStore, themes } from "@/src/core";
 
 interface AvatarPickerProps {
   avatar: string | null;

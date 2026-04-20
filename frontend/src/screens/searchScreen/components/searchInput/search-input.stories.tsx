@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { SearchInput } from "./search-input";
+import { SearchInput } from "../search-input";
 import { withTheme, withMobile } from "@/src/shared/storybook/decorators";
 
 const meta = {

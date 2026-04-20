@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import { ActivityIndicator } from "react-native";
 import { YStack, Text, ScrollView } from "tamagui";
 import { Header, Tabs } from "@/src/shared";
-import { ProfileHeader } from "@/src/screens";
+import { ProfileHeader } from "./components/profileHeader/profile-header";
 import {
   useMyPosts,
   useLikedPosts,

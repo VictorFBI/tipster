@@ -42,8 +42,6 @@ export function ProfileHeader({ userId }: ProfileHeaderProps) {
     isError,
   } = isOwnProfile ? myProfileQuery : accountProfileQuery;
 
-  console.log("PROF", profile);
-
   if (isLoading) {
     return (
       <YStack paddingVertical="$8" alignItems="center" justifyContent="center">

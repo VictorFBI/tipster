@@ -21,4 +21,4 @@ export function VerificationIcon({ icon }: VerificationIconProps) {
   );
 }
 
-//DELETE
+//TODO DELETE
