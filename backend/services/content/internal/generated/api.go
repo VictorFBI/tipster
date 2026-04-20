@@ -13,6 +13,12 @@ const (
 	BearerAuthScopes = "bearerAuth.Scopes"
 )
 
+// Defines values for FeedItemFeedSource.
+const (
+	Following   FeedItemFeedSource = "following"
+	Recommended FeedItemFeedSource = "recommended"
+)
+
 // Comment defines model for Comment.
 type Comment struct {
 	AuthorId  openapi_types.UUID `json:"author_id"`
@@ -65,6 +71,26 @@ type DeletePostRequest struct {
 // ErrorResponse defines model for ErrorResponse.
 type ErrorResponse struct {
 	Message string `json:"message"`
+}
+
+// FeedItem A row in the home feed. The `feed_source` field is the stable machine value for UI copy: map it to localized strings (badges, subtitles, accessibility labels). Example: `recommended` → “May interest you” / «Может понравиться вам».
+type FeedItem struct {
+	// FeedSource Where this row came from; use for frontend labels. `following` — from an author the user follows (e.g. no extra promo line, or “From subscriptions”). `recommended` — from the 24h top-likes pool (e.g. “Suggested for you” / «Может понравиться вам»).
+	FeedSource FeedItemFeedSource `json:"feed_source"`
+	Post       Post               `json:"post"`
+}
+
+// FeedItemFeedSource Where this row came from; use for frontend labels. `following` — from an author the user follows (e.g. no extra promo line, or “From subscriptions”). `recommended` — from the 24h top-likes pool (e.g. “Suggested for you” / «Может понравиться вам»).
+type FeedItemFeedSource string
+
+// FeedPage Paginated feed: subscription posts plus injected recommendations. Items are ordered by post created_at descending. Each item indicates whether it came from a followed author or from the 24h top-likes recommendation pool. `started_from` mirrors the anchor from the request (see required query parameter).
+type FeedPage struct {
+	Items  []FeedItem `json:"items"`
+	Limit  int        `json:"limit"`
+	Offset int        `json:"offset"`
+
+	// StartedFrom Feed session anchor used for this response—typically the same as the `started_from` query (or the server-normalized form). Reuse it for subsequent pages in this session; for a new session (refresh), send a new `started_from` in the query.
+	StartedFrom time.Time `json:"started_from"`
 }
 
 // LikeRequest Target post for like / unlike
@@ -122,6 +148,15 @@ type UpdatePostRequest struct {
 	Content        *string            `json:"content,omitempty"`
 	ImageObjectIds *[]string          `json:"image_object_ids,omitempty"`
 	PostId         openapi_types.UUID `json:"post_id"`
+}
+
+// GetContentFeedParams defines parameters for GetContentFeed.
+type GetContentFeedParams struct {
+	Limit  int `form:"limit" json:"limit"`
+	Offset int `form:"offset" json:"offset"`
+
+	// StartedFrom Anchor for this feed session. First page after open or refresh: send a new instant, e.g. current time. Later pages: send the same value as on the first page of this scroll session (match the `started_from` returned in that response if the server normalizes it).
+	StartedFrom time.Time `form:"started_from" json:"started_from"`
 }
 
 // GetContentPostsParams defines parameters for GetContentPosts.

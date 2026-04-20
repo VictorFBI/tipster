@@ -41,6 +41,7 @@ services:
     networks:
       - default
       - tipster_infra
+      - tipster_apps
 
 volumes:
   users_postgres_data:
@@ -49,3 +50,6 @@ networks:
   tipster_infra:
     external: true
     name: tipster-infra_default
+  tipster_apps:
+    external: true
+    name: tipster_apps

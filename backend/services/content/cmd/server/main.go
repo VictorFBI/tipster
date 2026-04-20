@@ -13,9 +13,10 @@ import (
 	"tipster/backend/content/internal/db/postgresql"
 	"tipster/backend/content/internal/handlers"
 	"tipster/backend/content/internal/handlers/comments"
+	"tipster/backend/content/internal/handlers/feed"
 	"tipster/backend/content/internal/handlers/likes"
 	"tipster/backend/content/internal/handlers/posts"
-	likedhandlers "tipster/backend/content/internal/handlers/posts/liked"
+	"tipster/backend/content/internal/handlers/posts/liked"
 	"tipster/backend/content/internal/handlers/stats"
 	applogging "tipster/backend/content/internal/logging"
 	middlewares "tipster/backend/content/internal/middlewares"
@@ -67,6 +68,14 @@ func checkMediaServiceURL() {
 	slog.Info("media_service_url_ok", slog.String("base", os.Getenv("MEDIA_SERVICE_BASE_URL")))
 }
 
+func checkUsersServiceURL() {
+	if os.Getenv("USERS_SERVICE_BASE_URL") == "" {
+		slog.Warn("users_service_skipped", slog.String("reason", "USERS_SERVICE_BASE_URL unset; feed will only show recommendations, not subscriptions"))
+		return
+	}
+	slog.Info("users_service_url_ok", slog.String("base", os.Getenv("USERS_SERVICE_BASE_URL")))
+}
+
 func main() {
 	h := slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelInfo})
 	slog.SetDefault(slog.New(h))
@@ -82,6 +91,7 @@ func main() {
 	checkPostgreSQLConnection(ctx)
 	checkKafkaConnection(ctx)
 	checkMediaServiceURL()
+	checkUsersServiceURL()
 
 	r := chi.NewRouter()
 	slog.Info("server_starting")
@@ -93,7 +103,8 @@ func main() {
 		httpSwagger.URL("/swagger/doc.json"),
 	))
 
-	r.With(middlewares.RequireAccessToken).Get("/content/posts/liked", likedhandlers.GetContentPostsLiked)
+	r.With(middlewares.RequireAccessToken).Get("/content/posts/liked", liked.GetContentPostsLiked)
+	r.With(middlewares.RequireAccessToken).Get("/content/feed", feed.GetContentFeed)
 	r.With(middlewares.RequireAccessToken).Get("/content/stats", stats.GetContentStats)
 	r.With(middlewares.RequireAccessToken).Get("/content/posts", posts.GetContentPosts)
 	r.With(middlewares.RequireAccessToken).Post("/content/posts", posts.PostContentPosts)
