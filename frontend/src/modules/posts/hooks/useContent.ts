@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
 import contentService from "../api/content.service";
 import type {
   PostResponse,
@@ -13,6 +14,7 @@ import type {
   PaginationParams,
   MyPostsPage,
   LikedPostsPage,
+  ContentStats,
   ContentApiError,
 } from "../api/types";
 
@@ -25,6 +27,8 @@ export const contentKeys = {
     [...contentKeys.all, "posts", "liked", limit, offset] as const,
   comments: (postId: string) =>
     [...contentKeys.all, "comments", postId] as const,
+  stats: (accountId?: string) =>
+    [...contentKeys.all, "stats", accountId ?? "me"] as const,
 };
 
 // ── Posts ──
@@ -205,4 +209,37 @@ export const useUnlikePost = (options?: {
     },
     onError: options?.onError,
   });
+};
+
+// ── Stats ──
+
+/** GET /content/stats — post count for a user */
+export const useContentStats = (
+  accountId?: string,
+  options?: {
+    enabled?: boolean;
+    onSuccess?: (data: ContentStats) => void;
+    onError?: (error: ContentApiError) => void;
+  },
+) => {
+  const query = useQuery({
+    queryKey: contentKeys.stats(accountId),
+    queryFn: () =>
+      contentService.getContentStats(accountId ? { accountId } : undefined),
+    enabled: options?.enabled,
+  });
+
+  useEffect(() => {
+    if (query.isSuccess && query.data && options?.onSuccess) {
+      options.onSuccess(query.data);
+    }
+  }, [query.isSuccess, query.data]);
+
+  useEffect(() => {
+    if (query.isError && query.error && options?.onError) {
+      options.onError(query.error as ContentApiError);
+    }
+  }, [query.isError, query.error]);
+
+  return query;
 };

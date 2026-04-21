@@ -27,6 +27,7 @@ export {
   useUnlikePost,
   useMyPosts,
   useLikedPosts,
+  useContentStats,
   contentKeys,
 } from "./hooks/useContent";
 
@@ -45,5 +46,6 @@ export type {
   MyPostsPage,
   LikedPostItem,
   LikedPostsPage,
+  ContentStats,
   ContentApiError,
 } from "./api/types";

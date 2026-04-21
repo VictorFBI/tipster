@@ -1,63 +1,59 @@
+import { useMemo } from "react";
 import { YStack } from "tamagui";
 import { Header } from "@/src/shared";
-import { UsersList } from "@/src/modules/user";
+import { UsersList, useFollowers, useFollowing } from "@/src/modules/user";
 import { useLocalSearchParams } from "expo-router";
 import { useTranslation } from "react-i18next";
+import type { UserCardUser } from "@/src/modules/user";
+import type { UserSearchItem } from "@/src/modules/user/api/types";
 
-// Mock data for demonstration
-const mockFollowers = [
-  {
-    id: "1",
-    username: "CryptoKing",
-    avatar: "https://i.pravatar.cc/150?img=1",
-    subscribers: 2340,
-  },
-  {
-    id: "2",
-    username: "TokenHunter",
-    avatar: "https://i.pravatar.cc/150?img=2",
-    subscribers: 1567,
-  },
-  {
-    id: "3",
-    username: "AirdropMaster",
-    avatar: "https://i.pravatar.cc/150?img=3",
-    subscribers: 4521,
-  },
-];
+const PAGE_LIMIT = 50;
 
-const mockFollowing = [
-  {
-    id: "4",
-    username: "BlockchainBoss",
-    avatar: "https://i.pravatar.cc/150?img=4",
-    subscribers: 3210,
-  },
-  {
-    id: "5",
-    username: "CryptoWhale",
-    avatar: "https://i.pravatar.cc/150?img=5",
-    subscribers: 982,
-  },
-];
+/** Map API item to the shape UserCard expects */
+function toUserCardUser(item: UserSearchItem): UserCardUser {
+  return {
+    id: item.user_id,
+    username: item.username,
+    avatar: item.avatar_url ?? "",
+  };
+}
 
 export default function UsersListScreen() {
   const { t } = useTranslation();
   const params = useLocalSearchParams();
   const type = params.type as "followers" | "following";
+  const userId = params.userId as string | undefined;
 
-  const users = type === "followers" ? mockFollowers : mockFollowing;
+  const followersQuery = useFollowers(
+    { accountId: userId, limit: PAGE_LIMIT, offset: 0 },
+    { enabled: type === "followers" },
+  );
+
+  const followingQuery = useFollowing(
+    { accountId: userId, limit: PAGE_LIMIT, offset: 0 },
+    { enabled: type === "following" },
+  );
+
+  const activeQuery = type === "followers" ? followersQuery : followingQuery;
+
+  const users: UserCardUser[] = useMemo(
+    () => (activeQuery.data?.items ?? []).map(toUserCardUser),
+    [activeQuery.data],
+  );
+
   const title =
     type === "followers" ? t("profile.followers") : t("profile.following");
   const emptyMessage =
-    type === "followers"
-      ? t("users.noFollowers") || "Нет подписчиков"
-      : t("users.noFollowing") || "Нет подписок";
+    type === "followers" ? t("profile.noFollowers") : t("profile.noFollowing");
 
   return (
     <YStack flex={1} backgroundColor="$background">
       <Header headerText={title} showBackButton />
-      <UsersList users={users} emptyMessage={emptyMessage} />
+      <UsersList
+        users={users}
+        isLoading={activeQuery.isLoading}
+        emptyMessage={emptyMessage}
+      />
     </YStack>
   );
 }

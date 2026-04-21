@@ -8,6 +8,12 @@ import {
   UnsubscribeRequest,
   SearchUsersRequest,
   UserSearchResponse,
+  GetFollowersRequest,
+  GetFollowersResponse,
+  GetFollowingRequest,
+  GetFollowingResponse,
+  GetUserStatsRequest,
+  GetUserStatsResponse,
 } from "./types";
 
 /**
@@ -102,6 +108,58 @@ export const userService = {
       "/users/unsubscribe",
       data,
     );
+    return response.data;
+  },
+
+  /**
+   * GET /users/followers
+   * List users subscribed to the given account (followers of account_id)
+   */
+  getFollowers: async (
+    params: GetFollowersRequest,
+  ): Promise<GetFollowersResponse> => {
+    const response: AxiosResponse<GetFollowersResponse> =
+      await accountsClient.get("/users/followers", {
+        params: {
+          ...(params.accountId && { account_id: params.accountId }),
+          limit: params.limit,
+          offset: params.offset,
+        },
+      });
+    return response.data;
+  },
+
+  /**
+   * GET /users/following
+   * List accounts the given user is subscribed to (following list for account_id)
+   */
+  getFollowing: async (
+    params: GetFollowingRequest,
+  ): Promise<GetFollowingResponse> => {
+    const response: AxiosResponse<GetFollowingResponse> =
+      await accountsClient.get("/users/following", {
+        params: {
+          ...(params.accountId && { account_id: params.accountId }),
+          limit: params.limit,
+          offset: params.offset,
+        },
+      });
+    return response.data;
+  },
+
+  /**
+   * GET /users/stats
+   * Subscription counts for a user (followers and outgoing subscriptions)
+   */
+  getUserStats: async (
+    params?: GetUserStatsRequest,
+  ): Promise<GetUserStatsResponse> => {
+    const response: AxiosResponse<GetUserStatsResponse> =
+      await accountsClient.get("/users/stats", {
+        params: {
+          ...(params?.accountId && { account_id: params.accountId }),
+        },
+      });
     return response.data;
   },
 };

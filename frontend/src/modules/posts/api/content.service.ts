@@ -12,6 +12,8 @@ import type {
   PaginationParams,
   MyPostsPage,
   LikedPostsPage,
+  ContentStats,
+  GetContentStatsRequest,
 } from "./types";
 
 const contentService = {
@@ -96,6 +98,20 @@ const contentService = {
   /** DELETE /content/likes — unlike a post (idempotent) */
   unlikePost: async (data: LikeRequest): Promise<void> => {
     await contentClient.delete("/content/likes", { data });
+  },
+
+  // ── Stats ──
+
+  /** GET /content/stats — post count for a user */
+  getContentStats: async (
+    params?: GetContentStatsRequest,
+  ): Promise<ContentStats> => {
+    const response = await contentClient.get<ContentStats>("/content/stats", {
+      params: {
+        ...(params?.accountId && { account_id: params.accountId }),
+      },
+    });
+    return response.data;
   },
 };
 

@@ -108,6 +108,8 @@
     "unsubscribe": "Отписаться",
     "noPosts": "Постов пока нет",
     "username": "Имя пользователя",
+    "noFollowers": "У вас пока нет подписчиков :(",
+    "noFollowing": "У вас пока нет подписок :(",
     "filling": {
       "welcome": "Настройте свой профиль",
       "completeProfile": "Расскажите о себе сообществу Tipster",

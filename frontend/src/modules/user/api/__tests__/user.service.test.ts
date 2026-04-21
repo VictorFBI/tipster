@@ -151,4 +151,144 @@ describe("userService", () => {
       });
     });
   });
+
+  describe("getFollowers", () => {
+    it("calls GET /users/followers with account_id, limit, offset", async () => {
+      const mockResponse = {
+        items: [
+          {
+            user_id: "u1",
+            username: "alice",
+            first_name: "Alice",
+            last_name: null,
+            avatar_url: null,
+          },
+        ],
+        total: 1,
+        limit: 10,
+        offset: 0,
+      };
+      (accountsClient.get as jest.Mock).mockResolvedValueOnce({
+        data: mockResponse,
+      });
+
+      const result = await userService.getFollowers({
+        accountId: "acc-123",
+        limit: 10,
+        offset: 0,
+      });
+
+      expect(accountsClient.get).toHaveBeenCalledWith("/users/followers", {
+        params: { account_id: "acc-123", limit: 10, offset: 0 },
+      });
+      expect(result).toEqual(mockResponse);
+    });
+
+    it("omits account_id when not provided (uses JWT subject)", async () => {
+      const mockResponse = {
+        items: [],
+        total: 0,
+        limit: 10,
+        offset: 0,
+      };
+      (accountsClient.get as jest.Mock).mockResolvedValueOnce({
+        data: mockResponse,
+      });
+
+      await userService.getFollowers({ limit: 10, offset: 0 });
+
+      expect(accountsClient.get).toHaveBeenCalledWith("/users/followers", {
+        params: { limit: 10, offset: 0 },
+      });
+    });
+  });
+
+  describe("getFollowing", () => {
+    it("calls GET /users/following with account_id, limit, offset", async () => {
+      const mockResponse = {
+        items: [
+          {
+            user_id: "u2",
+            username: "bob",
+            first_name: "Bob",
+            last_name: "Smith",
+            avatar_url: "https://example.com/bob.jpg",
+          },
+        ],
+        total: 1,
+        limit: 20,
+        offset: 0,
+      };
+      (accountsClient.get as jest.Mock).mockResolvedValueOnce({
+        data: mockResponse,
+      });
+
+      const result = await userService.getFollowing({
+        accountId: "acc-456",
+        limit: 20,
+        offset: 0,
+      });
+
+      expect(accountsClient.get).toHaveBeenCalledWith("/users/following", {
+        params: { account_id: "acc-456", limit: 20, offset: 0 },
+      });
+      expect(result).toEqual(mockResponse);
+    });
+
+    it("omits account_id when not provided (uses JWT subject)", async () => {
+      const mockResponse = {
+        items: [],
+        total: 0,
+        limit: 10,
+        offset: 0,
+      };
+      (accountsClient.get as jest.Mock).mockResolvedValueOnce({
+        data: mockResponse,
+      });
+
+      await userService.getFollowing({ limit: 10, offset: 0 });
+
+      expect(accountsClient.get).toHaveBeenCalledWith("/users/following", {
+        params: { limit: 10, offset: 0 },
+      });
+    });
+  });
+
+  describe("getUserStats", () => {
+    it("calls GET /users/stats with account_id", async () => {
+      const mockResponse = {
+        followers_count: 42,
+        subscriptions_count: 15,
+      };
+      (accountsClient.get as jest.Mock).mockResolvedValueOnce({
+        data: mockResponse,
+      });
+
+      const result = await userService.getUserStats({
+        accountId: "acc-789",
+      });
+
+      expect(accountsClient.get).toHaveBeenCalledWith("/users/stats", {
+        params: { account_id: "acc-789" },
+      });
+      expect(result).toEqual(mockResponse);
+    });
+
+    it("omits account_id when not provided (uses JWT subject)", async () => {
+      const mockResponse = {
+        followers_count: 10,
+        subscriptions_count: 5,
+      };
+      (accountsClient.get as jest.Mock).mockResolvedValueOnce({
+        data: mockResponse,
+      });
+
+      const result = await userService.getUserStats();
+
+      expect(accountsClient.get).toHaveBeenCalledWith("/users/stats", {
+        params: {},
+      });
+      expect(result).toEqual(mockResponse);
+    });
+  });
 });

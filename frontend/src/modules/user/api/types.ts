@@ -44,6 +44,26 @@ export interface UserSearchResponse {
   items: UserSearchItem[];
 }
 
+// User Connections (followers/following) Types
+export interface UserConnectionsPage {
+  items: UserSearchItem[];
+  total: number;
+  limit: number;
+  offset: number;
+}
+
+// User Stats Types
+export interface UserStats {
+  followers_count: number;
+  subscriptions_count: number;
+}
+
+// Normalized stats type used in components
+export interface NormalizedUserStats {
+  followersCount: number;
+  subscriptionsCount: number;
+}
+
 // API Request Types
 export interface GetAccountProfileRequest {
   account_id: string;
@@ -72,10 +92,32 @@ export interface SearchUsersRequest {
   offset: number;
 }
 
+export interface GetFollowersRequest {
+  accountId?: string;
+  limit: number;
+  offset: number;
+}
+
+export interface GetFollowingRequest {
+  accountId?: string;
+  limit: number;
+  offset: number;
+}
+
+export interface GetUserStatsRequest {
+  accountId?: string;
+}
+
 // API Response Types
 export interface GetAccountProfileResponse extends AccountProfile {}
 
 export interface GetMyProfileResponse extends AccountProfileWithSecureClaims {}
+
+export interface GetFollowersResponse extends UserConnectionsPage {}
+
+export interface GetFollowingResponse extends UserConnectionsPage {}
+
+export interface GetUserStatsResponse extends UserStats {}
 
 export interface ErrorResponse {
   message: string;
@@ -112,5 +154,13 @@ export function normalizeAccountProfile(
     bio: profile.bio,
     avatarUrl: profile.avatar_url,
     isSubscribed: profile.is_subscribed,
+  };
+}
+
+// Helper to normalize user stats from snake_case
+export function normalizeUserStats(stats: UserStats): NormalizedUserStats {
+  return {
+    followersCount: stats.followers_count,
+    subscriptionsCount: stats.subscriptions_count,
   };
 }

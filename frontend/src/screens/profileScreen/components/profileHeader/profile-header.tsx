@@ -1,6 +1,11 @@
 import { Avatar, YStack, Text, XStack, Spinner } from "tamagui";
 import { useTranslation } from "react-i18next";
-import { useMyProfile, useAccountProfile } from "@/src/modules/user";
+import {
+  useMyProfile,
+  useAccountProfile,
+  useUserStats,
+} from "@/src/modules/user";
+import { useContentStats } from "@/src/modules/posts";
 import { Ionicons } from "@expo/vector-icons";
 import { Pressable } from "react-native";
 import { useRouter } from "expo-router";
@@ -41,6 +46,13 @@ export function ProfileHeader({ userId }: ProfileHeaderProps) {
     isLoading,
     isError,
   } = isOwnProfile ? myProfileQuery : accountProfileQuery;
+
+  const { data: userStats } = useUserStats(userId);
+  const { data: contentStats } = useContentStats(userId);
+
+  const followersCount = userStats?.followersCount ?? 0;
+  const followingCount = userStats?.subscriptionsCount ?? 0;
+  const postsCount = contentStats?.posts_count ?? 0;
 
   if (isLoading) {
     return (
@@ -139,7 +151,7 @@ export function ProfileHeader({ userId }: ProfileHeaderProps) {
       <XStack gap="$8" marginTop="$4">
         <YStack alignItems="center" gap="$1">
           <Text fontSize={20} fontWeight="700" color="$text">
-            28
+            {postsCount}
           </Text>
           <Text fontSize={14} color={currentTheme.muted}>
             {t("profile.postsLabel")}
@@ -148,7 +160,7 @@ export function ProfileHeader({ userId }: ProfileHeaderProps) {
         <Pressable onPress={handleFollowersPress}>
           <YStack alignItems="center" gap="$1">
             <Text fontSize={20} fontWeight="700" color="$text">
-              145
+              {followersCount}
             </Text>
             <Text fontSize={14} color={currentTheme.muted}>
               {t("profile.followersLabel")}
@@ -158,7 +170,7 @@ export function ProfileHeader({ userId }: ProfileHeaderProps) {
         <Pressable onPress={handleFollowingPress}>
           <YStack alignItems="center" gap="$1">
             <Text fontSize={20} fontWeight="700" color="$text">
-              89
+              {followingCount}
             </Text>
             <Text fontSize={14} color={currentTheme.muted}>
               {t("profile.followingLabel")}

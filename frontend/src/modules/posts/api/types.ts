@@ -93,6 +93,17 @@ export interface LikeRequest {
   post_id: string;
 }
 
+// ── Stats ──
+
+/** Response from GET /content/stats */
+export interface ContentStats {
+  posts_count: number;
+}
+
+export interface GetContentStatsRequest {
+  accountId?: string;
+}
+
 // ── Error response ──
 
 export interface ContentApiError {

@@ -1,5 +1,13 @@
-import { normalizeMyProfile, normalizeAccountProfile } from "../types";
-import type { AccountProfileWithSecureClaims, AccountProfile } from "../types";
+import {
+  normalizeMyProfile,
+  normalizeAccountProfile,
+  normalizeUserStats,
+} from "../types";
+import type {
+  AccountProfileWithSecureClaims,
+  AccountProfile,
+  UserStats,
+} from "../types";
 
 describe("normalizeMyProfile", () => {
   it("normalizes PascalCase profile to camelCase", () => {
@@ -91,5 +99,33 @@ describe("normalizeAccountProfile", () => {
 
     expect(result.firstName).toBeNull();
     expect(result.isSubscribed).toBe(false);
+  });
+});
+
+describe("normalizeUserStats", () => {
+  it("normalizes snake_case stats to camelCase", () => {
+    const stats: UserStats = {
+      followers_count: 42,
+      subscriptions_count: 15,
+    };
+
+    const result = normalizeUserStats(stats);
+
+    expect(result).toEqual({
+      followersCount: 42,
+      subscriptionsCount: 15,
+    });
+  });
+
+  it("handles zero values", () => {
+    const stats: UserStats = {
+      followers_count: 0,
+      subscriptions_count: 0,
+    };
+
+    const result = normalizeUserStats(stats);
+
+    expect(result.followersCount).toBe(0);
+    expect(result.subscriptionsCount).toBe(0);
   });
 });

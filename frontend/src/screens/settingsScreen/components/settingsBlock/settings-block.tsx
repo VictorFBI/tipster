@@ -22,7 +22,7 @@ export function SettingsBlock() {
       padding="$4"
       gap="$4"
     >
-      <SettingSection title={t("settings.notifications")}>
+      {/* <SettingSection title={t("settings.notifications")}>
         <SettingItem
           icon="notifications-outline"
           title={t("settings.pushNotifications")}
@@ -30,9 +30,9 @@ export function SettingsBlock() {
           checked={pushEnabled}
           onCheckedChange={setPushEnabled}
         />
-      </SettingSection>
+      </SettingSection> */}
 
-      <Divider />
+      {/* <Divider />
 
       <SettingSection title={t("settings.privacy")}>
         <SettingItem
@@ -42,9 +42,9 @@ export function SettingsBlock() {
           checked={privateAccount}
           onCheckedChange={setPrivateAccount}
         />
-      </SettingSection>
+      </SettingSection> */}
 
-      <Divider />
+      {/* <Divider /> */}
 
       <SettingSection title={t("settings.appearance")}>
         <YStack gap="$5">

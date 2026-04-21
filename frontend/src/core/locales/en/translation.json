@@ -108,6 +108,8 @@
     "noPosts": "No posts yet",
     "loadError": "Failed to load profile",
     "anonymous": "Anonymous",
+    "noFollowers": "You have no followers :(",
+    "noFollowing": "У вас пока нет подписок :(",
     "filling": {
       "welcome": "Set up your profile",
       "completeProfile": "Tell the Tipster community about yourself",
