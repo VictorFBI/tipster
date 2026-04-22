@@ -79,6 +79,9 @@
     "createPost": "Create Post",
     "noPostsYet": "No posts yet",
     "loadMore": "Load More",
+    "loadError": "Failed to load feed",
+    "followingAuthor": "Following",
+    "recommendedAuthor": "Recommended",
     "activityTip": "Be active! Every post, like and comment increases your airdrop"
   },
   "search": {

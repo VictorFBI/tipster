@@ -10,6 +10,7 @@ export interface Post {
   image?: string;
   tipAmount: number;
   likes: number;
+  likedByMe: boolean;
   comments: number;
   reposts?: number;
   commentsList?: Comment[];

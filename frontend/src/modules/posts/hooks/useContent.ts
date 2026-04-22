@@ -12,7 +12,10 @@ import type {
   DeleteCommentRequest,
   LikeRequest,
   PaginationParams,
+  GetPostsRequest,
+  GetFeedRequest,
   MyPostsPage,
+  FeedPage,
   LikedPostsPage,
   ContentStats,
   ContentApiError,
@@ -21,8 +24,13 @@ import type {
 export const contentKeys = {
   all: ["content"] as const,
   posts: () => [...contentKeys.all, "posts"] as const,
-  myPosts: (limit: number, offset: number) =>
-    [...contentKeys.all, "posts", "my", limit, offset] as const,
+  postsByAuthor: (
+    accountId: string | undefined,
+    limit: number,
+    offset: number,
+  ) => [...contentKeys.all, "posts", accountId ?? "me", limit, offset] as const,
+  feed: (startedFrom: string, limit: number, offset: number) =>
+    [...contentKeys.all, "feed", startedFrom, limit, offset] as const,
   likedPosts: (limit: number, offset: number) =>
     [...contentKeys.all, "posts", "liked", limit, offset] as const,
   comments: (postId: string) =>
@@ -33,6 +41,25 @@ export const contentKeys = {
 
 // ── Posts ──
 
+/** GET /content/posts — list posts for the authenticated user or a specific author */
+export const usePosts = (
+  params: GetPostsRequest,
+  options?: {
+    enabled?: boolean;
+    onError?: (error: ContentApiError) => void;
+  },
+) => {
+  return useQuery({
+    queryKey: contentKeys.postsByAuthor(
+      params.accountId,
+      params.limit,
+      params.offset,
+    ),
+    queryFn: () => contentService.getPosts(params),
+    enabled: options?.enabled,
+  });
+};
+
 /** GET /content/posts — list the authenticated user's posts (paginated) */
 export const useMyPosts = (
   params: PaginationParams,
@@ -41,11 +68,37 @@ export const useMyPosts = (
     onError?: (error: ContentApiError) => void;
   },
 ) => {
-  return useQuery({
-    queryKey: contentKeys.myPosts(params.limit, params.offset),
-    queryFn: () => contentService.getMyPosts(params),
+  return usePosts(params, options);
+};
+
+/** GET /content/feed — personalized home feed for the authenticated user */
+export const useFeed = (
+  params: GetFeedRequest,
+  options?: {
+    enabled?: boolean;
+    onSuccess?: (data: FeedPage) => void;
+    onError?: (error: ContentApiError) => void;
+  },
+) => {
+  const query = useQuery({
+    queryKey: contentKeys.feed(params.startedFrom, params.limit, params.offset),
+    queryFn: () => contentService.getFeed(params),
     enabled: options?.enabled,
   });
+
+  useEffect(() => {
+    if (query.isSuccess && query.data && options?.onSuccess) {
+      options.onSuccess(query.data);
+    }
+  }, [query.isSuccess, query.data]);
+
+  useEffect(() => {
+    if (query.isError && query.error && options?.onError) {
+      options.onError(query.error as ContentApiError);
+    }
+  }, [query.isError, query.error]);
+
+  return query;
 };
 
 /** GET /content/posts/liked — list posts liked by the authenticated user (paginated) */
@@ -188,6 +241,14 @@ export const useLikePost = (options?: {
     mutationFn: (data: LikeRequest) => contentService.likePost(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: contentKeys.posts() });
+      queryClient.invalidateQueries({ queryKey: contentKeys.feed("", 0, 0) });
+      queryClient.invalidateQueries({ queryKey: [...contentKeys.all, "feed"] });
+      queryClient.invalidateQueries({
+        queryKey: contentKeys.likedPosts(20, 0),
+      });
+      queryClient.invalidateQueries({
+        queryKey: [...contentKeys.all, "posts", "liked"],
+      });
       options?.onSuccess?.();
     },
     onError: options?.onError,
@@ -205,6 +266,14 @@ export const useUnlikePost = (options?: {
     mutationFn: (data: LikeRequest) => contentService.unlikePost(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: contentKeys.posts() });
+      queryClient.invalidateQueries({ queryKey: contentKeys.feed("", 0, 0) });
+      queryClient.invalidateQueries({ queryKey: [...contentKeys.all, "feed"] });
+      queryClient.invalidateQueries({
+        queryKey: contentKeys.likedPosts(20, 0),
+      });
+      queryClient.invalidateQueries({
+        queryKey: [...contentKeys.all, "posts", "liked"],
+      });
       options?.onSuccess?.();
     },
     onError: options?.onError,

@@ -75,7 +75,7 @@ export interface UpdateAccountProfileRequest {
   username?: string;
   bio?: string;
   avatar_url?: string;
-  wallet_address?: string;
+  wallet_address?: string | null;
 }
 
 export interface SubscribeRequest {

@@ -79,6 +79,9 @@
     "createPost": "Создать пост",
     "noPostsYet": "Постов пока нет",
     "loadMore": "Загрузить еще",
+    "loadError": "Не удалось загрузить ленту",
+    "followingAuthor": "Подписка",
+    "recommendedAuthor": "Рекомендация",
     "activityTip": "Будьте активны! Каждый пост, лайк и комментарий увеличивает ваш airdrop"
   },
   "search": {

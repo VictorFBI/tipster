@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Image } from "react-native";
 import { YStack, Text } from "tamagui";
 import { CommentsSection } from "../commentsSection/comments-section";
@@ -30,7 +30,7 @@ export function PostCard({
   isOwnPost = false,
   onDeleted,
 }: PostCardProps) {
-  const [liked, setLiked] = useState(false);
+  const [liked, setLiked] = useState(post.likedByMe);
   const [likeCount, setLikeCount] = useState(post.likes);
   const [reposted, setReposted] = useState(false);
   const [repostsCount, setRepostsCount] = useState(post.reposts || 0);
@@ -67,10 +67,15 @@ export function PostCard({
     },
   });
 
+  useEffect(() => {
+    setLiked(post.likedByMe);
+    setLikeCount(post.likes);
+  }, [post.likedByMe, post.likes]);
+
   const { mutate: likePost } = useLikePost({
     onSuccess: () => {
       setLiked(true);
-      setLikeCount(likeCount + 1);
+      setLikeCount((current) => current + 1);
     },
     onError: () => {
       showAlert("Ошибка", "Не удалось поставить лайк. Попробуйте ещё раз.");
@@ -80,7 +85,7 @@ export function PostCard({
   const { mutate: unlikePost } = useUnlikePost({
     onSuccess: () => {
       setLiked(false);
-      setLikeCount(likeCount - 1);
+      setLikeCount((current) => Math.max(0, current - 1));
     },
     onError: () => {
       showAlert("Ошибка", "Не удалось убрать лайк. Попробуйте ещё раз.");

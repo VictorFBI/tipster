@@ -1,8 +1,14 @@
 import { Ionicons } from "@expo/vector-icons";
-import { XStack, YStack, Text } from "tamagui";
+import { useCallback, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
+import { XStack, YStack, Text } from "tamagui";
 import { useThemeStore } from "@/src/core/store/themeStore";
 import { themes } from "@/src/core/theme/themes";
+import { showAlert } from "@/src/core/utils/alertService";
+import {
+  useMyProfile,
+  useUpdateAccountProfile,
+} from "@/src/modules/user/hooks/useUser";
 import {
   WalletConnectModal,
   useWalletConnectModal,
@@ -31,26 +37,65 @@ export function BalanceBlock({ balance }: BalanceBlockProps) {
   const currentTheme = themes[theme];
 
   const { open, isConnected, address, provider } = useWalletConnectModal();
+  const { data: myProfile } = useMyProfile({ enabled: true });
+  const lastSyncedAddressRef = useRef<string | null>(null);
+  const isDisconnectingRef = useRef(false);
+  const walletAddress = address ?? myProfile?.walletAddress ?? null;
 
-  // Function to handle the
-  const handleButtonPress = async () => {
-    if (isConnected) {
-      return provider?.disconnect();
+  const updateAccountProfileMutation = useUpdateAccountProfile({
+    onError: () => {
+      showAlert(t("common.error"), "Failed to attach wallet");
+    },
+  });
+
+  // Stable reference to the mutate function to avoid re-triggering the sync effect
+  const mutateRef = useRef(updateAccountProfileMutation.mutate);
+  mutateRef.current = updateAccountProfileMutation.mutate;
+
+  // Sync wallet address to backend when a new address is connected
+  useEffect(() => {
+    if (
+      isDisconnectingRef.current ||
+      !isConnected ||
+      !address ||
+      lastSyncedAddressRef.current === address
+    ) {
+      return;
     }
-    console.log("toopne");
-    return open();
-  };
 
-  // const handleWalletAction = async () => {
-  //   console.log("=== BalanceBlock handleWalletAction ===");
-  //   console.log("connect function:", typeof connect);
-  //   try {
-  //     await connect();
-  //     console.log("connect() completed");
-  //   } catch (error) {
-  //     console.error("Error in handleWalletAction:", error);
-  //   }
-  // };
+    mutateRef.current(
+      { wallet_address: address },
+      {
+        onSuccess: () => {
+          lastSyncedAddressRef.current = address;
+        },
+      },
+    );
+  }, [address, isConnected]);
+
+  const handleButtonPress = useCallback(async () => {
+    if (isConnected) {
+      // Set the flag before mutating to prevent the sync effect from
+      // re-sending the old address while disconnect is in progress
+      isDisconnectingRef.current = true;
+      updateAccountProfileMutation.mutate(
+        { wallet_address: null },
+        {
+          onSuccess: async () => {
+            lastSyncedAddressRef.current = null;
+            await provider?.disconnect();
+            isDisconnectingRef.current = false;
+          },
+          onError: () => {
+            isDisconnectingRef.current = false;
+          },
+        },
+      );
+      return;
+    }
+
+    return open();
+  }, [isConnected, provider, open, updateAccountProfileMutation]);
 
   const formatAddress = (addr: string) => {
     return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
@@ -81,7 +126,7 @@ export function BalanceBlock({ balance }: BalanceBlockProps) {
         </Text>
       </XStack>
 
-      {isConnected && address && (
+      {walletAddress && (
         <XStack
           backgroundColor="rgba(255, 255, 255, 0.2)"
           borderRadius="$2"
@@ -91,7 +136,7 @@ export function BalanceBlock({ balance }: BalanceBlockProps) {
         >
           <Ionicons name="checkmark-circle" size={16} color="white" />
           <Text color="white" fontSize={14} fontWeight="500">
-            {formatAddress(address)}
+            {formatAddress(walletAddress)}
           </Text>
         </XStack>
       )}

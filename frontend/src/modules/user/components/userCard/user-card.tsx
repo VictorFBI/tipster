@@ -6,6 +6,7 @@ import { themes } from "@/src/core/theme/themes";
 import { StyledButton } from "@/src/shared";
 import { useSubscribe, useUnsubscribe } from "../../hooks/useUser";
 import { useAccountProfile } from "../../hooks/useUser";
+import { useAuthStore } from "@/src/modules/auth/store/authStore";
 
 export interface UserCardUser {
   id: string;
@@ -20,9 +21,11 @@ export function UserCard({ user }: { user: UserCardUser }) {
   const { t } = useTranslation();
   const { theme } = useThemeStore();
   const currentTheme = themes[theme];
+  const currentUser = useAuthStore((s) => s.user);
+  const isOwnAccount = currentUser?.accountId === user.id;
 
   const { data: profile } = useAccountProfile(user.id, {
-    enabled: !!user.id,
+    enabled: !!user.id && !isOwnAccount,
   });
 
   const isSubscribed = profile?.isSubscribed ?? false;
@@ -73,22 +76,24 @@ export function UserCard({ user }: { user: UserCardUser }) {
         </YStack>
       </XStack>
 
-      <StyledButton
-        onPress={handleToggleSubscribe}
-        buttonSize="s"
-        color={isSubscribed ? "normal" : "accent"}
-        borderRadius={6}
-        minWidth={120}
-        disabled={isLoading}
-      >
-        <Text
-          fontSize={14}
-          fontWeight="600"
-          color={isSubscribed ? "$textSecondary2" : "white"}
+      {!isOwnAccount && (
+        <StyledButton
+          onPress={handleToggleSubscribe}
+          buttonSize="s"
+          color={isSubscribed ? "normal" : "accent"}
+          borderRadius={6}
+          minWidth={120}
+          disabled={isLoading}
         >
-          {isSubscribed ? t("profile.unsubscribe") : t("profile.subscribe")}
-        </Text>
-      </StyledButton>
+          <Text
+            fontSize={14}
+            fontWeight="600"
+            color={isSubscribed ? "$textSecondary2" : "white"}
+          >
+            {isSubscribed ? t("profile.unsubscribe") : t("profile.subscribe")}
+          </Text>
+        </StyledButton>
+      )}
     </XStack>
   );
 }

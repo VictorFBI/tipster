@@ -41,21 +41,18 @@ export default function Settings() {
       );
 
       if (refreshToken) {
-        // Calls POST /auth/logout with refresh_token,
-        // then clears tokens and store state via onSuccess/onError in useLogout
         await logoutMutation.mutateAsync({ refresh_token: refreshToken });
       } else {
-        // No refresh token stored — just clear local state
         await clearAuthTokens();
         useAuthStore.getState().logout();
       }
-
-      router.replace("/(auth)/login");
     } catch (error) {
       const errorMessage = getErrorMessage(error);
       showAlert(t("common.error") || "Ошибка", errorMessage);
       console.warn("Logout error:", error);
-      // useLogout onError already clears tokens and store, just navigate
+      await clearAuthTokens();
+      useAuthStore.getState().logout();
+    } finally {
       router.replace("/(auth)/login");
     }
   };

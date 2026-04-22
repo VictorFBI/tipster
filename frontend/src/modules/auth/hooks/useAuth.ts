@@ -1,6 +1,7 @@
 import {
   useMutation,
   useQuery,
+  useQueryClient,
   UseMutationResult,
 } from "@tanstack/react-query";
 import { AxiosError } from "axios";
@@ -55,13 +56,18 @@ export const useLogin = (): UseMutationResult<
   AxiosError<ApiError>,
   LoginRequest
 > => {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: authService.login,
     onSuccess: async (data) => {
       // Save tokens to storage
       await setAuthTokens(data.access_token, data.refresh_token);
 
-      console.log(data);
+      // Drop cached user-scoped data from previous session before reading current user
+      queryClient.removeQueries({ queryKey: ["user"] });
+      queryClient.removeQueries({ queryKey: ["content"] });
+      queryClient.removeQueries({ queryKey: authKeys.me() });
 
       // Fetch accountId from /auth/me
       try {
@@ -90,21 +96,29 @@ export const useLogout = (): UseMutationResult<
   AxiosError<ApiError>,
   LogoutRequest
 > => {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: authService.logout,
     onSuccess: async () => {
       // Clear tokens from storage
       await clearAuthTokens();
+      queryClient.removeQueries({ queryKey: ["user"] });
+      queryClient.removeQueries({ queryKey: ["content"] });
+      queryClient.removeQueries({ queryKey: authKeys.me() });
       // Update Zustand store
       useAuthStore.getState().logout();
     },
-    onError: (error) => {
+    onError: async (error) => {
       console.warn(
         "Logout error:",
         error.response?.data?.message || error.message,
       );
       // Clear tokens even on error
-      clearAuthTokens();
+      await clearAuthTokens();
+      queryClient.removeQueries({ queryKey: ["user"] });
+      queryClient.removeQueries({ queryKey: ["content"] });
+      queryClient.removeQueries({ queryKey: authKeys.me() });
       useAuthStore.getState().logout();
     },
   });

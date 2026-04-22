@@ -5,7 +5,7 @@ import { SearchInput } from "./components/searchInput/search-input";
 import { useTranslation } from "react-i18next";
 import { Pressable } from "react-native";
 import { useRouter } from "expo-router";
-import { useState, useMemo } from "react";
+import { useMemo, useState } from "react";
 import { UserSearchItem } from "@/src/modules/user/api/types";
 import { Ionicons } from "@expo/vector-icons";
 import { useThemeStore } from "@/src/core/store/themeStore";

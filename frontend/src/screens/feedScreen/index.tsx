@@ -1,83 +1,150 @@
-import { XStack, YStack, Text } from "tamagui";
-import { PostsList } from "@/src/modules/posts";
-import { Header, InfoBlock, StyledButton } from "@/src/shared";
 import { Ionicons } from "@expo/vector-icons";
-
+import { useEffect, useMemo, useState } from "react";
+import { ActivityIndicator } from "react-native";
 import { useTranslation } from "react-i18next";
+import { XStack, YStack, Text } from "tamagui";
+import { mapPostResponseToPost, PostsList, useFeed } from "@/src/modules/posts";
+import { useMyProfile } from "@/src/modules/user";
+import { userService } from "@/src/modules/user/api/user.service";
+import type { NormalizedProfile } from "@/src/modules/user/api/types";
+import { useAuthStore } from "@/src/modules/auth/store/authStore";
+import { Header, InfoBlock, StyledButton } from "@/src/shared";
 import { useThemeStore } from "@/src/core/store/themeStore";
 import { themes } from "@/src/core/theme/themes";
 import { useRouter } from "expo-router";
-import { useAuthStore } from "@/src/modules/auth/store/authStore";
 
-interface Post {
-  id: string;
-  author: {
-    id?: string;
-    name: string;
-    avatar: string;
-  };
-  timestamp: string;
-  content: string;
-  tipAmount: number;
-  likes: number;
-  comments: number;
-}
-
-const mockPosts: Post[] = [
-  {
-    id: "1",
-    author: {
-      id: "current-user",
-      name: "CryptoKing",
-      avatar: "https://i.pravatar.cc/150?img=1",
-    },
-    timestamp: "2ч назад",
-    content: "Только что заработал 500 TIP токенов! 🚀 Airdrop будет огромным!",
-    tipAmount: 12450,
-    likes: 234,
-    comments: 45,
-  },
-  {
-    id: "2",
-    author: {
-      id: "user-2",
-      name: "TokenHunter",
-      avatar: "https://i.pravatar.cc/150?img=2",
-    },
-    timestamp: "4ч назад",
-    content:
-      "Советую всем активнее постить и лайкать. Каждое действие приносит токены! 💰",
-    tipAmount: 8920,
-    likes: 189,
-    comments: 32,
-  },
-  {
-    id: "3",
-    author: {
-      id: "user-3",
-      name: "AirdropMaster",
-      avatar: "https://i.pravatar.cc/150?img=3",
-    },
-    timestamp: "6ч назад",
-    content:
-      "Поделитесь своими стратегиями заработка TIP токенов в комментариях! 👇",
-    tipAmount: 25300,
-    likes: 567,
-    comments: 128,
-  },
-];
+const PAGE_SIZE = 20;
 
 export default function Feed() {
   const { t } = useTranslation();
   const { theme } = useThemeStore();
   const currentTheme = themes[theme];
   const { user } = useAuthStore();
-
   const router = useRouter();
+
+  const { data: profile } = useMyProfile();
+  const {
+    data: feedPage,
+    isLoading,
+    isError,
+  } = useFeed({
+    startedFrom: new Date().toISOString(),
+    limit: PAGE_SIZE,
+    offset: 0,
+  });
+
+  const [authorsMap, setAuthorsMap] = useState<
+    Record<string, NormalizedProfile>
+  >({});
+
+  const feedItems = Array.isArray(feedPage?.items) ? feedPage.items : [];
+
+  useEffect(() => {
+    const authorIds = Array.from(
+      new Set(
+        feedItems
+          .map((item) => item.post.author_id)
+          .filter((authorId) => authorId && authorId !== user?.accountId),
+      ),
+    );
+
+    const missingAuthorIds = authorIds.filter(
+      (authorId) => !authorsMap[authorId],
+    );
+
+    if (missingAuthorIds.length === 0) {
+      return;
+    }
+
+    let cancelled = false;
+
+    Promise.all(
+      missingAuthorIds.map(async (authorId) => {
+        const rawProfile = await userService.getAccountProfile(authorId);
+        return {
+          authorId,
+          profile: {
+            username: rawProfile.username,
+            firstName: rawProfile.first_name,
+            lastName: rawProfile.last_name,
+            avatarUrl: rawProfile.avatar_url,
+            bio: rawProfile.bio,
+            isSubscribed: rawProfile.is_subscribed,
+          } satisfies NormalizedProfile,
+        };
+      }),
+    )
+      .then((profiles) => {
+        if (cancelled) {
+          return;
+        }
+
+        setAuthorsMap((current) => {
+          const next = { ...current };
+          profiles.forEach(({ authorId, profile }) => {
+            next[authorId] = profile;
+          });
+          return next;
+        });
+      })
+      .catch(() => {
+        // Ignore author profile loading errors to keep feed usable
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [authorsMap, feedItems, user?.accountId]);
+
+  const posts = useMemo(() => {
+    if (!Array.isArray(feedItems)) {
+      return [];
+    }
+
+    return feedItems.map((item) => {
+      const isCurrentUserPost = item.post.author_id === user?.accountId;
+      const authorProfile = authorsMap[item.post.author_id];
+      const authorName = isCurrentUserPost
+        ? profile?.firstName && profile?.lastName
+          ? `${profile.firstName} ${profile.lastName}`
+          : profile?.username || t("common.you")
+        : authorProfile?.firstName && authorProfile?.lastName
+          ? `${authorProfile.firstName} ${authorProfile.lastName}`
+          : authorProfile?.username || t("profile.anonymous") || "Anonymous";
+
+      return mapPostResponseToPost(item.post, {
+        id: item.post.author_id,
+        name: authorName,
+        avatar: isCurrentUserPost
+          ? profile?.avatarUrl || ""
+          : authorProfile?.avatarUrl || "",
+      });
+    });
+  }, [authorsMap, feedItems, profile, t, user?.accountId]);
 
   const handleCreatePost = () => {
     router.push("/create-post");
   };
+
+  const renderLoading = () => (
+    <YStack alignItems="center" justifyContent="center" paddingVertical="$10">
+      <ActivityIndicator size="large" color={currentTheme.accent} />
+    </YStack>
+  );
+
+  const renderEmpty = (icon: string, message: string) => (
+    <YStack alignItems="center" justifyContent="center" paddingVertical="$10">
+      <Ionicons name={icon as any} size={48} color={currentTheme.muted} />
+      <Text
+        fontSize={16}
+        color={currentTheme.muted}
+        marginTop="$3"
+        textAlign="center"
+      >
+        {message}
+      </Text>
+    </YStack>
+  );
 
   return (
     <YStack flex={1} backgroundColor={"$background"}>
@@ -99,10 +166,21 @@ export default function Feed() {
         </StyledButton>
       </YStack>
 
-      <PostsList
-        posts={mockPosts}
-        currentUserId={user?.accountId || "current-user"}
-      />
+      {isLoading ? (
+        renderLoading()
+      ) : isError ? (
+        renderEmpty(
+          "alert-circle-outline",
+          t("feed.loadError") || "Failed to load feed",
+        )
+      ) : posts.length === 0 ? (
+        renderEmpty("document-text-outline", t("feed.noPostsYet"))
+      ) : (
+        <PostsList
+          posts={posts}
+          currentUserId={user?.accountId || "current-user"}
+        />
+      )}
     </YStack>
   );
 }

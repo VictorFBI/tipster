@@ -8,6 +8,8 @@ export interface PostResponse {
   image_object_ids: string[];
   created_at: string;
   updated_at: string;
+  likes_count: number;
+  liked_by_me: boolean;
 }
 
 /** Paginated list of posts for the authenticated author (GET /content/posts) */
@@ -48,6 +50,16 @@ export interface CommentResponse {
 export interface PaginationParams {
   limit: number;
   offset: number;
+}
+
+/** Pagination query parameters for GET /content/posts with optional author filter */
+export interface GetPostsRequest extends PaginationParams {
+  accountId?: string;
+}
+
+/** Pagination query parameters for GET /content/feed */
+export interface GetFeedRequest extends PaginationParams {
+  startedFrom: string;
 }
 
 /** POST /content/posts */
@@ -91,6 +103,22 @@ export interface DeleteCommentRequest {
 /** POST/DELETE /content/likes */
 export interface LikeRequest {
   post_id: string;
+}
+
+// ── Feed ──
+
+/** A row in the personalized home feed */
+export interface FeedItem {
+  post: PostResponse;
+  feed_source: "following" | "recommended";
+}
+
+/** Paginated personalized home feed response */
+export interface FeedPage {
+  items: FeedItem[];
+  started_from: string;
+  limit: number;
+  offset: number;
 }
 
 // ── Stats ──

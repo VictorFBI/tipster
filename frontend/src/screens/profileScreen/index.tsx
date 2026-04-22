@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator } from "react-native";
 import { YStack, Text, ScrollView } from "tamagui";
 import { Header, Tabs } from "@/src/shared";
@@ -11,6 +11,8 @@ import {
 } from "@/src/modules/posts";
 import { PostCard } from "@/src/modules/posts/components/postsCard/post-card";
 import { useMyProfile } from "@/src/modules/user";
+import { userService } from "@/src/modules/user/api/user.service";
+import type { NormalizedProfile } from "@/src/modules/user/api/types";
 import { useTranslation } from "react-i18next";
 import { useThemeStore, themes } from "@/src/core";
 
@@ -59,16 +61,86 @@ export default function Profile() {
     [myPostsPage, authorInfo],
   );
 
-  const likedPosts = useMemo(
+  const [likedAuthorsMap, setLikedAuthorsMap] = useState<
+    Record<string, NormalizedProfile>
+  >({});
+
+  const likedPosts = likedPostsPage?.items ?? [];
+
+  useEffect(() => {
+    if (activeTab !== "liked") {
+      return;
+    }
+
+    const authorIds = Array.from(
+      new Set(likedPosts.map((item) => item.post.author_id).filter(Boolean)),
+    );
+
+    const missingAuthorIds = authorIds.filter(
+      (authorId) => !likedAuthorsMap[authorId],
+    );
+
+    if (missingAuthorIds.length === 0) {
+      return;
+    }
+
+    let cancelled = false;
+
+    Promise.all(
+      missingAuthorIds.map(async (authorId) => {
+        const rawProfile = await userService.getAccountProfile(authorId);
+        return {
+          authorId,
+          profile: {
+            username: rawProfile.username,
+            firstName: rawProfile.first_name,
+            lastName: rawProfile.last_name,
+            avatarUrl: rawProfile.avatar_url,
+            bio: rawProfile.bio,
+            isSubscribed: rawProfile.is_subscribed,
+          } satisfies NormalizedProfile,
+        };
+      }),
+    )
+      .then((profiles) => {
+        if (cancelled) {
+          return;
+        }
+
+        setLikedAuthorsMap((current) => {
+          const next = { ...current };
+          profiles.forEach(({ authorId, profile }) => {
+            next[authorId] = profile;
+          });
+          return next;
+        });
+      })
+      .catch(() => {
+        // Ignore author profile loading errors to keep liked posts usable
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [activeTab, likedAuthorsMap, likedPosts]);
+
+  const likedPostsMapped = useMemo(
     () =>
-      likedPostsPage?.items.map((item) =>
-        mapPostResponseToPost(item.post, {
-          name: "",
-          avatar: "",
+      likedPosts.map((item) => {
+        const authorProfile = likedAuthorsMap[item.post.author_id];
+
+        const authorName =
+          authorProfile?.firstName && authorProfile?.lastName
+            ? `${authorProfile.firstName} ${authorProfile.lastName}`
+            : authorProfile?.username || t("profile.anonymous") || "Anonymous";
+
+        return mapPostResponseToPost(item.post, {
+          name: authorName,
+          avatar: authorProfile?.avatarUrl || "",
           id: item.post.author_id,
-        }),
-      ) ?? [],
-    [likedPostsPage],
+        });
+      }),
+    [likedAuthorsMap, likedPosts, t],
   );
 
   const renderLoading = () => (
@@ -121,9 +193,9 @@ export default function Profile() {
         "alert-circle-outline",
         t("profile.loadError") || "Failed to load posts",
       );
-    if (likedPosts.length === 0)
+    if (likedPostsMapped.length === 0)
       return renderEmpty("heart-outline", t("profile.noPosts"));
-    return renderPostCards(likedPosts, false);
+    return renderPostCards(likedPostsMapped, false);
   };
 
   return (

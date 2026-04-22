@@ -22,7 +22,7 @@ beforeEach(() => {
 describe("contentService", () => {
   // ── Posts ──
 
-  describe("getMyPosts", () => {
+  describe("getPosts", () => {
     it("calls GET /content/posts with limit and offset params", async () => {
       const mockPage = {
         items: [
@@ -33,6 +33,8 @@ describe("contentService", () => {
             image_object_ids: [],
             created_at: "2024-01-01T00:00:00Z",
             updated_at: "2024-01-01T00:00:00Z",
+            likes_count: 0,
+            liked_by_me: false,
           },
         ],
         limit: 20,
@@ -42,7 +44,7 @@ describe("contentService", () => {
         data: mockPage,
       });
 
-      const result = await contentService.getMyPosts({
+      const result = await contentService.getPosts({
         limit: 20,
         offset: 0,
       });
@@ -52,6 +54,72 @@ describe("contentService", () => {
       });
       expect(result).toEqual(mockPage);
       expect(result.items).toHaveLength(1);
+    });
+
+    it("passes account_id when requesting posts for a specific author", async () => {
+      const mockPage = {
+        items: [],
+        limit: 20,
+        offset: 10,
+      };
+      (contentClient.get as jest.Mock).mockResolvedValueOnce({
+        data: mockPage,
+      });
+
+      const result = await contentService.getPosts({
+        accountId: "author-1",
+        limit: 20,
+        offset: 10,
+      });
+
+      expect(contentClient.get).toHaveBeenCalledWith("/content/posts", {
+        params: { account_id: "author-1", limit: 20, offset: 10 },
+      });
+      expect(result).toEqual(mockPage);
+    });
+  });
+
+  describe("getFeed", () => {
+    it("calls GET /content/feed with started_from, limit and offset params", async () => {
+      const mockPage = {
+        items: [
+          {
+            post: {
+              id: "p-feed-1",
+              author_id: "a2",
+              content: "Feed post",
+              image_object_ids: [],
+              created_at: "2024-01-01T00:00:00Z",
+              updated_at: "2024-01-01T00:00:00Z",
+              likes_count: 5,
+              liked_by_me: false,
+            },
+            feed_source: "recommended",
+          },
+        ],
+        started_from: "2026-04-20T14:30:00.000Z",
+        limit: 10,
+        offset: 0,
+      };
+      (contentClient.get as jest.Mock).mockResolvedValueOnce({
+        data: mockPage,
+      });
+
+      const result = await contentService.getFeed({
+        startedFrom: "2026-04-20T14:30:00.000Z",
+        limit: 10,
+        offset: 0,
+      });
+
+      expect(contentClient.get).toHaveBeenCalledWith("/content/feed", {
+        params: {
+          limit: 10,
+          offset: 0,
+          started_from: "2026-04-20T14:30:00.000Z",
+        },
+      });
+      expect(result).toEqual(mockPage);
+      expect(result.items[0].feed_source).toBe("recommended");
     });
   });
 
@@ -67,6 +135,8 @@ describe("contentService", () => {
               image_object_ids: [],
               created_at: "2024-01-01T00:00:00Z",
               updated_at: "2024-01-01T00:00:00Z",
+              likes_count: 3,
+              liked_by_me: true,
             },
             liked_at: "2024-01-02T00:00:00Z",
           },
@@ -100,6 +170,8 @@ describe("contentService", () => {
         image_object_ids: [],
         created_at: "2024-01-01T00:00:00Z",
         updated_at: "2024-01-01T00:00:00Z",
+        likes_count: 0,
+        liked_by_me: false,
       };
       (contentClient.post as jest.Mock).mockResolvedValueOnce({
         data: mockPost,
@@ -121,6 +193,8 @@ describe("contentService", () => {
         image_object_ids: ["img1", "img2"],
         created_at: "2024-01-01T00:00:00Z",
         updated_at: "2024-01-01T00:00:00Z",
+        likes_count: 0,
+        liked_by_me: false,
       };
       (contentClient.post as jest.Mock).mockResolvedValueOnce({
         data: mockPost,
@@ -148,6 +222,8 @@ describe("contentService", () => {
         image_object_ids: [],
         created_at: "2024-01-01T00:00:00Z",
         updated_at: "2024-01-02T00:00:00Z",
+        likes_count: 1,
+        liked_by_me: true,
       };
       (contentClient.patch as jest.Mock).mockResolvedValueOnce({
         data: mockPost,

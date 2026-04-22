@@ -4,12 +4,15 @@ import {
   useAccountProfile,
   useSubscribe,
   useUnsubscribe,
+  useUserStats,
 } from "@/src/modules/user";
+import { useContentStats } from "@/src/modules/posts";
 import { Ionicons } from "@expo/vector-icons";
 import { Pressable } from "react-native";
 import { useRouter } from "expo-router";
 import { useThemeStore, themes } from "@/src/core";
 import { StyledButton } from "@/src/shared";
+import { useAuthStore } from "@/src/modules/auth/store/authStore";
 
 interface UserProfileHeaderProps {
   userId: string;
@@ -20,8 +23,9 @@ export function UserProfileHeader({ userId }: UserProfileHeaderProps) {
   const router = useRouter();
   const { theme } = useThemeStore();
   const currentTheme = themes[theme];
+  const currentUser = useAuthStore((s) => s.user);
+  const isOwnAccount = currentUser?.accountId === userId;
 
-  console.log(userId);
   const {
     data: profile,
     isLoading,
@@ -30,13 +34,22 @@ export function UserProfileHeader({ userId }: UserProfileHeaderProps) {
     enabled: !!userId,
   });
 
-  console.log(profile);
+  const { data: userStats } = useUserStats(userId, {
+    enabled: !!userId,
+  });
+  const { data: contentStats } = useContentStats(userId, {
+    enabled: !!userId,
+  });
 
   const subscribeMutation = useSubscribe();
   const unsubscribeMutation = useUnsubscribe();
 
   const isSubscribeLoading =
     subscribeMutation.isPending || unsubscribeMutation.isPending;
+
+  const followersCount = userStats?.followersCount ?? 0;
+  const followingCount = userStats?.subscriptionsCount ?? 0;
+  const postsCount = contentStats?.posts_count ?? 0;
 
   const handleFollowersPress = () => {
     router.push(`/users-list?type=followers&userId=${userId}`);
@@ -129,40 +142,42 @@ export function UserProfileHeader({ userId }: UserProfileHeaderProps) {
         </Text>
       )}
 
-      <StyledButton
-        onPress={handleSubscribeToggle}
-        color={profile.isSubscribed ? "surface" : "accent"}
-        buttonSize="m"
-        borderRadius={8}
-        minWidth={400}
-        disabled={isSubscribeLoading}
-      >
-        <XStack alignItems="center" gap="$2">
-          <Ionicons
-            name={
-              profile.isSubscribed
-                ? "person-remove-outline"
-                : "person-add-outline"
-            }
-            size={18}
-            color={profile.isSubscribed ? currentTheme.text : "#FFFFFF"}
-          />
-          <Text
-            fontSize={15}
-            fontWeight="600"
-            color={profile.isSubscribed ? "$text" : "#FFFFFF"}
-          >
-            {profile.isSubscribed
-              ? t("profile.unsubscribe") || "Unsubscribe"
-              : t("profile.subscribe") || "Subscribe"}
-          </Text>
-        </XStack>
-      </StyledButton>
+      {!isOwnAccount && (
+        <StyledButton
+          onPress={handleSubscribeToggle}
+          color={profile.isSubscribed ? "surface" : "accent"}
+          buttonSize="m"
+          borderRadius={8}
+          minWidth={400}
+          disabled={isSubscribeLoading}
+        >
+          <XStack alignItems="center" gap="$2">
+            <Ionicons
+              name={
+                profile.isSubscribed
+                  ? "person-remove-outline"
+                  : "person-add-outline"
+              }
+              size={18}
+              color={profile.isSubscribed ? currentTheme.text : "#FFFFFF"}
+            />
+            <Text
+              fontSize={15}
+              fontWeight="600"
+              color={profile.isSubscribed ? "$text" : "#FFFFFF"}
+            >
+              {profile.isSubscribed
+                ? t("profile.unsubscribe") || "Unsubscribe"
+                : t("profile.subscribe") || "Subscribe"}
+            </Text>
+          </XStack>
+        </StyledButton>
+      )}
 
       <XStack gap="$8" marginTop="$4">
         <YStack alignItems="center" gap="$1">
           <Text fontSize={20} fontWeight="700" color="$text">
-            28
+            {postsCount}
           </Text>
           <Text fontSize={14} color={currentTheme.muted}>
             {t("profile.postsLabel")}
@@ -171,7 +186,7 @@ export function UserProfileHeader({ userId }: UserProfileHeaderProps) {
         <Pressable onPress={handleFollowersPress}>
           <YStack alignItems="center" gap="$1">
             <Text fontSize={20} fontWeight="700" color="$text">
-              145
+              {followersCount}
             </Text>
             <Text fontSize={14} color={currentTheme.muted}>
               {t("profile.followersLabel")}
@@ -181,7 +196,7 @@ export function UserProfileHeader({ userId }: UserProfileHeaderProps) {
         <Pressable onPress={handleFollowingPress}>
           <YStack alignItems="center" gap="$1">
             <Text fontSize={20} fontWeight="700" color="$text">
-              89
+              {followingCount}
             </Text>
             <Text fontSize={14} color={currentTheme.muted}>
               {t("profile.followingLabel")}

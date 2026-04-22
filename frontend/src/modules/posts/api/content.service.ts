@@ -10,7 +10,10 @@ import type {
   DeleteCommentRequest,
   LikeRequest,
   PaginationParams,
+  GetPostsRequest,
+  GetFeedRequest,
   MyPostsPage,
+  FeedPage,
   LikedPostsPage,
   ContentStats,
   GetContentStatsRequest,
@@ -19,10 +22,26 @@ import type {
 const contentService = {
   // ── Posts ──
 
-  /** GET /content/posts — list the authenticated user's posts (paginated) */
-  getMyPosts: async (params: PaginationParams): Promise<MyPostsPage> => {
+  /** GET /content/posts — list posts for the authenticated user or a specific author */
+  getPosts: async (params: GetPostsRequest): Promise<MyPostsPage> => {
     const response = await contentClient.get<MyPostsPage>("/content/posts", {
-      params,
+      params: {
+        limit: params.limit,
+        offset: params.offset,
+        ...(params.accountId && { account_id: params.accountId }),
+      },
+    });
+    return response.data;
+  },
+
+  /** GET /content/feed — personalized home feed for the authenticated user */
+  getFeed: async (params: GetFeedRequest): Promise<FeedPage> => {
+    const response = await contentClient.get<FeedPage>("/content/feed", {
+      params: {
+        limit: params.limit,
+        offset: params.offset,
+        started_from: params.startedFrom,
+      },
     });
     return response.data;
   },

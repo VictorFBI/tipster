@@ -36,10 +36,12 @@ export function Login() {
     try {
       setErrorMsg("");
 
-      await loginMutation.mutateAsync({
+      const res = await loginMutation.mutateAsync({
         email: data.email,
         password: data.password,
       });
+
+      console.log(res);
 
       router.replace("/(tabs)");
     } catch (error) {

@@ -24,7 +24,8 @@ export function mapPostResponseToPost(
     content: response.content,
     image: response.image_object_ids?.[0] ?? undefined,
     tipAmount: 0,
-    likes: 0,
+    likes: response.likes_count,
+    likedByMe: response.liked_by_me,
     comments: 0,
   };
 }
