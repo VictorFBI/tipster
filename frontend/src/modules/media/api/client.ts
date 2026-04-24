@@ -3,7 +3,7 @@ import { setupAuthInterceptors } from "@/src/core/api/authInterceptor";
 
 // Media API base URL
 const MEDIA_API_URL =
-  process.env.EXPO_PUBLIC_MEDIA_API_URL || "http://localhost:8084";
+  process.env.EXPO_PUBLIC_MEDIA_API_URL || "http://localhost:8082";
 
 // Create axios instance for media service
 export const mediaClient: AxiosInstance = axios.create({

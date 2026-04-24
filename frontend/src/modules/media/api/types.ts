@@ -12,11 +12,6 @@ export interface PresignedUploadRequest {
   purpose: "post_images" | "comment_images";
 }
 
-/** POST /media/commit */
-export interface CommitMediaRequest {
-  object_keys: string[];
-}
-
 // ── Response types ──
 
 /** Single upload item returned from presigned-url endpoint */
@@ -28,6 +23,13 @@ export interface PresignedUploadItem {
 /** Response from POST /media/presigned-url */
 export interface PresignedUploadResponse {
   uploads: PresignedUploadItem[];
+}
+
+// ── Commit types ──
+
+/** POST /media/commit */
+export interface CommitMediaRequest {
+  object_keys: string[];
 }
 
 /** Response from POST /media/commit */

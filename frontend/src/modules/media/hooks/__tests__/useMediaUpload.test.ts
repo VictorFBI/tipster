@@ -1,14 +1,36 @@
 import { renderHook, act } from "@testing-library/react-native";
 import { useMediaUpload } from "../useMediaUpload";
 import mediaService from "../../api/media.service";
+import axios from "axios";
 
 // Mock media service
 jest.mock("../../api/media.service", () => ({
   __esModule: true,
   default: {
     getPresignedUrls: jest.fn(),
-    uploadFileToPresignedUrl: jest.fn(),
-    commitMedia: jest.fn(),
+  },
+}));
+
+// Mock axios
+jest.mock("axios", () => ({
+  __esModule: true,
+  default: jest.fn(),
+}));
+
+// Mock expo-file-system/legacy
+const mockReadAsStringAsync = jest.fn();
+jest.mock("expo-file-system/legacy", () => ({
+  readAsStringAsync: mockReadAsStringAsync,
+  EncodingType: { Base64: "base64" },
+}));
+
+// Mock buffer
+jest.mock("buffer", () => ({
+  Buffer: {
+    from: jest.fn((data: string, encoding: string) => {
+      // Return a simple Uint8Array to simulate a Buffer
+      return new Uint8Array([0x89, 0x50, 0x4e, 0x47]);
+    }),
   },
 }));
 
@@ -54,15 +76,19 @@ describe("useMediaUpload", () => {
     });
 
     it("uploads images and returns object keys", async () => {
+      // Mock presigned URL response
       (mediaService.getPresignedUrls as jest.Mock).mockResolvedValueOnce({
         uploads: [
           { object_key: "key1", upload_url: "https://s3.example.com/key1" },
           { object_key: "key2", upload_url: "https://s3.example.com/key2" },
         ],
       });
-      (mediaService.uploadFileToPresignedUrl as jest.Mock).mockResolvedValue(
-        undefined,
-      );
+
+      // Mock readAsStringAsync to return fake base64
+      mockReadAsStringAsync.mockResolvedValue("aGVsbG8=");
+
+      // Mock axios PUT to succeed
+      (axios as unknown as jest.Mock).mockResolvedValue({ status: 200 });
 
       const { result } = renderHook(() => useMediaUpload());
 
@@ -87,12 +113,37 @@ describe("useMediaUpload", () => {
         ],
         purpose: "post_images",
       });
-      expect(mediaService.uploadFileToPresignedUrl).toHaveBeenCalledTimes(2);
+
+      // Verify readAsStringAsync was called for each file
+      expect(mockReadAsStringAsync).toHaveBeenCalledWith("file:///photo1.jpg", {
+        encoding: "base64",
+      });
+      expect(mockReadAsStringAsync).toHaveBeenCalledWith("file:///photo2.png", {
+        encoding: "base64",
+      });
+
+      // Verify axios PUT was called for each presigned URL
+      expect(axios).toHaveBeenCalledTimes(2);
+      expect(axios).toHaveBeenCalledWith(
+        expect.objectContaining({
+          method: "PUT",
+          url: "https://s3.example.com/key1",
+          headers: { "Content-Type": "image/jpeg" },
+        }),
+      );
+      expect(axios).toHaveBeenCalledWith(
+        expect.objectContaining({
+          method: "PUT",
+          url: "https://s3.example.com/key2",
+          headers: { "Content-Type": "image/png" },
+        }),
+      );
+
       expect(result.current.isUploading).toBe(false);
       expect(result.current.progress).toBe(1);
     });
 
-    it("sets error on upload failure", async () => {
+    it("sets error on presigned URL request failure", async () => {
       const networkError = new Error("Network error");
       (mediaService.getPresignedUrls as jest.Mock).mockRejectedValueOnce(
         networkError,
@@ -113,6 +164,38 @@ describe("useMediaUpload", () => {
 
       expect(caughtError?.message).toBe("Network error");
       expect(result.current.error?.message).toBe("Network error");
+      expect(result.current.isUploading).toBe(false);
+    });
+
+    it("sets error on axios PUT failure", async () => {
+      (mediaService.getPresignedUrls as jest.Mock).mockResolvedValueOnce({
+        uploads: [
+          { object_key: "key1", upload_url: "https://s3.example.com/key1" },
+        ],
+      });
+
+      mockReadAsStringAsync.mockResolvedValue("aGVsbG8=");
+
+      // Mock axios to reject with a 403 error
+      (axios as unknown as jest.Mock).mockRejectedValueOnce({
+        response: { status: 403, data: { message: "Access Denied" } },
+        message: "Request failed with status code 403",
+      });
+
+      const { result } = renderHook(() => useMediaUpload());
+      const assets = [createMockAsset("file:///photo1.jpg")];
+
+      let caughtError: Error | undefined;
+      await act(async () => {
+        try {
+          await result.current.uploadImages(assets as any, "post_images");
+        } catch (err) {
+          caughtError = err as Error;
+        }
+      });
+
+      expect(caughtError?.message).toBe("Access Denied");
+      expect(result.current.error?.message).toBe("Access Denied");
       expect(result.current.isUploading).toBe(false);
     });
 

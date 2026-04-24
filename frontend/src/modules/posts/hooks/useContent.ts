@@ -143,7 +143,8 @@ export const useUpdatePost = (options?: {
   return useMutation({
     mutationFn: (data: UpdatePostRequest) => contentService.updatePost(data),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: contentKeys.posts() });
+      // Invalidate all content queries (posts, feed, liked, etc.) so UI updates immediately
+      queryClient.invalidateQueries({ queryKey: contentKeys.all });
       options?.onSuccess?.(data);
     },
     onError: options?.onError,

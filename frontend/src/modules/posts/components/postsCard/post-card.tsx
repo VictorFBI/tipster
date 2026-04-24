@@ -1,14 +1,19 @@
-import { useEffect, useState } from "react";
-import { Image } from "react-native";
+import { useEffect, useState, useCallback } from "react";
+import {
+  Image,
+  View,
+  ScrollView,
+  NativeSyntheticEvent,
+  NativeScrollEvent,
+} from "react-native";
 import { YStack, Text } from "tamagui";
+import { getImageUrl } from "@/src/modules/media";
 import { CommentsSection } from "../commentsSection/comments-section";
 import { PostHeader } from "../postHeader/post-header";
 import { PostActions } from "../postActions/post-actions";
 import { PostEditMenu } from "../postEditMenu/post-edit-menu";
-import { EditPostModal } from "../editPostModal/edit-post-modal";
 import { usePostComments, type Post } from "@/src/modules/posts";
 import {
-  useUpdatePost,
   useDeletePost,
   useLikePost,
   useUnlikePost,
@@ -16,8 +21,85 @@ import {
 } from "../../hooks/useContent";
 import { ConfirmDialog } from "@/src/shared/ui/confirmDialog/confirm-dialog";
 import { showAlert } from "@/src/core";
+import { useRouter } from "expo-router";
 
 export type { Post };
+
+const SLIDER_HEIGHT = 250;
+
+/** Horizontal image slider with page indicator dots */
+function ImageSlider({ images }: { images: string[] }) {
+  const [containerWidth, setContainerWidth] = useState(0);
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  const handleScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    if (containerWidth === 0) return;
+    const offsetX = e.nativeEvent.contentOffset.x;
+    const index = Math.round(offsetX / containerWidth);
+    setActiveIndex(index);
+  };
+
+  return (
+    <View
+      style={{ marginTop: 8 }}
+      onLayout={(e) => setContainerWidth(e.nativeEvent.layout.width)}
+    >
+      {containerWidth > 0 && (
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          onScroll={handleScroll}
+          scrollEventThrottle={16}
+          decelerationRate="fast"
+          snapToInterval={containerWidth}
+          snapToAlignment="start"
+          disableIntervalMomentum
+        >
+          {images.map((uri, index) => (
+            <Image
+              key={index}
+              source={{ uri }}
+              style={{
+                width: containerWidth,
+                height: SLIDER_HEIGHT,
+                borderRadius: 12,
+              }}
+              resizeMode="cover"
+            />
+          ))}
+        </ScrollView>
+      )}
+
+      {/* Page indicator dots */}
+      {images.length > 1 && (
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "center",
+            alignItems: "center",
+            marginTop: 8,
+            gap: 6,
+          }}
+        >
+          {images.map((_, index) => (
+            <View
+              key={index}
+              style={{
+                width: index === activeIndex ? 8 : 6,
+                height: index === activeIndex ? 8 : 6,
+                borderRadius: index === activeIndex ? 4 : 3,
+                backgroundColor:
+                  index === activeIndex
+                    ? "rgba(255,255,255,0.9)"
+                    : "rgba(255,255,255,0.4)",
+              }}
+            />
+          ))}
+        </View>
+      )}
+    </View>
+  );
+}
 
 interface PostCardProps {
   post: Post;
@@ -30,6 +112,7 @@ export function PostCard({
   isOwnPost = false,
   onDeleted,
 }: PostCardProps) {
+  const router = useRouter();
   const [liked, setLiked] = useState(post.likedByMe);
   const [likeCount, setLikeCount] = useState(post.likes);
   const [reposted, setReposted] = useState(false);
@@ -40,23 +123,10 @@ export function PostCard({
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [postContent, setPostContent] = useState(post.content);
-  const [postImage, setPostImage] = useState(post.image);
+  const [postImages, setPostImages] = useState<string[]>(post.images);
   const { comments, handleAddComment, handleAddReply } = usePostComments(
     post.commentsList || [],
   );
-
-  const { mutate: updatePost } = useUpdatePost({
-    onSuccess: (data) => {
-      setPostContent(data.content);
-      // Update local image from the response (first image or undefined)
-      setPostImage(
-        data.image_object_ids.length > 0 ? data.image_object_ids[0] : undefined,
-      );
-    },
-    onError: () => {
-      showAlert("Ошибка", "Не удалось обновить пост. Попробуйте ещё раз.");
-    },
-  });
 
   const { mutate: deletePost } = useDeletePost({
     onSuccess: () => {
@@ -71,6 +141,12 @@ export function PostCard({
     setLiked(post.likedByMe);
     setLikeCount(post.likes);
   }, [post.likedByMe, post.likes]);
+
+  // Sync local state with post prop when it changes (e.g. after edit + query invalidation)
+  useEffect(() => {
+    setPostContent(post.content);
+    setPostImages(post.images);
+  }, [post.content, post.images]);
 
   const { mutate: likePost } = useLikePost({
     onSuccess: () => {
@@ -152,19 +228,27 @@ export function PostCard({
     handleAddReply(parentId, content);
   };
 
+  const handleAuthorPress = useCallback(() => {
+    if (post.author.id) {
+      router.push({
+        pathname: "/(profile)/user-profile",
+        params: { userId: post.author.id },
+      });
+    }
+  }, [post.author.id, router]);
+
   const handleEditMenuOpen = () => {
     setShowEditMenu(true);
   };
 
   const handleEdit = () => {
-    setShowEditModal(true);
-  };
-
-  const handleSaveEdit = (newContent: string, imageObjectIds?: string[]) => {
-    updatePost({
-      post_id: post.id,
-      content: newContent,
-      ...(imageObjectIds !== undefined && { image_object_ids: imageObjectIds }),
+    router.push({
+      pathname: "/(profile)/edit-post",
+      params: {
+        postId: post.id,
+        initialContent: postContent,
+        initialImages: JSON.stringify(postImages),
+      },
     });
   };
 
@@ -191,15 +275,16 @@ export function PostCard({
         timestamp={post.timestamp}
         isOwnPost={isOwnPost}
         onEdit={handleEditMenuOpen}
+        onAuthorPress={handleAuthorPress}
       />
 
       <Text fontSize={16} color="$text" lineHeight={22}>
         {postContent}
       </Text>
 
-      {postImage && (
+      {postImages.length === 1 && (
         <Image
-          source={{ uri: postImage }}
+          source={{ uri: postImages[0] }}
           style={{
             width: "100%",
             height: 200,
@@ -209,6 +294,8 @@ export function PostCard({
           resizeMode="cover"
         />
       )}
+
+      {postImages.length > 1 && <ImageSlider images={postImages} />}
 
       <PostActions
         liked={liked}
@@ -234,14 +321,6 @@ export function PostCard({
         onOpenChange={setShowEditMenu}
         onEdit={handleEdit}
         onDelete={handleDeleteRequest}
-      />
-
-      <EditPostModal
-        open={showEditModal}
-        onOpenChange={setShowEditModal}
-        initialContent={postContent}
-        initialImage={postImage}
-        onSave={handleSaveEdit}
       />
 
       <ConfirmDialog

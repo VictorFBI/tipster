@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useRouter } from "expo-router";
+import { useRouter, useLocalSearchParams } from "expo-router";
 import { YStack, XStack, Text, Button, TextArea, ScrollView } from "tamagui";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
@@ -15,16 +15,34 @@ import {
 import * as ImagePicker from "expo-image-picker";
 import { useThemeStore } from "@/src/core/store/themeStore";
 import { themes } from "@/src/core/theme/themes";
-import { useCreatePost as useCreatePostMutation } from "../../hooks/useContent";
+import { useUpdatePost } from "../../hooks/useContent";
 import { useMediaUpload } from "@/src/modules/media";
+import { showAlert } from "@/src/core";
 
-export function CreatePost() {
+const MAX_IMAGES = 10;
+
+export function EditPost() {
   const { t } = useTranslation();
   const router = useRouter();
+  const params = useLocalSearchParams<{
+    postId: string;
+    initialContent: string;
+    initialImages: string;
+  }>();
+
+  const postId = params.postId;
+  const initialContent = params.initialContent ?? "";
+  const initialImages: string[] = params.initialImages
+    ? JSON.parse(params.initialImages)
+    : [];
+
   const { theme } = useThemeStore();
   const currentTheme = themes[theme];
-  const [content, setContent] = useState("");
-  const [images, setImages] = useState<ImagePicker.ImagePickerAsset[]>([]);
+  const [content, setContent] = useState(initialContent);
+  const [existingImages, setExistingImages] = useState<string[]>(initialImages);
+  const [newImages, setNewImages] = useState<ImagePicker.ImagePickerAsset[]>(
+    [],
+  );
 
   const {
     uploadImages,
@@ -34,13 +52,11 @@ export function CreatePost() {
   } = useMediaUpload();
 
   const maxLength = 500;
-  const maxImages = 10;
+  const totalImageCount = existingImages.length + newImages.length;
   const remainingChars = maxLength - content.length;
 
   const pickImage = async () => {
-    console.log("pickImage");
-    console.log("images", images);
-    if (images.length >= maxImages) {
+    if (totalImageCount >= MAX_IMAGES) {
       return;
     }
 
@@ -48,63 +64,86 @@ export function CreatePost() {
       mediaTypes: ["images"],
       allowsMultipleSelection: true,
       quality: 0.8,
-      selectionLimit: maxImages - images.length,
+      selectionLimit: MAX_IMAGES - totalImageCount,
     });
-    console.log("result", result);
 
     if (!result.canceled) {
-      setImages([...images, ...result.assets].slice(0, maxImages));
+      setNewImages(
+        [...newImages, ...result.assets].slice(
+          0,
+          MAX_IMAGES - existingImages.length,
+        ),
+      );
     }
   };
 
-  const removeImage = (index: number) => {
-    setImages(images.filter((_, i) => i !== index));
+  const removeExistingImage = (index: number) => {
+    setExistingImages((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const createPostMutation = useCreatePostMutation({
+  const removeNewImage = (index: number) => {
+    setNewImages((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const updatePostMutation = useUpdatePost({
     onSuccess: () => {
       router.back();
     },
     onError: (error) => {
-      console.warn("Create post failed:", error);
+      console.warn("Update post error:", error);
+      showAlert("Ошибка", "Не удалось обновить пост. Попробуйте ещё раз.");
     },
   });
 
-  const isPosting = createPostMutation.isPending || isUploading;
+  const isSaving = updatePostMutation.isPending || isUploading;
 
-  const handlePost = async () => {
-    // console.log("handlePost");
-    // console.log("content", content);
-    // console.log("images", images);
-    if (content.trim().length === 0 && images.length === 0) {
+  const handleSave = async () => {
+    if (content.trim().length === 0) {
       return;
     }
 
     try {
       let imageObjectIds: string[] | undefined;
 
-      // Upload images via presigned URLs if any are selected
-      if (images.length > 0) {
-        const result = await uploadImages(images, "post_images");
-        console.log("result", result);
+      // Upload new images if any
+      if (newImages.length > 0) {
+        const result = await uploadImages(newImages, "post_images");
         imageObjectIds = result.objectKeys;
       }
 
-      // console.log("imageObjectIds", imageObjectIds);
+      // Determine if images changed
+      if (
+        existingImages.length < initialImages.length ||
+        newImages.length > 0
+      ) {
+        if (existingImages.length === 0 && newImages.length === 0) {
+          // All images removed
+          imageObjectIds = [];
+        } else if (
+          existingImages.length < initialImages.length &&
+          newImages.length === 0
+        ) {
+          // Some existing images removed, no new ones
+          imageObjectIds = [];
+        }
+        // If new images added, imageObjectIds already set from upload
+      }
 
-      // Create the post with content and optional image object keys
-      createPostMutation.mutate({
+      const updateData = {
+        post_id: postId,
         content: content.trim(),
-        image_object_ids: imageObjectIds,
-      });
+        ...(imageObjectIds !== undefined && {
+          image_object_ids: imageObjectIds,
+        }),
+      };
+
+      updatePostMutation.mutate(updateData);
     } catch (err) {
       console.warn("Image upload failed:", err);
     }
   };
 
-  const canPost =
-    (content.trim().length > 0 || images.length > 0) &&
-    content.length <= maxLength;
+  const canSave = content.trim().length > 0 && content.length <= maxLength;
 
   const uploadProgressPercent = Math.round(progress * 100);
 
@@ -132,34 +171,36 @@ export function CreatePost() {
           </Button>
 
           <Text fontSize={18} fontWeight="600" color="$text">
-            {t("createPost.title")}
+            {t("editPost.title", "Редактировать пост")}
           </Text>
 
           <Button
-            backgroundColor={canPost ? "$accent" : "$borderColor"}
+            backgroundColor={canSave ? "$accent" : "$borderColor"}
             paddingHorizontal="$4"
             paddingVertical="$2"
             borderRadius="$3"
-            disabled={!canPost || isPosting}
-            onPress={handlePost}
+            disabled={!canSave || isSaving}
+            onPress={handleSave}
             pressStyle={{ opacity: 0.8 }}
           >
             <Text
               fontSize={16}
               fontWeight="600"
-              color={canPost ? "white" : currentTheme.muted}
+              color={canSave ? "white" : currentTheme.muted}
             >
-              {isPosting ? t("createPost.posting") : t("createPost.post")}
+              {isSaving
+                ? t("editPost.saving", "Сохранение...")
+                : t("editPost.save", "Сохранить")}
             </Text>
           </Button>
         </XStack>
 
         <ScrollView flex={1}>
           <YStack padding="$4" gap="$3">
-            {createPostMutation.isError && (
+            {updatePostMutation.isError && (
               <YStack backgroundColor="$red2" padding="$3" borderRadius="$3">
                 <Text fontSize={14} color="$red10">
-                  {(createPostMutation.error as any)?.response?.data?.message ||
+                  {(updatePostMutation.error as any)?.response?.data?.message ||
                     t("common.error")}
                 </Text>
               </YStack>
@@ -174,7 +215,7 @@ export function CreatePost() {
             )}
 
             <TextArea
-              placeholder={t("createPost.placeholder")}
+              placeholder={t("createPost.placeholder", "Что у вас нового?")}
               value={content}
               onChangeText={setContent}
               fontSize={16}
@@ -190,32 +231,69 @@ export function CreatePost() {
               placeholderTextColor={currentTheme.muted}
             />
 
-            {images.length > 0 && (
+            {/* Images grid — horizontal scroll, 2 rows */}
+            {(existingImages.length > 0 || newImages.length > 0) && (
               <RNScrollView
                 horizontal
                 showsHorizontalScrollIndicator={false}
-                style={{ maxHeight: images.length <= 1 ? 160 : 320 }}
+                style={{
+                  maxHeight: totalImageCount <= 1 ? 160 : 320,
+                }}
               >
                 <View
                   style={{
                     flexDirection: "column",
                     flexWrap: "wrap",
                     gap: 8,
-                    height: images.length <= 1 ? 150 : 310,
+                    height: totalImageCount <= 1 ? 150 : 310,
                   }}
                 >
-                  {images.map((asset, index) => (
-                    <View key={index} style={{ position: "relative" }}>
+                  {/* Existing images */}
+                  {existingImages.map((uri, index) => (
+                    <View
+                      key={`existing-${index}`}
+                      style={{ position: "relative" }}
+                    >
                       <Image
-                        source={{ uri: asset.uri }}
+                        source={{ uri }}
                         style={{
-                          width: images.length === 1 ? 300 : 145,
-                          height: images.length === 1 ? 150 : 145,
+                          width: totalImageCount === 1 ? 300 : 145,
+                          height: totalImageCount === 1 ? 150 : 145,
                           borderRadius: 8,
                         }}
                       />
                       <TouchableOpacity
-                        onPress={() => removeImage(index)}
+                        onPress={() => removeExistingImage(index)}
+                        style={{
+                          position: "absolute",
+                          top: 8,
+                          right: 8,
+                          backgroundColor: "rgba(0,0,0,0.6)",
+                          borderRadius: 15,
+                          width: 30,
+                          height: 30,
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <Ionicons name="close" size={20} color="white" />
+                      </TouchableOpacity>
+                    </View>
+                  ))}
+
+                  {/* Newly picked images */}
+                  {newImages.map((asset, index) => (
+                    <View key={`new-${index}`} style={{ position: "relative" }}>
+                      <Image
+                        source={{ uri: asset.uri }}
+                        style={{
+                          width: totalImageCount === 1 ? 300 : 145,
+                          height: totalImageCount === 1 ? 150 : 145,
+                          borderRadius: 8,
+                        }}
+                      />
+                      <TouchableOpacity
+                        onPress={() => removeNewImage(index)}
                         style={{
                           position: "absolute",
                           top: 8,
@@ -240,7 +318,8 @@ export function CreatePost() {
               <XStack alignItems="center" gap="$2" paddingVertical="$2">
                 <ActivityIndicator size="small" color={currentTheme.accent} />
                 <Text fontSize={14} color={currentTheme.muted}>
-                  {t("createPost.uploading")} {uploadProgressPercent}%
+                  {t("createPost.uploading", "Загрузка...")}{" "}
+                  {uploadProgressPercent}%
                 </Text>
               </XStack>
             )}
@@ -254,11 +333,12 @@ export function CreatePost() {
                     : currentTheme.muted
                 }
               >
-                {remainingChars} {t("createPost.charactersLeft")}
+                {remainingChars}{" "}
+                {t("createPost.charactersLeft", "символов осталось")}
               </Text>
             </XStack>
 
-            {images.length < maxImages && (
+            {totalImageCount < MAX_IMAGES && (
               <Button
                 backgroundColor="$surface"
                 borderWidth={1}
@@ -267,7 +347,7 @@ export function CreatePost() {
                 paddingVertical="$2"
                 borderRadius="$3"
                 onPress={pickImage}
-                disabled={isPosting}
+                disabled={isSaving}
                 pressStyle={{ opacity: 0.7 }}
               >
                 <XStack alignItems="center" gap="$2">
@@ -277,29 +357,12 @@ export function CreatePost() {
                     color={currentTheme.accent}
                   />
                   <Text fontSize={16} color="$text">
-                    {t("createPost.addImage")} ({images.length}/{maxImages})
+                    {t("createPost.addImage", "Добавить изображение")} (
+                    {totalImageCount}/{MAX_IMAGES})
                   </Text>
                 </XStack>
               </Button>
             )}
-
-            <YStack
-              backgroundColor="$surface"
-              padding="$4"
-              borderRadius="$4"
-              gap="$2"
-              marginTop="$2"
-            >
-              <XStack alignItems="center" gap="$2">
-                <Ionicons name="bulb" size={20} color={currentTheme.accent} />
-                <Text fontSize={16} fontWeight="600" color="$text">
-                  {t("createPost.tipsTitle")}
-                </Text>
-              </XStack>
-              <Text fontSize={14} color={currentTheme.muted} lineHeight={20}>
-                {t("createPost.tipsText")}
-              </Text>
-            </YStack>
           </YStack>
         </ScrollView>
       </YStack>

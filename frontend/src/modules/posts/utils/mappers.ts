@@ -1,5 +1,6 @@
 import type { PostResponse } from "../api/types";
 import type { Post } from "../types";
+import { getImageUrl } from "@/src/modules/media";
 
 interface AuthorInfo {
   name: string;
@@ -17,12 +18,17 @@ export function mapPostResponseToPost(
   response: PostResponse,
   author: AuthorInfo,
 ): Post {
+  const images = (response.image_object_ids ?? [])
+    .map(getImageUrl)
+    .filter((url): url is string => url !== undefined);
+
   return {
     id: response.id,
     author,
     timestamp: formatTimestamp(response.created_at),
     content: response.content,
-    image: response.image_object_ids?.[0] ?? undefined,
+    image: images[0],
+    images,
     tipAmount: 0,
     likes: response.likes_count,
     likedByMe: response.liked_by_me,

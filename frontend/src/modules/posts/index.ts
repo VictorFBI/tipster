@@ -1,4 +1,5 @@
 export { CreatePost } from "./components/createPost/create-post";
+export { EditPost } from "./components/editPost/edit-post";
 export { PostsList } from "./components/postsList/posts-list";
 
 export { CommentsList } from "./components/commentsList/comments-list";

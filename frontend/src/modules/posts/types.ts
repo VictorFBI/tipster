@@ -7,7 +7,10 @@ export interface Post {
   };
   timestamp: string;
   content: string;
+  /** @deprecated Use `images` instead */
   image?: string;
+  /** All post image URLs (resolved from object keys) */
+  images: string[];
   tipAmount: number;
   likes: number;
   likedByMe: boolean;

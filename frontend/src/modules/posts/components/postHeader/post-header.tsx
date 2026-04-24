@@ -1,4 +1,5 @@
 import { Avatar, XStack, YStack, Text, Button } from "tamagui";
+import { TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useThemeStore } from "@/src/core/store/themeStore";
 import { themes } from "@/src/core/theme/themes";
@@ -9,6 +10,7 @@ interface PostHeaderProps {
   timestamp: string;
   isOwnPost?: boolean;
   onEdit?: () => void;
+  onAuthorPress?: () => void;
 }
 
 export function PostHeader({
@@ -17,13 +19,18 @@ export function PostHeader({
   timestamp,
   isOwnPost = false,
   onEdit,
+  onAuthorPress,
 }: PostHeaderProps) {
   const { theme } = useThemeStore();
   const currentTheme = themes[theme];
 
   return (
     <XStack alignItems="center" justifyContent="space-between">
-      <XStack alignItems="center" gap="$3">
+      <TouchableOpacity
+        onPress={onAuthorPress}
+        activeOpacity={0.7}
+        style={{ flexDirection: "row", alignItems: "center", gap: 12, flex: 1 }}
+      >
         <Avatar circular size="$4">
           <Avatar.Image src={authorAvatar} />
           <Avatar.Fallback backgroundColor="$accent" />
@@ -36,7 +43,7 @@ export function PostHeader({
             {timestamp}
           </Text>
         </YStack>
-      </XStack>
+      </TouchableOpacity>
       {isOwnPost && onEdit && (
         <Button
           unstyled

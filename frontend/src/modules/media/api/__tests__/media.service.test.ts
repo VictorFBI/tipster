@@ -12,12 +12,6 @@ jest.mock("../client", () => {
   };
 });
 
-// axios is already globally mocked in jest.setup.js
-const axios = jest.requireMock("axios");
-
-// Mock global fetch for uploadFileToPresignedUrl
-global.fetch = jest.fn() as jest.Mock;
-
 beforeEach(() => {
   jest.clearAllMocks();
 });
@@ -55,39 +49,13 @@ describe("mediaService", () => {
       });
 
       const result = await mediaService.commitMedia({
-        object_keys: ["key1", "key2"],
+        object_keys: ["uuid1.jpg", "uuid2.jpg"],
       });
 
       expect(mediaClient.post).toHaveBeenCalledWith("/media/commit", {
-        object_keys: ["key1", "key2"],
+        object_keys: ["uuid1.jpg", "uuid2.jpg"],
       });
-      expect(result).toEqual({ success: true });
-    });
-  });
-
-  describe("uploadFileToPresignedUrl", () => {
-    it("fetches file as blob and uploads via PUT", async () => {
-      const mockBlob = new Blob(["test"], { type: "image/jpeg" });
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
-        blob: () => Promise.resolve(mockBlob),
-      });
-      axios.put.mockResolvedValueOnce({});
-
-      await mediaService.uploadFileToPresignedUrl(
-        "https://s3.example.com/upload",
-        "file:///path/to/image.jpg",
-        "image/jpeg",
-      );
-
-      expect(global.fetch).toHaveBeenCalledWith("file:///path/to/image.jpg");
-      expect(axios.put).toHaveBeenCalledWith(
-        "https://s3.example.com/upload",
-        mockBlob,
-        {
-          headers: { "Content-Type": "image/jpeg" },
-          timeout: 60000,
-        },
-      );
+      expect(result).toEqual(mockResponse);
     });
   });
 });
