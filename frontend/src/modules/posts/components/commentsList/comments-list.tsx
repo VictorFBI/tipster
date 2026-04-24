@@ -8,22 +8,28 @@ import { CommentItem } from "../commentItem/comment-item";
 
 interface CommentsListProps {
   comments: Comment[];
+  currentUserId?: string;
   replyingTo: string | null;
   replyText: string;
   onReplyTextChange: (text: string) => void;
   onStartReply: (commentId: string) => void;
   onSubmitReply: (commentId: string) => void;
   onCancelReply: () => void;
+  onEditComment?: (commentId: string, newContent: string) => void;
+  onDeleteComment?: (commentId: string) => void;
 }
 
 export function CommentsList({
   comments,
+  currentUserId,
   replyingTo,
   replyText,
   onReplyTextChange,
   onStartReply,
   onSubmitReply,
   onCancelReply,
+  onEditComment,
+  onDeleteComment,
 }: CommentsListProps) {
   const { t } = useTranslation();
   const { theme } = useThemeStore();
@@ -44,12 +50,19 @@ export function CommentsList({
           <CommentItem
             key={comment.id}
             comment={comment}
+            isOwnComment={
+              !!currentUserId &&
+              (!comment.author.id || comment.author.id === currentUserId)
+            }
+            currentUserId={currentUserId}
             isReplying={replyingTo === comment.id}
             replyText={replyText}
             onReplyTextChange={onReplyTextChange}
             onStartReply={() => onStartReply(comment.id)}
             onSubmitReply={() => onSubmitReply(comment.id)}
             onCancelReply={onCancelReply}
+            onEdit={onEditComment}
+            onDelete={onDeleteComment}
           />
         ))}
       </ScrollView>

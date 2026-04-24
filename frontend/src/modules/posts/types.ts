@@ -24,6 +24,7 @@ export interface Post {
 export interface Comment {
   id: string;
   author: {
+    id?: string;
     name: string;
     avatar: string;
   };
@@ -34,6 +35,9 @@ export interface Comment {
 
 export interface CommentsSectionProps {
   comments: Comment[];
+  currentUserId?: string;
   onAddComment: (content: string) => void;
   onAddReply: (commentId: string, content: string) => void;
+  onEditComment: (commentId: string, newContent: string) => void;
+  onDeleteComment: (commentId: string) => void;
 }

@@ -209,7 +209,10 @@
     "addComment": "Add a comment...",
     "writeReply": "Write a reply...",
     "reply": "Reply",
-    "send": "Send"
+    "send": "Send",
+    "edit": "Edit",
+    "delete": "Delete",
+    "editing": "Editing..."
   },
   "createPost": {
     "title": "Create Post",

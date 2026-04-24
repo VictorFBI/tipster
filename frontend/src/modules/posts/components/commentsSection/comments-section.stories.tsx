@@ -11,6 +11,10 @@ const meta = {
       control: "object",
       description: "Array of comments",
     },
+    currentUserId: {
+      control: "text",
+      description: "Current user ID to determine own comments",
+    },
     onAddComment: {
       action: "comment added",
       description: "Function called when a comment is added",
@@ -18,6 +22,14 @@ const meta = {
     onAddReply: {
       action: "reply added",
       description: "Function called when a reply is added",
+    },
+    onEditComment: {
+      action: "comment edited",
+      description: "Function called when a comment is edited",
+    },
+    onDeleteComment: {
+      action: "comment deleted",
+      description: "Function called when a comment is deleted",
     },
   },
 } satisfies Meta<typeof CommentsSection>;
@@ -29,6 +41,7 @@ const mockComments: Comment[] = [
   {
     id: "1",
     author: {
+      id: "user-1",
       name: "TokenHunter",
       avatar: "https://i.pravatar.cc/150?img=2",
     },
@@ -38,6 +51,7 @@ const mockComments: Comment[] = [
       {
         id: "r1",
         author: {
+          id: "current-user",
           name: "CryptoKing",
           avatar: "https://i.pravatar.cc/150?img=1",
         },
@@ -50,8 +64,9 @@ const mockComments: Comment[] = [
   {
     id: "2",
     author: {
-      name: "BlockchainBoss",
-      avatar: "https://i.pravatar.cc/150?img=3",
+      id: "current-user",
+      name: "CryptoKing",
+      avatar: "https://i.pravatar.cc/150?img=1",
     },
     timestamp: "30m ago",
     content: "I have a question about this. Can you elaborate?",
@@ -62,9 +77,13 @@ const mockComments: Comment[] = [
 export const DefaultDark: Story = {
   args: {
     comments: mockComments,
+    currentUserId: "current-user",
     onAddComment: (content) => console.log("Comment added:", content),
     onAddReply: (commentId, content) =>
       console.log("Reply added to", commentId, ":", content),
+    onEditComment: (commentId, content) =>
+      console.log("Comment edited:", commentId, content),
+    onDeleteComment: (commentId) => console.log("Comment deleted:", commentId),
   },
   parameters: {
     backgrounds: { default: "dark" },
@@ -74,9 +93,13 @@ export const DefaultDark: Story = {
 export const DefaultLight: Story = {
   args: {
     comments: mockComments,
+    currentUserId: "current-user",
     onAddComment: (content) => console.log("Comment added:", content),
     onAddReply: (commentId, content) =>
       console.log("Reply added to", commentId, ":", content),
+    onEditComment: (commentId, content) =>
+      console.log("Comment edited:", commentId, content),
+    onDeleteComment: (commentId) => console.log("Comment deleted:", commentId),
   },
   parameters: {
     backgrounds: { default: "light" },
@@ -90,6 +113,9 @@ export const NoCommentsDark: Story = {
     onAddComment: (content) => console.log("Comment added:", content),
     onAddReply: (commentId, content) =>
       console.log("Reply added to", commentId, ":", content),
+    onEditComment: (commentId, content) =>
+      console.log("Comment edited:", commentId, content),
+    onDeleteComment: (commentId) => console.log("Comment deleted:", commentId),
   },
   parameters: {
     backgrounds: { default: "dark" },
@@ -102,6 +128,9 @@ export const NoCommentsLight: Story = {
     onAddComment: (content) => console.log("Comment added:", content),
     onAddReply: (commentId, content) =>
       console.log("Reply added to", commentId, ":", content),
+    onEditComment: (commentId, content) =>
+      console.log("Comment edited:", commentId, content),
+    onDeleteComment: (commentId) => console.log("Comment deleted:", commentId),
   },
   parameters: {
     backgrounds: { default: "light" },
@@ -112,9 +141,13 @@ export const NoCommentsLight: Story = {
 export const SingleCommentDark: Story = {
   args: {
     comments: [mockComments[0]],
+    currentUserId: "current-user",
     onAddComment: (content) => console.log("Comment added:", content),
     onAddReply: (commentId, content) =>
       console.log("Reply added to", commentId, ":", content),
+    onEditComment: (commentId, content) =>
+      console.log("Comment edited:", commentId, content),
+    onDeleteComment: (commentId) => console.log("Comment deleted:", commentId),
   },
   parameters: {
     backgrounds: { default: "dark" },
@@ -124,9 +157,13 @@ export const SingleCommentDark: Story = {
 export const SingleCommentLight: Story = {
   args: {
     comments: [mockComments[0]],
+    currentUserId: "current-user",
     onAddComment: (content) => console.log("Comment added:", content),
     onAddReply: (commentId, content) =>
       console.log("Reply added to", commentId, ":", content),
+    onEditComment: (commentId, content) =>
+      console.log("Comment edited:", commentId, content),
+    onDeleteComment: (commentId) => console.log("Comment deleted:", commentId),
   },
   parameters: {
     backgrounds: { default: "light" },

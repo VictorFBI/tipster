@@ -6,6 +6,7 @@ export { CommentsList } from "./components/commentsList/comments-list";
 export { CommentInput } from "./components/commentInput/comment-input";
 
 export { CommentItem } from "./components/commentItem/comment-item";
+export { CommentEditMenu } from "./components/commentEditMenu/comment-edit-menu";
 
 export { usePostComments } from "./hooks/usePostComments";
 export type { Post } from "./types";

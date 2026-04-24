@@ -7,8 +7,11 @@ export type { Comment, CommentsSectionProps };
 
 export function CommentsSection({
   comments,
+  currentUserId,
   onAddComment,
   onAddReply,
+  onEditComment,
+  onDeleteComment,
 }: CommentsSectionProps) {
   const [commentText, setCommentText] = useState("");
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
@@ -49,12 +52,15 @@ export function CommentsSection({
     >
       <CommentsList
         comments={comments}
+        currentUserId={currentUserId}
         replyingTo={replyingTo}
         replyText={replyText}
         onReplyTextChange={setReplyText}
         onStartReply={startReply}
         onSubmitReply={handleAddReply}
         onCancelReply={cancelReply}
+        onEditComment={onEditComment}
+        onDeleteComment={onDeleteComment}
       />
 
       <CommentInput

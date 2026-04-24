@@ -18,10 +18,13 @@ import {
   useLikePost,
   useUnlikePost,
   useCreateComment,
+  useUpdateComment,
+  useDeleteComment,
 } from "../../hooks/useContent";
 import { ConfirmDialog } from "@/src/shared/ui/confirmDialog/confirm-dialog";
 import { showAlert } from "@/src/core";
 import { useRouter } from "expo-router";
+import { useAuthStore } from "@/src/modules/auth/store/authStore";
 
 export type { Post };
 
@@ -124,9 +127,16 @@ export function PostCard({
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [postContent, setPostContent] = useState(post.content);
   const [postImages, setPostImages] = useState<string[]>(post.images);
-  const { comments, handleAddComment, handleAddReply } = usePostComments(
-    post.commentsList || [],
-  );
+  const authUser = useAuthStore((s) => s.user);
+  const currentUserId = authUser?.accountId;
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const {
+    comments,
+    handleAddComment,
+    handleAddReply,
+    handleEditComment,
+    handleDeleteComment,
+  } = usePostComments(post.commentsList || [], currentUserId);
 
   const { mutate: deletePost } = useDeletePost({
     onSuccess: () => {
@@ -181,6 +191,24 @@ export function PostCard({
     },
   });
 
+  const { mutate: updateComment } = useUpdateComment({
+    onError: () => {
+      showAlert(
+        "Ошибка",
+        "Не удалось обновить комментарий. Попробуйте ещё раз.",
+      );
+    },
+  });
+
+  const { mutate: deleteComment } = useDeleteComment({
+    onError: () => {
+      showAlert(
+        "Ошибка",
+        "Не удалось удалить комментарий. Попробуйте ещё раз.",
+      );
+    },
+  });
+
   const handleLike = () => {
     if (liked) {
       unlikePost({ post_id: post.id });
@@ -226,6 +254,18 @@ export function PostCard({
     });
     // Also update local state for immediate UI feedback
     handleAddReply(parentId, content);
+  };
+
+  const handleCommentEdit = (commentId: string, newContent: string) => {
+    updateComment({ comment_id: commentId, content: newContent });
+    // Also update local state for immediate UI feedback
+    handleEditComment(commentId, newContent);
+  };
+
+  const handleCommentDelete = (commentId: string) => {
+    deleteComment({ comment_id: commentId });
+    // Also update local state for immediate UI feedback
+    handleDeleteComment(commentId);
   };
 
   const handleAuthorPress = useCallback(() => {
@@ -312,8 +352,13 @@ export function PostCard({
       {showComments && (
         <CommentsSection
           comments={comments}
+          currentUserId={
+            currentUserId || (isAuthenticated ? "__me__" : undefined)
+          }
           onAddComment={handleCommentSubmit}
           onAddReply={handleReplySubmit}
+          onEditComment={handleCommentEdit}
+          onDeleteComment={handleCommentDelete}
         />
       )}
 

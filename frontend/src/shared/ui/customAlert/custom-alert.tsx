@@ -86,7 +86,7 @@ export function CustomAlert({
             shadowRadius={16}
             elevation={8}
           >
-            Icon
+            {/* Icon */}
             <YStack alignItems="center" marginBottom="$2">
               <YStack
                 width={56}
