@@ -11,6 +11,8 @@ export interface Post {
   image?: string;
   /** All post image URLs (resolved from object keys) */
   images: string[];
+  /** Raw S3 object keys for the images (needed for edit operations) */
+  imageObjectIds: string[];
   tipAmount: number;
   likes: number;
   likedByMe: boolean;

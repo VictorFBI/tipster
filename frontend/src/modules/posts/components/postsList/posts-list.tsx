@@ -1,19 +1,6 @@
 import { ScrollView, YStack } from "tamagui";
 import { PostCard } from "../postsCard/post-card";
-
-interface Post {
-  id: string;
-  author: {
-    name: string;
-    avatar: string;
-    id?: string;
-  };
-  timestamp: string;
-  content: string;
-  tipAmount: number;
-  likes: number;
-  comments: number;
-}
+import type { Post } from "../../types";
 
 interface PostsListProps {
   posts: Post[];

@@ -30,8 +30,11 @@ const mockPost = {
     "Just discovered an amazing new DeFi protocol! The APY is incredible and the team seems solid. DYOR as always! 🚀",
   tipAmount: 150,
   likes: 42,
+  likedByMe: false,
   comments: 8,
   reposts: 15,
+  images: [] as string[],
+  imageObjectIds: [] as string[],
   commentsList: [
     {
       id: "c1",

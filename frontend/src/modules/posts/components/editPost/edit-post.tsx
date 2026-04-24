@@ -21,6 +21,12 @@ import { showAlert } from "@/src/core";
 
 const MAX_IMAGES = 10;
 
+/** Pair of display URL + S3 object key for an existing image */
+interface ExistingImage {
+  url: string;
+  objectKey: string;
+}
+
 export function EditPost() {
   const { t } = useTranslation();
   const router = useRouter();
@@ -28,18 +34,32 @@ export function EditPost() {
     postId: string;
     initialContent: string;
     initialImages: string;
+    initialImageObjectIds: string;
   }>();
 
   const postId = params.postId;
   const initialContent = params.initialContent ?? "";
-  const initialImages: string[] = params.initialImages
+  const initialImageUrls: string[] = params.initialImages
     ? JSON.parse(params.initialImages)
     : [];
+  const initialObjectIds: string[] = params.initialImageObjectIds
+    ? JSON.parse(params.initialImageObjectIds)
+    : [];
+
+  // Build paired existing images (url + objectKey)
+  const initialExistingImages: ExistingImage[] = initialImageUrls.map(
+    (url, i) => ({
+      url,
+      objectKey: initialObjectIds[i] ?? "",
+    }),
+  );
 
   const { theme } = useThemeStore();
   const currentTheme = themes[theme];
   const [content, setContent] = useState(initialContent);
-  const [existingImages, setExistingImages] = useState<string[]>(initialImages);
+  const [existingImages, setExistingImages] = useState<ExistingImage[]>(
+    initialExistingImages,
+  );
   const [newImages, setNewImages] = useState<ImagePicker.ImagePickerAsset[]>(
     [],
   );
@@ -105,29 +125,28 @@ export function EditPost() {
     try {
       let imageObjectIds: string[] | undefined;
 
-      // Upload new images if any
-      if (newImages.length > 0) {
-        const result = await uploadImages(newImages, "post_images");
-        imageObjectIds = result.objectKeys;
-      }
+      const existingChanged =
+        existingImages.length !== initialExistingImages.length;
+      const hasNewImages = newImages.length > 0;
 
-      // Determine if images changed
-      if (
-        existingImages.length < initialImages.length ||
-        newImages.length > 0
-      ) {
-        if (existingImages.length === 0 && newImages.length === 0) {
-          // All images removed
-          imageObjectIds = [];
-        } else if (
-          existingImages.length < initialImages.length &&
-          newImages.length === 0
-        ) {
-          // Some existing images removed, no new ones
-          imageObjectIds = [];
+      if (existingChanged || hasNewImages) {
+        // Collect object keys of remaining existing images
+        const remainingExistingKeys = existingImages.map(
+          (img) => img.objectKey,
+        );
+
+        // Upload new images if any
+        let newUploadedKeys: string[] = [];
+        if (hasNewImages) {
+          const result = await uploadImages(newImages, "post_images");
+          newUploadedKeys = result.objectKeys;
         }
-        // If new images added, imageObjectIds already set from upload
+
+        // Combine remaining existing keys + newly uploaded keys
+        imageObjectIds = [...remainingExistingKeys, ...newUploadedKeys];
       }
+      // If nothing changed (no existing removed, no new added), imageObjectIds stays undefined
+      // which means "don't change images" for the API
 
       const updateData = {
         post_id: postId,
@@ -249,13 +268,13 @@ export function EditPost() {
                   }}
                 >
                   {/* Existing images */}
-                  {existingImages.map((uri, index) => (
+                  {existingImages.map((img, index) => (
                     <View
                       key={`existing-${index}`}
                       style={{ position: "relative" }}
                     >
                       <Image
-                        source={{ uri }}
+                        source={{ uri: img.url }}
                         style={{
                           width: totalImageCount === 1 ? 300 : 145,
                           height: totalImageCount === 1 ? 150 : 145,

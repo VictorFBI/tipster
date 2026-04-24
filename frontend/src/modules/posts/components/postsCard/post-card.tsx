@@ -248,6 +248,7 @@ export function PostCard({
         postId: post.id,
         initialContent: postContent,
         initialImages: JSON.stringify(postImages),
+        initialImageObjectIds: JSON.stringify(post.imageObjectIds),
       },
     });
   };

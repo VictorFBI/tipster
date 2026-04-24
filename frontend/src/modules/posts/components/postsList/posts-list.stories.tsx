@@ -23,7 +23,10 @@ const mockPosts = [
       "Just discovered an amazing new DeFi protocol! The APY is incredible and the team seems solid. DYOR as always! 🚀",
     tipAmount: 150,
     likes: 42,
+    likedByMe: false,
     comments: 8,
+    images: [] as string[],
+    imageObjectIds: [] as string[],
   },
   {
     id: "2",
@@ -36,7 +39,10 @@ const mockPosts = [
       "New airdrop alert! Check out this project, they are giving away tokens to early supporters.",
     tipAmount: 89,
     likes: 156,
+    likedByMe: false,
     comments: 23,
+    images: [] as string[],
+    imageObjectIds: [] as string[],
   },
   {
     id: "3",
@@ -49,7 +55,10 @@ const mockPosts = [
       "Here's my detailed analysis of the current market situation. We're seeing interesting patterns in the charts.",
     tipAmount: 320,
     likes: 891,
+    likedByMe: false,
     comments: 145,
+    images: [] as string[],
+    imageObjectIds: [] as string[],
   },
 ];
 

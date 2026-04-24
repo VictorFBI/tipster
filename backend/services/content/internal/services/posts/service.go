@@ -99,6 +99,27 @@ func replacePostImagesTx(ctx context.Context, tx pgx.Tx, postID string, keys []s
 	return nil
 }
 
+// getPostImageKeys returns the current object keys for a post's images.
+func (s *Service) getPostImageKeys(ctx context.Context, postID string) ([]string, error) {
+	rows, err := s.postgres.Query(ctx,
+		`SELECT object_key FROM post_images WHERE post_id = $1::uuid ORDER BY sort_index`,
+		postID,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var keys []string
+	for rows.Next() {
+		var k string
+		if err := rows.Scan(&k); err != nil {
+			return nil, err
+		}
+		keys = append(keys, k)
+	}
+	return keys, rows.Err()
+}
+
 func scanPostWithImages(row pgx.Row) (*Post, error) {
 	var p Post
 	var createdAt, updatedAt time.Time
@@ -193,8 +214,27 @@ func (s *Service) UpdatePost(ctx context.Context, authorID, postID string, conte
 		}
 	}
 	if keysProvided && len(keysNorm) > 0 {
-		if err := media.Commit(ctx, keysNorm, authorization); err != nil {
+		// Only commit keys that are NEW (not already associated with this post).
+		// Existing keys are already in the permanent bucket; re-committing them
+		// would cause a 404 from the media service.
+		existingKeys, err := s.getPostImageKeys(ctx, postID)
+		if err != nil {
 			return nil, err
+		}
+		existingSet := make(map[string]struct{}, len(existingKeys))
+		for _, k := range existingKeys {
+			existingSet[k] = struct{}{}
+		}
+		var newKeys []string
+		for _, k := range keysNorm {
+			if _, found := existingSet[k]; !found {
+				newKeys = append(newKeys, k)
+			}
+		}
+		if len(newKeys) > 0 {
+			if err := media.Commit(ctx, newKeys, authorization); err != nil {
+				return nil, err
+			}
 		}
 	}
 	tx, err := s.postgres.Begin(ctx)

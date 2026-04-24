@@ -29,6 +29,7 @@ export function mapPostResponseToPost(
     content: response.content,
     image: images[0],
     images,
+    imageObjectIds: response.image_object_ids ?? [],
     tipAmount: 0,
     likes: response.likes_count,
     likedByMe: response.liked_by_me,
