@@ -17,6 +17,10 @@ import { useThemeStore } from "@/src/core/store/themeStore";
 import { themes } from "@/src/core/theme/themes";
 import { useCreatePost as useCreatePostMutation } from "../../hooks/useContent";
 import { useMediaUpload } from "@/src/modules/media";
+import {
+  MAX_POST_CONTENT_LENGTH,
+  MAX_POST_IMAGES,
+} from "@/src/shared/constants/limits";
 
 export function CreatePost() {
   const { t } = useTranslation();
@@ -33,14 +37,10 @@ export function CreatePost() {
     error: uploadError,
   } = useMediaUpload();
 
-  const maxLength = 500;
-  const maxImages = 10;
-  const remainingChars = maxLength - content.length;
+  const remainingChars = MAX_POST_CONTENT_LENGTH - content.length;
 
   const pickImage = async () => {
-    console.log("pickImage");
-    console.log("images", images);
-    if (images.length >= maxImages) {
+    if (images.length >= MAX_POST_IMAGES) {
       return;
     }
 
@@ -48,12 +48,11 @@ export function CreatePost() {
       mediaTypes: ["images"],
       allowsMultipleSelection: true,
       quality: 0.8,
-      selectionLimit: maxImages - images.length,
+      selectionLimit: MAX_POST_IMAGES - images.length,
     });
-    console.log("result", result);
 
     if (!result.canceled) {
-      setImages([...images, ...result.assets].slice(0, maxImages));
+      setImages([...images, ...result.assets].slice(0, MAX_POST_IMAGES));
     }
   };
 
@@ -73,9 +72,6 @@ export function CreatePost() {
   const isPosting = createPostMutation.isPending || isUploading;
 
   const handlePost = async () => {
-    // console.log("handlePost");
-    // console.log("content", content);
-    // console.log("images", images);
     if (content.trim().length === 0 && images.length === 0) {
       return;
     }
@@ -90,8 +86,6 @@ export function CreatePost() {
         imageObjectIds = result.objectKeys;
       }
 
-      // console.log("imageObjectIds", imageObjectIds);
-
       // Create the post with content and optional image object keys
       createPostMutation.mutate({
         content: content.trim(),
@@ -104,7 +98,7 @@ export function CreatePost() {
 
   const canPost =
     (content.trim().length > 0 || images.length > 0) &&
-    content.length <= maxLength;
+    content.length <= MAX_POST_CONTENT_LENGTH;
 
   const uploadProgressPercent = Math.round(progress * 100);
 
@@ -183,12 +177,25 @@ export function CreatePost() {
               backgroundColor="$surface"
               borderWidth={0}
               minHeight={150}
-              maxLength={maxLength}
+              maxLength={MAX_POST_CONTENT_LENGTH}
               multiline
               autoFocus
               // @ts-ignore
               placeholderTextColor={currentTheme.muted}
             />
+
+            <XStack justifyContent="flex-end">
+              <Text
+                fontSize={14}
+                color={
+                  remainingChars < 50
+                    ? currentTheme.warning
+                    : currentTheme.muted
+                }
+              >
+                {remainingChars} {t("createPost.charactersLeft")}
+              </Text>
+            </XStack>
 
             {images.length > 0 && (
               <RNScrollView
@@ -245,20 +252,7 @@ export function CreatePost() {
               </XStack>
             )}
 
-            <XStack justifyContent="flex-end">
-              <Text
-                fontSize={14}
-                color={
-                  remainingChars < 50
-                    ? currentTheme.warning
-                    : currentTheme.muted
-                }
-              >
-                {remainingChars} {t("createPost.charactersLeft")}
-              </Text>
-            </XStack>
-
-            {images.length < maxImages && (
+            {images.length < MAX_POST_IMAGES && (
               <Button
                 backgroundColor="$surface"
                 borderWidth={1}
@@ -277,7 +271,8 @@ export function CreatePost() {
                     color={currentTheme.accent}
                   />
                   <Text fontSize={16} color="$text">
-                    {t("createPost.addImage")} ({images.length}/{maxImages})
+                    {t("createPost.addImage")} ({images.length}/
+                    {MAX_POST_IMAGES})
                   </Text>
                 </XStack>
               </Button>

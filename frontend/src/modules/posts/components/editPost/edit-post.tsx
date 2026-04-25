@@ -18,8 +18,10 @@ import { themes } from "@/src/core/theme/themes";
 import { useUpdatePost } from "../../hooks/useContent";
 import { useMediaUpload } from "@/src/modules/media";
 import { showAlert } from "@/src/core";
-
-const MAX_IMAGES = 10;
+import {
+  MAX_POST_CONTENT_LENGTH,
+  MAX_POST_IMAGES,
+} from "@/src/shared/constants/limits";
 
 /** Pair of display URL + S3 object key for an existing image */
 interface ExistingImage {
@@ -71,12 +73,11 @@ export function EditPost() {
     error: uploadError,
   } = useMediaUpload();
 
-  const maxLength = 500;
   const totalImageCount = existingImages.length + newImages.length;
-  const remainingChars = maxLength - content.length;
+  const remainingChars = MAX_POST_CONTENT_LENGTH - content.length;
 
   const pickImage = async () => {
-    if (totalImageCount >= MAX_IMAGES) {
+    if (totalImageCount >= MAX_POST_IMAGES) {
       return;
     }
 
@@ -84,14 +85,14 @@ export function EditPost() {
       mediaTypes: ["images"],
       allowsMultipleSelection: true,
       quality: 0.8,
-      selectionLimit: MAX_IMAGES - totalImageCount,
+      selectionLimit: MAX_POST_IMAGES - totalImageCount,
     });
 
     if (!result.canceled) {
       setNewImages(
         [...newImages, ...result.assets].slice(
           0,
-          MAX_IMAGES - existingImages.length,
+          MAX_POST_IMAGES - existingImages.length,
         ),
       );
     }
@@ -162,7 +163,8 @@ export function EditPost() {
     }
   };
 
-  const canSave = content.trim().length > 0 && content.length <= maxLength;
+  const canSave =
+    content.trim().length > 0 && content.length <= MAX_POST_CONTENT_LENGTH;
 
   const uploadProgressPercent = Math.round(progress * 100);
 
@@ -243,12 +245,26 @@ export function EditPost() {
               backgroundColor="$surface"
               borderWidth={0}
               minHeight={150}
-              maxLength={maxLength}
+              maxLength={MAX_POST_CONTENT_LENGTH}
               multiline
               autoFocus
               // @ts-ignore
               placeholderTextColor={currentTheme.muted}
             />
+
+            <XStack justifyContent="flex-end">
+              <Text
+                fontSize={14}
+                color={
+                  remainingChars < 50
+                    ? currentTheme.warning
+                    : currentTheme.muted
+                }
+              >
+                {remainingChars}{" "}
+                {t("createPost.charactersLeft", "символов осталось")}
+              </Text>
+            </XStack>
 
             {/* Images grid — horizontal scroll, 2 rows */}
             {(existingImages.length > 0 || newImages.length > 0) && (
@@ -343,21 +359,7 @@ export function EditPost() {
               </XStack>
             )}
 
-            <XStack justifyContent="flex-end">
-              <Text
-                fontSize={14}
-                color={
-                  remainingChars < 50
-                    ? currentTheme.warning
-                    : currentTheme.muted
-                }
-              >
-                {remainingChars}{" "}
-                {t("createPost.charactersLeft", "символов осталось")}
-              </Text>
-            </XStack>
-
-            {totalImageCount < MAX_IMAGES && (
+            {totalImageCount < MAX_POST_IMAGES && (
               <Button
                 backgroundColor="$surface"
                 borderWidth={1}
@@ -377,7 +379,7 @@ export function EditPost() {
                   />
                   <Text fontSize={16} color="$text">
                     {t("createPost.addImage", "Добавить изображение")} (
-                    {totalImageCount}/{MAX_IMAGES})
+                    {totalImageCount}/{MAX_POST_IMAGES})
                   </Text>
                 </XStack>
               </Button>

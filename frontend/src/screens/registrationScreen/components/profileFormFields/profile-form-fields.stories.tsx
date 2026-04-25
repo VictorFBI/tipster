@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { ProfileFormFields } from "./profile-form-fields";
 import { withTheme, withMobile } from "@/src/shared/storybook/decorators";
+import { MAX_BIO_LENGTH } from "@/src/shared/constants/limits";
 
 const meta = {
   title: "Screens/Registration/Components/ProfileFilling/ProfileFormFields",
@@ -43,7 +44,7 @@ export const EmptyDark: Story = {
     onLastNameChange: () => {},
     bio: "",
     onBioChange: () => {},
-    maxBioLength: 150,
+    maxBioLength: MAX_BIO_LENGTH,
   },
   parameters: {
     backgrounds: { default: "dark" },
@@ -60,7 +61,7 @@ export const EmptyLight: Story = {
     onLastNameChange: () => {},
     bio: "",
     onBioChange: () => {},
-    maxBioLength: 150,
+    maxBioLength: MAX_BIO_LENGTH,
   },
   parameters: {
     backgrounds: { default: "light" },
@@ -78,7 +79,7 @@ export const FilledDark: Story = {
     onLastNameChange: () => {},
     bio: "Crypto enthusiast and blockchain developer. Love DeFi and NFTs!",
     onBioChange: () => {},
-    maxBioLength: 150,
+    maxBioLength: MAX_BIO_LENGTH,
   },
   parameters: {
     backgrounds: { default: "dark" },
@@ -95,7 +96,7 @@ export const FilledLight: Story = {
     onLastNameChange: () => {},
     bio: "Crypto enthusiast and blockchain developer. Love DeFi and NFTs!",
     onBioChange: () => {},
-    maxBioLength: 150,
+    maxBioLength: MAX_BIO_LENGTH,
   },
   parameters: {
     backgrounds: { default: "light" },

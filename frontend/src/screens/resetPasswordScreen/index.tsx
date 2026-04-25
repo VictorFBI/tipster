@@ -112,6 +112,7 @@ export function ResetPassword() {
                   message: t("auth.passwordMinLength"),
                 },
               }}
+              showStrengthHint={true}
             />
 
             <PasswordInput

@@ -6,12 +6,6 @@ import { Buffer } from "buffer";
 import mediaService from "../api/media.service";
 import type { PresignedUploadFile } from "../api/types";
 
-/**
- * Infer MIME type from file URI extension.
- * Only returns types supported by the backend: image/jpeg, image/png, image/gif.
- * HEIC/WEBP are mapped to image/jpeg since expo-image-picker converts them
- * when quality < 1.
- */
 function inferContentType(uri: string): string {
   const ext = uri.split(".").pop()?.toLowerCase();
   switch (ext) {
@@ -36,29 +30,21 @@ function inferContentType(uri: string): string {
  * 1. Reads the file as base64 via expo-file-system's legacy API.
  * 2. Converts base64 to a binary Buffer.
  * 3. PUTs the raw binary to the presigned S3 URL via axios.
- *
- * This approach is proven to work reliably in React Native for S3 uploads.
  */
 async function putFileToPresignedUrl(
   presignedUrl: string,
   fileUri: string,
   contentType: string,
 ): Promise<void> {
-  // Read the file as base64 string
   const base64 = await readAsStringAsync(fileUri, {
     encoding: EncodingType.Base64,
   });
 
-  // Convert base64 to a binary Buffer
   const buffer = Buffer.from(base64, "base64");
+  // console.log(
+  //   `[putFile] curl equivalent:\ncurl -X PUT \\\n  -H "Content-Type: ${contentType}" \\\n  --data-binary @./local-file.jpg \\\n  "${presignedUrl}"`,
+  // );
 
-  // Log the equivalent curl command for manual testing
-  console.log(
-    `[putFile] curl equivalent:\ncurl -X PUT \\\n  -H "Content-Type: ${contentType}" \\\n  --data-binary @./local-file.jpg \\\n  "${presignedUrl}"`,
-  );
-  console.log(`[putFile] buffer size: ${buffer.length} bytes`);
-
-  // PUT the raw binary to the presigned URL
   const response = await axios({
     method: "PUT",
     url: presignedUrl,
@@ -72,7 +58,6 @@ async function putFileToPresignedUrl(
 }
 
 export interface UploadImagesResult {
-  /** Object keys in the temp bucket, ready to pass to content service */
   objectKeys: string[];
 }
 
@@ -80,25 +65,14 @@ interface UseMediaUploadReturn {
   /**
    * Upload picked images via presigned URLs.
    * Returns the object_keys to pass to the post/comment creation endpoint.
-   *
-   * @param assets - ImagePicker assets with uri, fileSize, etc.
-   * @param purpose - "post_images" or "comment_images"
    */
   uploadImages: (
     assets: ImagePicker.ImagePickerAsset[],
     purpose: "post_images" | "comment_images",
   ) => Promise<UploadImagesResult>;
-
-  /** Whether an upload is currently in progress */
   isUploading: boolean;
-
-  /** Upload progress as a fraction 0..1 (based on file count, not bytes) */
   progress: number;
-
-  /** Last upload error, if any */
   error: Error | null;
-
-  /** Reset error state */
   resetError: () => void;
 }
 

@@ -6,9 +6,9 @@ import {
   CodeInput,
   ResendSection,
   useVerificationCode,
-  VerificationIcon,
 } from "@/src/modules/verification";
 import { StyledButton } from "@/src/shared";
+import { VERIFICATION_CODE_LENGTH } from "@/src/shared/constants/limits";
 
 interface VerificationCodeScreenProps {
   email: string;
@@ -70,7 +70,7 @@ export function VerificationCodeScreen({
     errorIncompleteCode: finalErrorIncompleteCode,
   });
 
-  const isCodeComplete = code.join("").length === 6;
+  const isCodeComplete = code.join("").length === VERIFICATION_CODE_LENGTH;
   const disabled = isVerifying || !isCodeComplete;
 
   return (

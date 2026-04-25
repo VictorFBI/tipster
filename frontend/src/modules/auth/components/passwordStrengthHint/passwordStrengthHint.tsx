@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Ionicons } from "@expo/vector-icons";
 import { useThemeStore } from "@/src/core/store/themeStore";
 import { themes } from "@/src/core/theme/themes";
+import { MIN_PASSWORD_LENGTH } from "@/src/shared/constants/limits";
 
 interface PasswordRule {
   key: string;
@@ -24,7 +25,7 @@ export function PasswordStrengthHint({ password }: PasswordStrengthHintProps) {
     {
       key: "minLength",
       label: t("auth.passwordHint.minLength"),
-      test: (pw) => pw.length >= 12,
+      test: (pw) => pw.length >= MIN_PASSWORD_LENGTH,
     },
     {
       key: "hasUppercase",

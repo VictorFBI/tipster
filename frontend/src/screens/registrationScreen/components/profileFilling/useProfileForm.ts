@@ -4,8 +4,7 @@ import { useTranslation } from "react-i18next";
 import * as ImagePicker from "expo-image-picker";
 import { useUpdateAccountProfile } from "@/src/modules/user";
 import { showAlert } from "@/src/core";
-
-const MAX_BIO_LENGTH = 160;
+import { MAX_BIO_LENGTH } from "@/src/shared/constants/limits";
 
 export function useProfileForm() {
   const { t } = useTranslation();

@@ -1,6 +1,10 @@
 import { useState, useRef, useEffect } from "react";
 import { TextInput } from "react-native";
 import { getErrorMessage } from "@/src/core/utils";
+import {
+  VERIFICATION_CODE_LENGTH,
+  VERIFICATION_RESEND_COOLDOWN_SECONDS,
+} from "@/src/shared/constants/limits";
 
 interface UseVerificationCodeOptions {
   onVerifySuccess: (code: string) => void | Promise<void>;
@@ -15,9 +19,9 @@ export function useVerificationCode({
   onResendCode,
   errorInvalidCode,
   errorIncompleteCode,
-  resendCooldown = 60,
+  resendCooldown = VERIFICATION_RESEND_COOLDOWN_SECONDS,
 }: UseVerificationCodeOptions) {
-  const [code, setCode] = useState(["", "", "", "", "", ""]);
+  const [code, setCode] = useState(Array(VERIFICATION_CODE_LENGTH).fill(""));
   const [isVerifying, setIsVerifying] = useState(false);
   const [error, setError] = useState("");
   const [resendTimer, setResendTimer] = useState(0);
@@ -57,7 +61,7 @@ export function useVerificationCode({
     setCode(newCode);
     setError("");
 
-    if (value && index < 5) {
+    if (value && index < VERIFICATION_CODE_LENGTH - 1) {
       inputRefs.current[index + 1]?.focus();
     }
   };
@@ -71,7 +75,7 @@ export function useVerificationCode({
   const handleVerify = async () => {
     const verificationCode = code.join("");
 
-    if (verificationCode.length !== 6) {
+    if (verificationCode.length !== VERIFICATION_CODE_LENGTH) {
       setError(errorIncompleteCode);
       return;
     }
@@ -83,7 +87,7 @@ export function useVerificationCode({
       console.warn("Verification error:", err);
       const errorMessage = getErrorMessage(err);
       setError(errorMessage);
-      setCode(["", "", "", "", "", ""]);
+      setCode(Array(VERIFICATION_CODE_LENGTH).fill(""));
       inputRefs.current[0]?.focus();
     } finally {
       setIsVerifying(false);

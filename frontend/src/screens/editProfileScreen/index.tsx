@@ -11,6 +11,7 @@ import { themes } from "@/src/core/theme/themes";
 import { StyledInput } from "@/src/shared";
 import { useMyProfile, useUpdateAccountProfile } from "@/src/modules/user";
 import { showAlert } from "@/src/core";
+import { MAX_BIO_LENGTH } from "@/src/shared/constants/limits";
 
 export default function EditProfileScreen() {
   const { t } = useTranslation();
@@ -58,8 +59,6 @@ export default function EditProfileScreen() {
       );
     },
   });
-
-  const maxBioLength = 160;
 
   const handleSave = () => {
     updateProfile({
@@ -229,7 +228,7 @@ export default function EditProfileScreen() {
               }
               value={bio}
               onChangeText={(text) => {
-                if (text.length <= maxBioLength) {
+                if (text.length <= MAX_BIO_LENGTH) {
                   setBio(text);
                 }
               }}
@@ -245,10 +244,10 @@ export default function EditProfileScreen() {
               numberOfLines={4}
               minHeight={100}
               borderRadius={12}
-              maxLength={maxBioLength}
+              maxLength={MAX_BIO_LENGTH}
             />
             <Text fontSize={13} color={currentTheme.muted} textAlign="right">
-              {bio.length}/{maxBioLength}
+              {bio.length}/{MAX_BIO_LENGTH}
             </Text>
           </YStack>
 

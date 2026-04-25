@@ -1,4 +1,12 @@
 export { StyledButton } from "./ui/styledButton/styled-button";
+export {
+  MAX_POST_CONTENT_LENGTH,
+  MAX_POST_IMAGES,
+  MAX_BIO_LENGTH,
+  MIN_PASSWORD_LENGTH,
+  VERIFICATION_CODE_LENGTH,
+  VERIFICATION_RESEND_COOLDOWN_SECONDS,
+} from "./constants/limits";
 export { StyledInput } from "./ui/styledInput/styled-input";
 export { Tabs } from "./ui/tabs/tabs";
 export { ErrorMessage } from "./ui/errorMessage/errorMessage";
