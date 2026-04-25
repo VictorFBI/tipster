@@ -24,11 +24,13 @@ module.exports = {
     "!src/**/*.stories.{ts,tsx}",
     "!src/**/*.d.ts",
     "!src/**/index.ts",
-    // Исключить визуальные компоненты из покрытия
+    // Исключить визуальные компоненты и инфраструктурный код из покрытия
+    "!src/core/**/*.{ts,tsx}",
     "!src/screens/**/*.{ts,tsx}",
     "!src/modules/**/components/**/*.{ts,tsx}",
     "!src/shared/components/**/*.{ts,tsx}",
     "!src/shared/ui/**/*.{ts,tsx}",
+    "!src/shared/storybook/**/*.{ts,tsx}",
     "!src/app/**/*.{ts,tsx}",
   ],
   moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "node"],

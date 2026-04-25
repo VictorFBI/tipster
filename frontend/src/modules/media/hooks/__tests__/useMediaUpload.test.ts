@@ -2,6 +2,7 @@ import { renderHook, act } from "@testing-library/react-native";
 import { useMediaUpload } from "../useMediaUpload";
 import mediaService from "../../api/media.service";
 import axios from "axios";
+import { readAsStringAsync } from "expo-file-system/legacy";
 
 // Mock media service
 jest.mock("../../api/media.service", () => ({
@@ -11,18 +12,13 @@ jest.mock("../../api/media.service", () => ({
   },
 }));
 
-// Mock axios
-jest.mock("axios", () => ({
-  __esModule: true,
-  default: jest.fn(),
-}));
-
-// Mock expo-file-system/legacy
-const mockReadAsStringAsync = jest.fn();
-jest.mock("expo-file-system/legacy", () => ({
-  readAsStringAsync: mockReadAsStringAsync,
-  EncodingType: { Base64: "base64" },
-}));
+// Mock axios as a callable function (overrides global mock for this file)
+jest.mock("axios", () => {
+  const mockFn = jest.fn();
+  (mockFn as any).__esModule = true;
+  (mockFn as any).default = mockFn;
+  return mockFn;
+});
 
 // Mock buffer
 jest.mock("buffer", () => ({
@@ -33,6 +29,8 @@ jest.mock("buffer", () => ({
     }),
   },
 }));
+
+const mockReadAsStringAsync = readAsStringAsync as jest.Mock;
 
 // Mock expo-image-picker types
 const createMockAsset = (uri: string, fileSize = 1024) => ({

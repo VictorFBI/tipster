@@ -87,7 +87,18 @@ export function VerificationCodeScreen({
           paddingBottom="$8"
           gap="$4"
         >
-          <VerificationIcon icon={icon} />
+          <YStack alignItems="center">
+            <YStack
+              width={80}
+              height={80}
+              borderRadius={40}
+              backgroundColor="$accent"
+              alignItems="center"
+              justifyContent="center"
+            >
+              <Text fontSize={40}>{icon}</Text>
+            </YStack>
+          </YStack>
 
           <Text
             fontSize="$9"

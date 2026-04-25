@@ -73,6 +73,34 @@ jest.mock("expo-image-picker", () => ({
   },
 }));
 
+// Mock expo-modules-core (needed before expo-file-system)
+jest.mock("expo-modules-core", () => ({
+  NativeModulesProxy: {},
+  EventEmitter: jest.fn().mockImplementation(() => ({
+    addListener: jest.fn(),
+    removeListeners: jest.fn(),
+  })),
+  requireNativeModule: jest.fn(() => ({})),
+  requireOptionalNativeModule: jest.fn(() => null),
+  Platform: { OS: "ios" },
+}));
+
+// Mock expo-file-system/legacy
+jest.mock("expo-file-system/legacy", () => ({
+  readAsStringAsync: jest.fn(),
+  writeAsStringAsync: jest.fn(),
+  deleteAsync: jest.fn(),
+  getInfoAsync: jest.fn(),
+  makeDirectoryAsync: jest.fn(),
+  readDirectoryAsync: jest.fn(),
+  copyAsync: jest.fn(),
+  moveAsync: jest.fn(),
+  EncodingType: { UTF8: "utf8", Base64: "base64" },
+  FileSystemSessionType: { BACKGROUND: 0, FOREGROUND: 1 },
+  documentDirectory: "file:///mock-document-directory/",
+  cacheDirectory: "file:///mock-cache-directory/",
+}));
+
 // Mock expo-clipboard
 jest.mock("expo-clipboard", () => ({
   setStringAsync: jest.fn(),
