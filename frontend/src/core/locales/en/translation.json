@@ -25,6 +25,18 @@
     "password": "Password",
     "passwordRequired": "Password is required",
     "passwordMinLength": "Password must be at least 12 characters",
+    "passwordHint": {
+      "minLength": "At least 12 characters",
+      "hasUppercase": "Uppercase letter (A-Z)",
+      "hasLowercase": "Lowercase letter (a-z)",
+      "hasNumber": "Number (0-9)",
+      "hasSpecial": "Special character (!@#$%...)",
+      "weak": "Weak",
+      "fair": "Fair",
+      "good": "Good",
+      "strong": "Strong",
+      "veryStrong": "Very strong"
+    },
     "confirmPassword": "Confirm Password",
     "username": "Username",
     "forgotPassword": "Forgot Password?",

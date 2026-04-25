@@ -12,6 +12,7 @@ export {
 
 export { EmailInput } from "./components/emailInput/emailInput";
 export { PasswordInput } from "./components/passwordInput/passwordInput";
+export { PasswordStrengthHint } from "./components/passwordStrengthHint/passwordStrengthHint";
 
 export { useAuthStore } from "./store/authStore";
 export { STORAGE_KEYS, clearAuthTokens } from "./api/client";

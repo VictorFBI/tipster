@@ -12,6 +12,7 @@ import { TouchableOpacity } from "react-native";
 import { useThemeStore } from "@/src/core/store/themeStore";
 import { themes } from "@/src/core/theme/themes";
 import { StyledInput } from "@/src/shared";
+import { PasswordStrengthHint } from "../passwordStrengthHint/passwordStrengthHint";
 
 interface PasswordInputProps {
   label: string;
@@ -20,6 +21,7 @@ interface PasswordInputProps {
   message?: string;
   rules?: RegisterOptions;
   controlName?: string;
+  showStrengthHint?: boolean;
 }
 
 export function PasswordInput({
@@ -29,16 +31,18 @@ export function PasswordInput({
   message,
   rules,
   controlName = "password",
+  showStrengthHint = false,
 }: PasswordInputProps) {
   const { t } = useTranslation();
   const { theme } = useThemeStore();
   const currentTheme = themes[theme];
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [currentValue, setCurrentValue] = useState("");
 
   const defaultRules = {
     required: t("auth.passwordRequired"),
     minLength: {
-      value: 6,
+      value: 12,
       message: t("auth.passwordMinLength"),
     },
   };
@@ -57,37 +61,47 @@ export function PasswordInput({
         name={controlName}
         rules={rules || defaultRules}
         render={({ field: { onChange, onBlur, value } }) => (
-          <XStack position="relative" alignItems="center">
-            <StyledInput
-              placeholder="••••••••"
-              value={value}
-              onChangeText={onChange}
-              onBlur={onBlur}
-              secureTextEntry={!isPasswordVisible}
-              autoCapitalize="none"
-              hasError={!!errors}
-              paddingRight="$10"
-              inputSize="l"
-              flex={1}
-            />
-            <TouchableOpacity
-              onPress={togglePasswordVisibility}
-              style={{
-                position: "absolute",
-                right: 12,
-                padding: 8,
-              }}
-            >
-              <Ionicons
-                name={isPasswordVisible ? "eye-off-outline" : "eye-outline"}
-                size={20}
-                color={currentTheme.muted}
+          <>
+            <XStack position="relative" alignItems="center">
+              <StyledInput
+                placeholder="••••••••"
+                value={value}
+                onChangeText={(text: string) => {
+                  onChange(text);
+                  if (showStrengthHint) {
+                    setCurrentValue(text);
+                  }
+                }}
+                onBlur={onBlur}
+                secureTextEntry={!isPasswordVisible}
+                autoCapitalize="none"
+                hasError={!!errors}
+                paddingRight="$10"
+                inputSize="l"
+                flex={1}
               />
-            </TouchableOpacity>
-          </XStack>
+              <TouchableOpacity
+                onPress={togglePasswordVisibility}
+                style={{
+                  position: "absolute",
+                  right: 12,
+                  padding: 8,
+                }}
+              >
+                <Ionicons
+                  name={isPasswordVisible ? "eye-off-outline" : "eye-outline"}
+                  size={20}
+                  color={currentTheme.muted}
+                />
+              </TouchableOpacity>
+            </XStack>
+            {showStrengthHint && (
+              <PasswordStrengthHint password={currentValue} />
+            )}
+          </>
         )}
       />
-      {errors && (
+      {errors && !showStrengthHint && (
         <Text fontSize="$2" color="$error">
           {message}
         </Text>

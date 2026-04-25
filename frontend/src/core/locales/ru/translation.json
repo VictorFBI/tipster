@@ -25,6 +25,18 @@
     "password": "Пароль",
     "passwordRequired": "Пароль обязателен",
     "passwordMinLength": "Пароль должен быть минимум 12 символов",
+    "passwordHint": {
+      "minLength": "Минимум 12 символов",
+      "hasUppercase": "Заглавная буква (A-Z)",
+      "hasLowercase": "Строчная буква (a-z)",
+      "hasNumber": "Цифра (0-9)",
+      "hasSpecial": "Спецсимвол (!@#$%...)",
+      "weak": "Слабый",
+      "fair": "Средний",
+      "good": "Хороший",
+      "strong": "Надёжный",
+      "veryStrong": "Очень надёжный"
+    },
     "confirmPassword": "Подтвердите пароль",
     "username": "Имя пользователя",
     "forgotPassword": "Забыли пароль?",

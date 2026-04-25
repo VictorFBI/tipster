@@ -120,10 +120,11 @@ export function Registration() {
               control={control}
               errors={errors.password}
               message={errors.password?.message}
+              showStrengthHint
               rules={{
                 required: t("auth.passwordRequired"),
                 minLength: {
-                  value: 6,
+                  value: 12,
                   message: t("auth.passwordMinLength"),
                 },
               }}
