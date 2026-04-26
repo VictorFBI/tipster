@@ -112,6 +112,7 @@ func main() {
 	r.With(middlewares.RequireAccessToken).Delete("/content/posts", posts.DeleteContentPosts)
 
 	r.With(middlewares.RequireAccessToken).Post("/content/comments", comments.PostContentComments)
+	r.With(middlewares.RequireAccessToken).Get("/content/comments", comments.GetContentComments)
 	r.With(middlewares.RequireAccessToken).Patch("/content/comments", comments.PatchContentComments)
 	r.With(middlewares.RequireAccessToken).Delete("/content/comments", comments.DeleteContentComments)
 

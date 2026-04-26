@@ -8,9 +8,9 @@ import (
 	"time"
 	"unicode/utf8"
 
+	"tipster/backend/content/internal/clients/media"
 	"tipster/backend/content/internal/db/postgresql"
 	"tipster/backend/content/internal/services/helpers"
-	"tipster/backend/content/internal/clients/media"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
@@ -24,7 +24,8 @@ SELECT c.id::text, c.post_id::text, c.author_id::text, c.content, c.parent_id::t
 		(SELECT array_agg(ci.object_key ORDER BY ci.sort_index)
 		 FROM comment_images ci WHERE ci.comment_id = c.id),
 		'{}'::text[]
-	)
+	),
+	EXISTS(SELECT 1 FROM comments child WHERE child.parent_id = c.id) AS has_replies
 FROM comments c`
 
 var (
@@ -48,6 +49,11 @@ type Comment struct {
 	ParentID       *string
 	CreatedAt      string
 	UpdatedAt      string
+}
+
+type CommentListItem struct {
+	Comment
+	HasReplies bool
 }
 
 type Service struct {
@@ -320,4 +326,97 @@ func (s *Service) DeleteComment(ctx context.Context, authorID, commentID string)
 		return s.classifyCommentAccess(ctx, authorID, commentID)
 	}
 	return nil
+}
+
+// ListCommentsByParent returns comments for a post filtered by a parent level.
+// If parentID is nil, returns top-level comments (parent_id IS NULL).
+// If parentID is set, returns direct replies for that parent comment.
+func (s *Service) ListCommentsByParent(ctx context.Context, postID string, parentID *string, limit, offset int) ([]CommentListItem, error) {
+	postID = strings.TrimSpace(postID)
+	var exists int
+	err := s.postgres.QueryRow(ctx, `SELECT 1 FROM posts WHERE id = $1`, postID).Scan(&exists)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, ErrPostNotFound
+		}
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) && pgErr.Code == "22P02" {
+			return nil, ErrInvalidPostID
+		}
+		return nil, err
+	}
+
+	var parentArg interface{}
+	if parentID != nil && strings.TrimSpace(*parentID) != "" {
+		pid := strings.TrimSpace(*parentID)
+		var parentPostID string
+		err = s.postgres.QueryRow(ctx, `SELECT post_id::text FROM comments WHERE id = $1`, pid).Scan(&parentPostID)
+		if err != nil {
+			if errors.Is(err, pgx.ErrNoRows) {
+				return nil, ErrCommentNotFound
+			}
+			var pgErr *pgconn.PgError
+			if errors.As(err, &pgErr) && pgErr.Code == "22P02" {
+				return nil, ErrInvalidCommentID
+			}
+			return nil, err
+		}
+		if parentPostID != postID {
+			return nil, ErrParentCommentInvalid
+		}
+		parentArg = pid
+	} else {
+		parentArg = nil
+	}
+
+	rows, err := s.postgres.Query(ctx, commentSelectWithImagesSQL+`
+WHERE c.post_id = $1::uuid
+  AND (
+    ($2::uuid IS NULL AND c.parent_id IS NULL)
+    OR c.parent_id = $2::uuid
+  )
+ORDER BY c.created_at DESC, c.id DESC
+LIMIT $3 OFFSET $4`,
+		postID, parentArg, limit, offset,
+	)
+	if err != nil {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) && pgErr.Code == "22P02" {
+			return nil, ErrInvalidPostID
+		}
+		return nil, err
+	}
+	defer rows.Close()
+
+	items := make([]CommentListItem, 0, limit)
+	for rows.Next() {
+		var c Comment
+		var parent sql.NullString
+		var createdAt, updatedAt time.Time
+		var keys []string
+		var hasReplies bool
+		scanErr := rows.Scan(&c.ID, &c.PostID, &c.AuthorID, &c.Content, &parent, &createdAt, &updatedAt, &keys, &hasReplies)
+		if scanErr != nil {
+			return nil, scanErr
+		}
+		c.CreatedAt = createdAt.UTC().Format(time.RFC3339Nano)
+		c.UpdatedAt = updatedAt.UTC().Format(time.RFC3339Nano)
+		if parent.Valid && parent.String != "" {
+			v := parent.String
+			c.ParentID = &v
+		}
+		if keys == nil {
+			c.ImageObjectIds = []string{}
+		} else {
+			c.ImageObjectIds = keys
+		}
+		items = append(items, CommentListItem{
+			Comment:    c,
+			HasReplies: hasReplies,
+		})
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }

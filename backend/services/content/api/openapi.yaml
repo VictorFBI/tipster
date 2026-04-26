@@ -251,7 +251,7 @@ paths:
             refresh: send a new instant, e.g. current time. Later pages: send the
             same value as on the first page of this scroll session (match the
             `started_from` returned in that response if the server normalizes it).
-          example: "2026-04-20T14:30:00.000Z"
+          example: "2027-04-20T14:30:00.000Z"
       responses:
         '200':
           description: Success
@@ -305,6 +305,72 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
 
   /content/comments:
+    get:
+      summary: List comments for a post by parent
+      description: >
+        Returns paginated comments for a post filtered by `parent_id`.
+        If `parent_id` is omitted, returns top-level comments (`parent_id = null`).
+        If `parent_id` is provided, returns direct replies to that comment.
+        Pagination always applies to the selected level only.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: post_id
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Target post id
+        - name: limit
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+          example: 20
+        - name: offset
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+          example: 0
+        - name: parent_id
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+          description: >
+            Parent comment id to list replies for. Omit to fetch top-level
+            comments.
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentsPage'
+        '400':
+          description: Bad request (invalid or missing query parameters)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Post or parent comment not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     post:
       summary: Create a comment on a post
       security:
@@ -728,6 +794,38 @@ components:
         - image_object_ids
         - created_at
         - updated_at
+
+    CommentsPage:
+      type: object
+      description: >
+        Paginated list of comments for one parent level.
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/CommentListItem'
+        limit:
+          type: integer
+          minimum: 1
+          maximum: 100
+        offset:
+          type: integer
+          minimum: 0
+      required:
+        - items
+        - limit
+        - offset
+
+    CommentListItem:
+      allOf:
+        - $ref: '#/components/schemas/Comment'
+        - type: object
+          properties:
+            has_replies:
+              type: boolean
+              description: Whether this comment has at least one direct reply
+          required:
+            - has_replies
 
     CreateCommentRequest:
       type: object
