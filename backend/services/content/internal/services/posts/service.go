@@ -47,6 +47,7 @@ var (
 	ErrContentEmpty   = errors.New("content empty")
 	ErrAuthorMissing  = errors.New("author not found in database")
 	ErrNoUpdateFields = errors.New("no update fields")
+	ErrTooManyPostIDs = errors.New("too many post ids")
 )
 
 type Post struct {
@@ -476,6 +477,42 @@ func (s *Service) ListPostsLikedByUser(ctx context.Context, userID string, limit
 			p.ImageObjectIds = keys
 		}
 		out = append(out, LikedPostRow{Post: p, LikedAt: likedAt.UTC()})
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// ListPostsByIDs returns posts by ids preserving input order for found records.
+func (s *Service) ListPostsByIDs(ctx context.Context, viewerID string, postIDs []string) ([]Post, error) {
+	if len(postIDs) == 0 {
+		return []Post{}, nil
+	}
+	if len(postIDs) > 100 {
+		return nil, ErrTooManyPostIDs
+	}
+	rows, err := s.postgres.Query(ctx,
+		postSelectWithImagesSQL+`
+		 INNER JOIN unnest($2::uuid[]) WITH ORDINALITY AS req(id, ord) ON req.id = p.id
+		 ORDER BY req.ord`,
+		viewerID, postIDs,
+	)
+	if err != nil {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) && pgErr.Code == "22P02" {
+			return nil, ErrInvalidPostID
+		}
+		return nil, err
+	}
+	defer rows.Close()
+	out := make([]Post, 0, len(postIDs))
+	for rows.Next() {
+		p, scanErr := scanPostWithImages(rows)
+		if scanErr != nil {
+			return nil, scanErr
+		}
+		out = append(out, *p)
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err

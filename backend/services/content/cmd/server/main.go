@@ -16,6 +16,8 @@ import (
 	"tipster/backend/content/internal/handlers/feed"
 	"tipster/backend/content/internal/handlers/likes"
 	"tipster/backend/content/internal/handlers/posts"
+	byids "tipster/backend/content/internal/handlers/posts/by-ids"
+	repost "tipster/backend/content/internal/handlers/posts/repost"
 	"tipster/backend/content/internal/handlers/posts/liked"
 	"tipster/backend/content/internal/handlers/stats"
 	applogging "tipster/backend/content/internal/logging"
@@ -107,8 +109,9 @@ func main() {
 	r.With(middlewares.RequireAccessToken).Get("/content/feed", feed.GetContentFeed)
 	r.With(middlewares.RequireAccessToken).Get("/content/stats", stats.GetContentStats)
 	r.With(middlewares.RequireAccessToken).Get("/content/posts", posts.GetContentPosts)
+	r.With(middlewares.RequireAccessToken).Post("/content/posts/by-ids", byids.PostContentPostsByIds)
 	r.With(middlewares.RequireAccessToken).Post("/content/posts", posts.PostContentPosts)
-	r.With(middlewares.RequireAccessToken).Post("/content/posts/repost", posts.PostContentPostsRepost)
+	r.With(middlewares.RequireAccessToken).Post("/content/posts/repost", repost.PostContentPostsRepost)
 	r.With(middlewares.RequireAccessToken).Patch("/content/posts", posts.PatchContentPosts)
 	r.With(middlewares.RequireAccessToken).Delete("/content/posts", posts.DeleteContentPosts)
 

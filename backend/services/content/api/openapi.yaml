@@ -206,6 +206,40 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /content/posts/by-ids:
+    post:
+      summary: Get posts by id list
+      description: >
+        Returns posts for the provided ids (up to 100 items per request).
+        Response order follows the input `post_ids` order for found posts.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GetPostsByIdsRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostsByIdsResponse'
+        '400':
+          description: Bad request (invalid body or post ids)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /content/feed:
     get:
       summary: Personalized home feed for the authenticated user
@@ -702,6 +736,29 @@ components:
           format: uuid
       required:
         - post_id
+
+    GetPostsByIdsRequest:
+      type: object
+      properties:
+        post_ids:
+          type: array
+          minItems: 1
+          maxItems: 100
+          items:
+            type: string
+            format: uuid
+      required:
+        - post_ids
+
+    PostsByIdsResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Post'
+      required:
+        - items
 
     MyPostsPage:
       type: object

@@ -124,6 +124,11 @@ type FeedPage struct {
 	StartedFrom time.Time `json:"started_from"`
 }
 
+// GetPostsByIdsRequest defines model for GetPostsByIdsRequest.
+type GetPostsByIdsRequest struct {
+	PostIds []openapi_types.UUID `json:"post_ids"`
+}
+
 // LikeRequest Target post for like / unlike
 type LikeRequest struct {
 	PostId openapi_types.UUID `json:"post_id"`
@@ -177,6 +182,11 @@ type Post struct {
 	// SourcePostId Original post id for repost posts; null for regular posts
 	SourcePostId *openapi_types.UUID `json:"source_post_id"`
 	UpdatedAt    time.Time           `json:"updated_at"`
+}
+
+// PostsByIdsResponse defines model for PostsByIdsResponse.
+type PostsByIdsResponse struct {
+	Items []Post `json:"items"`
 }
 
 // UpdateCommentRequest Partial update; send content and/or image_object_ids (replaces image set when sent)
@@ -256,6 +266,9 @@ type PatchContentPostsJSONRequestBody = UpdatePostRequest
 
 // PostContentPostsJSONRequestBody defines body for PostContentPosts for application/json ContentType.
 type PostContentPostsJSONRequestBody = CreatePostRequest
+
+// PostContentPostsByIdsJSONRequestBody defines body for PostContentPostsByIds for application/json ContentType.
+type PostContentPostsByIdsJSONRequestBody = GetPostsByIdsRequest
 
 // PostContentPostsRepostJSONRequestBody defines body for PostContentPostsRepost for application/json ContentType.
 type PostContentPostsRepostJSONRequestBody = CreateRepostRequest
