@@ -549,6 +549,47 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /content/posts/repost:
+    post:
+      summary: Create a repost as a regular post
+      description: >
+        Creates a new post owned by the authenticated user, linked to an
+        existing source post. The new row is a full post (`is_repost = true`)
+        and may include an optional user signature in `content`.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRepostRequest'
+      responses:
+        '200':
+          description: Repost post created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Source post not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
 components:
   securitySchemes:
     bearerAuth:
@@ -590,6 +631,21 @@ components:
         liked_by_me:
           type: boolean
           description: Whether the authenticated user has liked this post
+        reposts_count:
+          type: integer
+          minimum: 0
+          description: Total number of reposts on this post
+        reposted_by_me:
+          type: boolean
+          description: Whether the authenticated user has created at least one repost of this post
+        is_repost:
+          type: boolean
+          description: Whether this row is a repost post
+        source_post_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Original post id for repost posts; null for regular posts
       required:
         - id
         - author_id
@@ -599,6 +655,9 @@ components:
         - updated_at
         - likes_count
         - liked_by_me
+        - reposts_count
+        - reposted_by_me
+        - is_repost
 
     CreatePostRequest:
       type: object
@@ -889,6 +948,19 @@ components:
           format: uuid
       required:
         - post_id
+
+    CreateRepostRequest:
+      type: object
+      description: Create a repost post from an existing source post
+      properties:
+        source_post_id:
+          type: string
+          format: uuid
+        content:
+          type: string
+          description: Optional user signature/comment attached to the repost post
+      required:
+        - source_post_id
 
     ContentStats:
       type: object

@@ -33,6 +33,30 @@ type Comment struct {
 	UpdatedAt      time.Time           `json:"updated_at"`
 }
 
+// CommentListItem defines model for CommentListItem.
+type CommentListItem struct {
+	AuthorId  openapi_types.UUID `json:"author_id"`
+	Content   string             `json:"content"`
+	CreatedAt time.Time          `json:"created_at"`
+
+	// HasReplies Whether this comment has at least one direct reply
+	HasReplies bool               `json:"has_replies"`
+	Id         openapi_types.UUID `json:"id"`
+
+	// ImageObjectIds Object ids in permanent storage; display order
+	ImageObjectIds []string            `json:"image_object_ids"`
+	ParentId       *openapi_types.UUID `json:"parent_id"`
+	PostId         openapi_types.UUID  `json:"post_id"`
+	UpdatedAt      time.Time           `json:"updated_at"`
+}
+
+// CommentsPage Paginated list of comments for one parent level.
+type CommentsPage struct {
+	Items  []CommentListItem `json:"items"`
+	Limit  int               `json:"limit"`
+	Offset int               `json:"offset"`
+}
+
 // ContentStats Number of posts whose author_id matches the requested user
 type ContentStats struct {
 	PostsCount int `json:"posts_count"`
@@ -56,6 +80,13 @@ type CreatePostRequest struct {
 
 	// ImageObjectIds Optional; up to 10 object ids in the temporary upload bucket (from media presigned upload). Content service moves them to permanent storage when creating the post.
 	ImageObjectIds *[]string `json:"image_object_ids,omitempty"`
+}
+
+// CreateRepostRequest Create a repost post from an existing source post
+type CreateRepostRequest struct {
+	// Content Optional user signature/comment attached to the repost post
+	Content      *string            `json:"content,omitempty"`
+	SourcePostId openapi_types.UUID `json:"source_post_id"`
 }
 
 // DeleteCommentRequest defines model for DeleteCommentRequest.
@@ -128,12 +159,24 @@ type Post struct {
 	// ImageObjectIds Object ids in permanent storage (same values as after content commit from temp); display order
 	ImageObjectIds []string `json:"image_object_ids"`
 
+	// IsRepost Whether this row is a repost post
+	IsRepost bool `json:"is_repost"`
+
 	// LikedByMe Whether the authenticated user has liked this post
 	LikedByMe bool `json:"liked_by_me"`
 
 	// LikesCount Total number of likes on this post
-	LikesCount int       `json:"likes_count"`
-	UpdatedAt  time.Time `json:"updated_at"`
+	LikesCount int `json:"likes_count"`
+
+	// RepostedByMe Whether the authenticated user has created at least one repost of this post
+	RepostedByMe bool `json:"reposted_by_me"`
+
+	// RepostsCount Total number of reposts on this post
+	RepostsCount int `json:"reposts_count"`
+
+	// SourcePostId Original post id for repost posts; null for regular posts
+	SourcePostId *openapi_types.UUID `json:"source_post_id"`
+	UpdatedAt    time.Time           `json:"updated_at"`
 }
 
 // UpdateCommentRequest Partial update; send content and/or image_object_ids (replaces image set when sent)
@@ -148,6 +191,17 @@ type UpdatePostRequest struct {
 	Content        *string            `json:"content,omitempty"`
 	ImageObjectIds *[]string          `json:"image_object_ids,omitempty"`
 	PostId         openapi_types.UUID `json:"post_id"`
+}
+
+// GetContentCommentsParams defines parameters for GetContentComments.
+type GetContentCommentsParams struct {
+	// PostId Target post id
+	PostId openapi_types.UUID `form:"post_id" json:"post_id"`
+	Limit  int                `form:"limit" json:"limit"`
+	Offset int                `form:"offset" json:"offset"`
+
+	// ParentId Parent comment id to list replies for. Omit to fetch top-level comments.
+	ParentId *openapi_types.UUID `form:"parent_id,omitempty" json:"parent_id,omitempty"`
 }
 
 // GetContentFeedParams defines parameters for GetContentFeed.
@@ -202,3 +256,6 @@ type PatchContentPostsJSONRequestBody = UpdatePostRequest
 
 // PostContentPostsJSONRequestBody defines body for PostContentPosts for application/json ContentType.
 type PostContentPostsJSONRequestBody = CreatePostRequest
+
+// PostContentPostsRepostJSONRequestBody defines body for PostContentPostsRepost for application/json ContentType.
+type PostContentPostsRepostJSONRequestBody = CreateRepostRequest

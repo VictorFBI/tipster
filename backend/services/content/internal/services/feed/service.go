@@ -2,6 +2,7 @@ package feed
 
 import (
 	"context"
+	"database/sql"
 	"time"
 
 	"tipster/backend/content/internal/db/postgresql"
@@ -26,6 +27,10 @@ follow_posts AS (
     ) AS keys,
     (SELECT COUNT(*)::bigint FROM likes lk WHERE lk.post_id = p.id) AS likes_count,
     EXISTS (SELECT 1 FROM likes lk WHERE lk.post_id = p.id AND lk.user_id = $1::uuid) AS liked_by_me,
+    (SELECT COUNT(*)::bigint FROM posts rp WHERE rp.source_post_id = p.id AND rp.is_repost = TRUE) AS reposts_count,
+    EXISTS (SELECT 1 FROM posts rp WHERE rp.source_post_id = p.id AND rp.is_repost = TRUE AND rp.author_id = $1::uuid) AS reposted_by_me,
+    p.is_repost,
+    p.source_post_id::text AS source_post_id,
     'following'::text AS feed_source
   FROM posts p
   WHERE $4::int > 0
@@ -58,6 +63,10 @@ rec_posts AS (
     ) AS keys,
     (SELECT COUNT(*)::bigint FROM likes lk WHERE lk.post_id = p.id) AS likes_count,
     EXISTS (SELECT 1 FROM likes lk WHERE lk.post_id = p.id AND lk.user_id = $1::uuid) AS liked_by_me,
+    (SELECT COUNT(*)::bigint FROM posts rp WHERE rp.source_post_id = p.id AND rp.is_repost = TRUE) AS reposts_count,
+    EXISTS (SELECT 1 FROM posts rp WHERE rp.source_post_id = p.id AND rp.is_repost = TRUE AND rp.author_id = $1::uuid) AS reposted_by_me,
+    p.is_repost,
+    p.source_post_id::text AS source_post_id,
     'recommended'::text AS feed_source
   FROM posts p
   INNER JOIN rec_ids r ON r.id = p.id
@@ -123,10 +132,11 @@ func (s *Service) Feed(ctx context.Context, viewerID string, anchor time.Time, a
 			id, authorID, content, feedSource string
 			createdAt, updatedAt              time.Time
 			imageObjectIds                    []string
-			likesCount                        int64
-			likedByMe                         bool
+			likesCount, repostsCount          int64
+			likedByMe, repostedByMe, isRepost bool
+			sourcePostID                      sql.NullString
 		)
-		if err := rows.Scan(&id, &authorID, &content, &createdAt, &updatedAt, &imageObjectIds, &likesCount, &likedByMe, &feedSource); err != nil {
+		if err := rows.Scan(&id, &authorID, &content, &createdAt, &updatedAt, &imageObjectIds, &likesCount, &likedByMe, &repostsCount, &repostedByMe, &isRepost, &sourcePostID, &feedSource); err != nil {
 			return nil, err
 		}
 		if imageObjectIds == nil {
@@ -141,6 +151,13 @@ func (s *Service) Feed(ctx context.Context, viewerID string, anchor time.Time, a
 			UpdatedAt:      updatedAt.UTC().Format(time.RFC3339Nano),
 			LikesCount:     likesCount,
 			LikedByMe:      likedByMe,
+			RepostsCount:   repostsCount,
+			RepostedByMe:   repostedByMe,
+			IsRepost:       isRepost,
+		}
+		if sourcePostID.Valid && sourcePostID.String != "" {
+			v := sourcePostID.String
+			p.SourcePostID = &v
 		}
 		out = append(out, Row{Post: p, FeedSource: feedSource})
 	}

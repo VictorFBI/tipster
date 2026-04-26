@@ -29,6 +29,14 @@ func PostFromService(p *postsservice.Post) (api.Post, error) {
 	if err != nil {
 		return api.Post{}, fmt.Errorf("updated_at: %w", err)
 	}
+	var sourcePostID *uuid.UUID
+	if p.SourcePostID != nil && *p.SourcePostID != "" {
+		v, err := uuid.Parse(*p.SourcePostID)
+		if err != nil {
+			return api.Post{}, fmt.Errorf("source_post_id: %w", err)
+		}
+		sourcePostID = &v
+	}
 	imgs := p.ImageObjectIds
 	if imgs == nil {
 		imgs = []string{}
@@ -42,6 +50,10 @@ func PostFromService(p *postsservice.Post) (api.Post, error) {
 		UpdatedAt:       updatedAt,
 		LikesCount:      int(p.LikesCount),
 		LikedByMe:       p.LikedByMe,
+		RepostsCount:    int(p.RepostsCount),
+		RepostedByMe:    p.RepostedByMe,
+		IsRepost:        p.IsRepost,
+		SourcePostId:    sourcePostID,
 	}, nil
 }
 

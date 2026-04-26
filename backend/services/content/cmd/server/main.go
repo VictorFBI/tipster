@@ -108,6 +108,7 @@ func main() {
 	r.With(middlewares.RequireAccessToken).Get("/content/stats", stats.GetContentStats)
 	r.With(middlewares.RequireAccessToken).Get("/content/posts", posts.GetContentPosts)
 	r.With(middlewares.RequireAccessToken).Post("/content/posts", posts.PostContentPosts)
+	r.With(middlewares.RequireAccessToken).Post("/content/posts/repost", posts.PostContentPostsRepost)
 	r.With(middlewares.RequireAccessToken).Patch("/content/posts", posts.PatchContentPosts)
 	r.With(middlewares.RequireAccessToken).Delete("/content/posts", posts.DeleteContentPosts)
 

@@ -2,6 +2,7 @@ package posts
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"strings"
 	"time"
@@ -21,13 +22,19 @@ const postLikeStatsSQL = `,
 	(SELECT COUNT(*)::bigint FROM likes lk WHERE lk.post_id = p.id),
 	EXISTS (SELECT 1 FROM likes lk WHERE lk.post_id = p.id AND lk.user_id = $1::uuid)`
 
+const postRepostStatsSQL = `,
+	(SELECT COUNT(*)::bigint FROM posts rp WHERE rp.source_post_id = p.id AND rp.is_repost = TRUE),
+	EXISTS (SELECT 1 FROM posts rp WHERE rp.source_post_id = p.id AND rp.is_repost = TRUE AND rp.author_id = $1::uuid)`
+
 const postSelectWithImagesSQL = `
 SELECT p.id::text, p.author_id::text, p.content, p.created_at, p.updated_at,
 	COALESCE(
 		(SELECT array_agg(pi.object_key ORDER BY pi.sort_index)
 		 FROM post_images pi WHERE pi.post_id = p.id),
 		'{}'::text[]
-	)` + postLikeStatsSQL + `
+	),
+	p.is_repost,
+	p.source_post_id::text` + postLikeStatsSQL + postRepostStatsSQL + `
 FROM posts p`
 
 var (
@@ -35,6 +42,7 @@ var (
 	ErrForbiddenPost  = errors.New("forbidden")
 	ErrInvalidPostID  = errors.New("invalid post id")
 	ErrInvalidAuthorID = errors.New("invalid author id")
+	ErrSourcePostNotFound = errors.New("source post not found")
 	ErrContentTooLong = errors.New("content too long")
 	ErrContentEmpty   = errors.New("content empty")
 	ErrAuthorMissing  = errors.New("author not found in database")
@@ -50,6 +58,10 @@ type Post struct {
 	UpdatedAt      string
 	LikesCount     int64
 	LikedByMe      bool
+	RepostsCount   int64
+	RepostedByMe   bool
+	IsRepost       bool
+	SourcePostID   *string
 }
 
 type LikedPostRow struct {
@@ -124,12 +136,17 @@ func scanPostWithImages(row pgx.Row) (*Post, error) {
 	var p Post
 	var createdAt, updatedAt time.Time
 	var keys []string
-	err := row.Scan(&p.ID, &p.AuthorID, &p.Content, &createdAt, &updatedAt, &keys, &p.LikesCount, &p.LikedByMe)
+	var sourcePostID sql.NullString
+	err := row.Scan(&p.ID, &p.AuthorID, &p.Content, &createdAt, &updatedAt, &keys, &p.IsRepost, &sourcePostID, &p.LikesCount, &p.LikedByMe, &p.RepostsCount, &p.RepostedByMe)
 	if err != nil {
 		return nil, err
 	}
 	p.CreatedAt = createdAt.UTC().Format(time.RFC3339Nano)
 	p.UpdatedAt = updatedAt.UTC().Format(time.RFC3339Nano)
+	if sourcePostID.Valid && sourcePostID.String != "" {
+		v := sourcePostID.String
+		p.SourcePostID = &v
+	}
 	if keys == nil {
 		p.ImageObjectIds = []string{}
 	} else {
@@ -186,6 +203,50 @@ func (s *Service) CreatePost(ctx context.Context, authorID, content string, imag
 		}
 	}
 	if err := tx.Commit(ctx); err != nil {
+		return nil, err
+	}
+	return s.loadPostWithImages(ctx, postID, authorID)
+}
+
+func (s *Service) CreateRepost(ctx context.Context, authorID, sourcePostID string, content *string) (*Post, error) {
+	sourcePostID = strings.TrimSpace(sourcePostID)
+	if sourcePostID == "" {
+		return nil, ErrInvalidPostID
+	}
+	var contentStr string
+	if content != nil {
+		contentStr = strings.TrimSpace(*content)
+	}
+	if err := validateContent(contentStr); err != nil {
+		return nil, err
+	}
+	var exists int
+	err := s.postgres.QueryRow(ctx, `SELECT 1 FROM posts WHERE id = $1::uuid`, sourcePostID).Scan(&exists)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, ErrSourcePostNotFound
+		}
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) && pgErr.Code == "22P02" {
+			return nil, ErrInvalidPostID
+		}
+		return nil, err
+	}
+	var postID string
+	err = s.postgres.QueryRow(ctx,
+		`INSERT INTO posts (id, author_id, content, is_repost, source_post_id)
+		 VALUES (gen_random_uuid(), $1::uuid, $2, TRUE, $3::uuid)
+		 RETURNING id::text`,
+		authorID, contentStr, sourcePostID,
+	).Scan(&postID)
+	if err != nil {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) && pgErr.Code == "22P02" {
+			return nil, ErrInvalidPostID
+		}
+		if errors.As(err, &pgErr) && pgErr.Code == "23503" {
+			return nil, ErrSourcePostNotFound
+		}
 		return nil, err
 	}
 	return s.loadPostWithImages(ctx, postID, authorID)
@@ -376,8 +437,12 @@ func (s *Service) ListPostsLikedByUser(ctx context.Context, userID string, limit
 				 FROM post_images pi WHERE pi.post_id = p.id),
 				'{}'::text[]
 			),
+			p.is_repost,
+			p.source_post_id::text,
 			(SELECT COUNT(*)::bigint FROM likes lk WHERE lk.post_id = p.id),
 			EXISTS (SELECT 1 FROM likes lk WHERE lk.post_id = p.id AND lk.user_id = $1::uuid),
+			(SELECT COUNT(*)::bigint FROM posts rp WHERE rp.source_post_id = p.id AND rp.is_repost = TRUE),
+			EXISTS (SELECT 1 FROM posts rp WHERE rp.source_post_id = p.id AND rp.is_repost = TRUE AND rp.author_id = $1::uuid),
 			l.created_at
 		 FROM likes l
 		 INNER JOIN posts p ON p.id = l.post_id
@@ -395,11 +460,16 @@ func (s *Service) ListPostsLikedByUser(ctx context.Context, userID string, limit
 		var p Post
 		var createdAt, updatedAt, likedAt time.Time
 		var keys []string
-		if err := rows.Scan(&p.ID, &p.AuthorID, &p.Content, &createdAt, &updatedAt, &keys, &p.LikesCount, &p.LikedByMe, &likedAt); err != nil {
+		var sourcePostID sql.NullString
+		if err := rows.Scan(&p.ID, &p.AuthorID, &p.Content, &createdAt, &updatedAt, &keys, &p.IsRepost, &sourcePostID, &p.LikesCount, &p.LikedByMe, &p.RepostsCount, &p.RepostedByMe, &likedAt); err != nil {
 			return nil, err
 		}
 		p.CreatedAt = createdAt.UTC().Format(time.RFC3339Nano)
 		p.UpdatedAt = updatedAt.UTC().Format(time.RFC3339Nano)
+		if sourcePostID.Valid && sourcePostID.String != "" {
+			v := sourcePostID.String
+			p.SourcePostID = &v
+		}
 		if keys == nil {
 			p.ImageObjectIds = []string{}
 		} else {
