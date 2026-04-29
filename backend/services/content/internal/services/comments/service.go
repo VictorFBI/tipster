@@ -104,7 +104,8 @@ func scanCommentWithImages(row pgx.Row) (*Comment, error) {
 	var parent sql.NullString
 	var createdAt, updatedAt time.Time
 	var keys []string
-	err := row.Scan(&c.ID, &c.PostID, &c.AuthorID, &c.Content, &parent, &createdAt, &updatedAt, &keys)
+	var hasReplies bool
+	err := row.Scan(&c.ID, &c.PostID, &c.AuthorID, &c.Content, &parent, &createdAt, &updatedAt, &keys, &hasReplies)
 	if err != nil {
 		return nil, err
 	}
