@@ -48,8 +48,9 @@ func CommentFromService(c *commentsservice.Comment) (api.Comment, error) {
 		AuthorId:       authorID,
 		Content:        c.Content,
 		ImageObjectIds: imgs,
-		CreatedAt:       createdAt,
-		UpdatedAt:       updatedAt,
+		CreatedAt:      createdAt,
+		UpdatedAt:      updatedAt,
+		Deleted:        c.Deleted,
 	}
 	if parentID != nil {
 		out.ParentId = parentID

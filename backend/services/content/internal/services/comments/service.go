@@ -19,7 +19,7 @@ import (
 const MaxContentRunes = 4096
 
 const commentSelectWithImagesSQL = `
-SELECT c.id::text, c.post_id::text, c.author_id::text, c.content, c.parent_id::text, c.created_at, c.updated_at,
+SELECT c.id::text, c.post_id::text, c.author_id::text, c.content, c.parent_id::text, c.created_at, c.updated_at, c.deleted_at,
 	COALESCE(
 		(SELECT array_agg(ci.object_key ORDER BY ci.sort_index)
 		 FROM comment_images ci WHERE ci.comment_id = c.id),
@@ -49,6 +49,7 @@ type Comment struct {
 	ParentID       *string
 	CreatedAt      string
 	UpdatedAt      string
+	Deleted        bool
 }
 
 type CommentListItem struct {
@@ -103,22 +104,27 @@ func scanCommentWithImages(row pgx.Row) (*Comment, error) {
 	var c Comment
 	var parent sql.NullString
 	var createdAt, updatedAt time.Time
+	var deletedAt sql.NullTime
 	var keys []string
 	var hasReplies bool
-	err := row.Scan(&c.ID, &c.PostID, &c.AuthorID, &c.Content, &parent, &createdAt, &updatedAt, &keys, &hasReplies)
+	err := row.Scan(&c.ID, &c.PostID, &c.AuthorID, &c.Content, &parent, &createdAt, &updatedAt, &deletedAt, &keys, &hasReplies)
 	if err != nil {
 		return nil, err
 	}
 	c.CreatedAt = createdAt.UTC().Format(time.RFC3339Nano)
 	c.UpdatedAt = updatedAt.UTC().Format(time.RFC3339Nano)
-	if parent.Valid && parent.String != "" {
-		v := parent.String
-		c.ParentID = &v
-	}
-	if keys == nil {
+	c.Deleted = deletedAt.Valid
+	if c.Deleted {
+		c.Content = ""
+		c.ImageObjectIds = []string{}
+	} else if keys == nil {
 		c.ImageObjectIds = []string{}
 	} else {
 		c.ImageObjectIds = keys
+	}
+	if parent.Valid && parent.String != "" {
+		v := parent.String
+		c.ParentID = &v
 	}
 	return &c, nil
 }
@@ -252,7 +258,7 @@ func (s *Service) UpdateComment(ctx context.Context, authorID, commentID string,
 	didContent := false
 	if content != nil {
 		ct, err := tx.Exec(ctx,
-			`UPDATE comments SET content = $1, updated_at = NOW() WHERE id = $2::uuid AND author_id = $3::uuid`,
+			`UPDATE comments SET content = $1, updated_at = NOW() WHERE id = $2::uuid AND author_id = $3::uuid AND deleted_at IS NULL`,
 			newContent, commentID, authorID,
 		)
 		if err != nil {
@@ -270,7 +276,7 @@ func (s *Service) UpdateComment(ctx context.Context, authorID, commentID string,
 	if keysProvided {
 		if !didContent {
 			ct, err := tx.Exec(ctx,
-				`UPDATE comments SET updated_at = NOW() WHERE id = $1::uuid AND author_id = $2::uuid`,
+				`UPDATE comments SET updated_at = NOW() WHERE id = $1::uuid AND author_id = $2::uuid AND deleted_at IS NULL`,
 				commentID, authorID,
 			)
 			if err != nil {
@@ -296,7 +302,7 @@ func (s *Service) UpdateComment(ctx context.Context, authorID, commentID string,
 
 func (s *Service) classifyCommentAccess(ctx context.Context, authorID, commentID string) error {
 	var owner string
-	err := s.postgres.QueryRow(ctx, `SELECT author_id::text FROM comments WHERE id = $1`, commentID).Scan(&owner)
+	err := s.postgres.QueryRow(ctx, `SELECT author_id::text FROM comments WHERE id = $1 AND deleted_at IS NULL`, commentID).Scan(&owner)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return ErrCommentNotFound
@@ -313,20 +319,70 @@ func (s *Service) classifyCommentAccess(ctx context.Context, authorID, commentID
 	return ErrCommentNotFound
 }
 
-// DeleteComment removes a comment; only the author may delete.
+// DeleteComment removes a comment for the author. If the comment has direct replies,
+// it is soft-deleted (row kept, deleted_at set, text and images cleared) so FK and thread stay intact.
 func (s *Service) DeleteComment(ctx context.Context, authorID, commentID string) error {
-	ct, err := s.postgres.Exec(ctx, `DELETE FROM comments WHERE id = $1 AND author_id = $2`, commentID, authorID)
+	tx, err := s.postgres.Begin(ctx)
 	if err != nil {
+		return err
+	}
+	defer tx.Rollback(ctx)
+
+	var owner string
+	var deletedAt sql.NullTime
+	err = tx.QueryRow(ctx,
+		`SELECT author_id::text, deleted_at FROM comments WHERE id = $1::uuid FOR UPDATE`,
+		commentID,
+	).Scan(&owner, &deletedAt)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return s.classifyCommentAccess(ctx, authorID, commentID)
+		}
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) && pgErr.Code == "22P02" {
 			return ErrInvalidCommentID
 		}
 		return err
 	}
-	if ct.RowsAffected() == 0 {
-		return s.classifyCommentAccess(ctx, authorID, commentID)
+	if owner != authorID {
+		return ErrForbiddenComment
 	}
-	return nil
+	if deletedAt.Valid {
+		return tx.Commit(ctx)
+	}
+
+	var hasChild bool
+	err = tx.QueryRow(ctx,
+		`SELECT EXISTS(SELECT 1 FROM comments WHERE parent_id = $1::uuid)`,
+		commentID,
+	).Scan(&hasChild)
+	if err != nil {
+		return err
+	}
+
+	if hasChild {
+		_, err = tx.Exec(ctx,
+			`UPDATE comments SET content = '', deleted_at = NOW(), updated_at = NOW() WHERE id = $1::uuid AND author_id = $2::uuid`,
+			commentID, authorID,
+		)
+		if err != nil {
+			return err
+		}
+		_, err = tx.Exec(ctx, `DELETE FROM comment_images WHERE comment_id = $1::uuid`, commentID)
+		if err != nil {
+			return err
+		}
+	} else {
+		_, err = tx.Exec(ctx, `DELETE FROM comments WHERE id = $1::uuid AND author_id = $2::uuid`, commentID, authorID)
+		if err != nil {
+			var pgErr *pgconn.PgError
+			if errors.As(err, &pgErr) && pgErr.Code == "22P02" {
+				return ErrInvalidCommentID
+			}
+			return err
+		}
+	}
+	return tx.Commit(ctx)
 }
 
 // ListCommentsByParent returns comments for a post filtered by a parent level.
@@ -394,22 +450,27 @@ LIMIT $3 OFFSET $4`,
 		var c Comment
 		var parent sql.NullString
 		var createdAt, updatedAt time.Time
+		var deletedAt sql.NullTime
 		var keys []string
 		var hasReplies bool
-		scanErr := rows.Scan(&c.ID, &c.PostID, &c.AuthorID, &c.Content, &parent, &createdAt, &updatedAt, &keys, &hasReplies)
+		scanErr := rows.Scan(&c.ID, &c.PostID, &c.AuthorID, &c.Content, &parent, &createdAt, &updatedAt, &deletedAt, &keys, &hasReplies)
 		if scanErr != nil {
 			return nil, scanErr
 		}
 		c.CreatedAt = createdAt.UTC().Format(time.RFC3339Nano)
 		c.UpdatedAt = updatedAt.UTC().Format(time.RFC3339Nano)
-		if parent.Valid && parent.String != "" {
-			v := parent.String
-			c.ParentID = &v
-		}
-		if keys == nil {
+		c.Deleted = deletedAt.Valid
+		if c.Deleted {
+			c.Content = ""
+			c.ImageObjectIds = []string{}
+		} else if keys == nil {
 			c.ImageObjectIds = []string{}
 		} else {
 			c.ImageObjectIds = keys
+		}
+		if parent.Valid && parent.String != "" {
+			v := parent.String
+			c.ParentID = &v
 		}
 		items = append(items, CommentListItem{
 			Comment:    c,

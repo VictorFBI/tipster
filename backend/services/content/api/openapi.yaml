@@ -902,6 +902,11 @@ components:
         updated_at:
           type: string
           format: date-time
+        deleted:
+          type: boolean
+          description: >
+            True when the author removed this comment but direct replies remain
+            (soft delete). Content and images are cleared in the API response.
       required:
         - id
         - post_id
@@ -910,6 +915,7 @@ components:
         - image_object_ids
         - created_at
         - updated_at
+        - deleted
 
     CommentsPage:
       type: object

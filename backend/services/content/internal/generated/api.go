@@ -24,7 +24,10 @@ type Comment struct {
 	AuthorId  openapi_types.UUID `json:"author_id"`
 	Content   string             `json:"content"`
 	CreatedAt time.Time          `json:"created_at"`
-	Id        openapi_types.UUID `json:"id"`
+
+	// Deleted True when the author removed this comment but direct replies remain (soft delete). Content and images are cleared in the API response.
+	Deleted bool               `json:"deleted"`
+	Id      openapi_types.UUID `json:"id"`
 
 	// ImageObjectIds Object ids in permanent storage; display order
 	ImageObjectIds []string            `json:"image_object_ids"`
@@ -38,6 +41,9 @@ type CommentListItem struct {
 	AuthorId  openapi_types.UUID `json:"author_id"`
 	Content   string             `json:"content"`
 	CreatedAt time.Time          `json:"created_at"`
+
+	// Deleted True when the author removed this comment but direct replies remain (soft delete). Content and images are cleared in the API response.
+	Deleted bool `json:"deleted"`
 
 	// HasReplies Whether this comment has at least one direct reply
 	HasReplies bool               `json:"has_replies"`
