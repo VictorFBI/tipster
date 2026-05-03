@@ -68,6 +68,12 @@ type ContentStats struct {
 	PostsCount int `json:"posts_count"`
 }
 
+// ContentTokens Aggregate reward tokens for the authenticated user from their authored posts (GET /content/tokens)
+type ContentTokens struct {
+	// Tokens Sum over posts by the JWT subject of (1 + comment_count + floor(like_count / 100)); comments with deleted_at set are excluded
+	Tokens int64 `json:"tokens"`
+}
+
 // CreateCommentRequest defines model for CreateCommentRequest.
 type CreateCommentRequest struct {
 	Content string `json:"content"`

@@ -429,6 +429,30 @@ func (s *Service) GetStatsByAuthor(ctx context.Context, authorID string) (int, e
 	return int(n), nil
 }
 
+// GetEarnedTokensByAuthor sums reward tokens for all posts whose author_id equals authorID.
+// Per post: 1 token for the post, 1 per comment with deleted_at IS NULL, plus floor(like_count / 100).
+func (s *Service) GetEarnedTokensByAuthor(ctx context.Context, authorID string) (int64, error) {
+	var n int64
+	err := s.postgres.QueryRow(ctx, `
+SELECT COALESCE(SUM(
+	1::bigint
+	+ (SELECT COUNT(*)::bigint FROM comments c WHERE c.post_id = p.id AND c.deleted_at IS NULL)
+	+ ((SELECT COUNT(*)::bigint FROM likes l WHERE l.post_id = p.id) / 100::bigint)
+), 0)::bigint
+FROM posts p
+WHERE p.author_id = $1::uuid`,
+		authorID,
+	).Scan(&n)
+	if err != nil {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) && pgErr.Code == "22P02" {
+			return 0, ErrInvalidAuthorID
+		}
+		return 0, err
+	}
+	return n, nil
+}
+
 // ListPostsLikedByUser returns posts liked by userID, newest like first.
 func (s *Service) ListPostsLikedByUser(ctx context.Context, userID string, limit, offset int) ([]LikedPostRow, error) {
 	rows, err := s.postgres.Query(ctx,

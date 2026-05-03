@@ -20,6 +20,7 @@ import (
 	repost "tipster/backend/content/internal/handlers/posts/repost"
 	"tipster/backend/content/internal/handlers/posts/liked"
 	"tipster/backend/content/internal/handlers/stats"
+	"tipster/backend/content/internal/handlers/tokens"
 	applogging "tipster/backend/content/internal/logging"
 	middlewares "tipster/backend/content/internal/middlewares"
 
@@ -108,6 +109,7 @@ func main() {
 	r.With(middlewares.RequireAccessToken).Get("/content/posts/liked", liked.GetContentPostsLiked)
 	r.With(middlewares.RequireAccessToken).Get("/content/feed", feed.GetContentFeed)
 	r.With(middlewares.RequireAccessToken).Get("/content/stats", stats.GetContentStats)
+	r.With(middlewares.RequireAccessToken).Get("/content/tokens", tokens.GetContentTokens)
 	r.With(middlewares.RequireAccessToken).Get("/content/posts", posts.GetContentPosts)
 	r.With(middlewares.RequireAccessToken).Post("/content/posts/by-ids", byids.PostContentPostsByIds)
 	r.With(middlewares.RequireAccessToken).Post("/content/posts", posts.PostContentPosts)
