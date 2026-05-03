@@ -12,6 +12,11 @@ import type {
   PaginationParams,
   GetPostsRequest,
   GetFeedRequest,
+  GetCommentsRequest,
+  CreateRepostRequest,
+  GetPostsByIdsRequest,
+  PostsByIdsResponse,
+  CommentsPage,
   MyPostsPage,
   FeedPage,
   LikedPostsPage,
@@ -80,6 +85,22 @@ const contentService = {
 
   // ── Comments ──
 
+  /** GET /content/comments — paginated comments for a post by parent */
+  getComments: async (params: GetCommentsRequest): Promise<CommentsPage> => {
+    const response = await contentClient.get<CommentsPage>(
+      "/content/comments",
+      {
+        params: {
+          post_id: params.postId,
+          limit: params.limit,
+          offset: params.offset,
+          ...(params.parentId && { parent_id: params.parentId }),
+        },
+      },
+    );
+    return response.data;
+  },
+
   /** POST /content/comments — create a comment on a post */
   createComment: async (
     data: CreateCommentRequest,
@@ -117,6 +138,30 @@ const contentService = {
   /** DELETE /content/likes — unlike a post (idempotent) */
   unlikePost: async (data: LikeRequest): Promise<void> => {
     await contentClient.delete("/content/likes", { data });
+  },
+
+  // ── Reposts ──
+
+  /** POST /content/posts/repost — create a repost */
+  createRepost: async (data: CreateRepostRequest): Promise<PostResponse> => {
+    const response = await contentClient.post<PostResponse>(
+      "/content/posts/repost",
+      data,
+    );
+    return response.data;
+  },
+
+  // ── Posts by IDs ──
+
+  /** POST /content/posts/by-ids — get posts by id list */
+  getPostsByIds: async (
+    data: GetPostsByIdsRequest,
+  ): Promise<PostsByIdsResponse> => {
+    const response = await contentClient.post<PostsByIdsResponse>(
+      "/content/posts/by-ids",
+      data,
+    );
+    return response.data;
   },
 
   // ── Stats ──

@@ -22,6 +22,10 @@ const baseResponse: PostResponse = {
   updated_at: new Date().toISOString(),
   likes_count: 5,
   liked_by_me: false,
+  reposts_count: 0,
+  reposted_by_me: false,
+  is_repost: false,
+  source_post_id: null,
 };
 
 describe("mapPostResponseToPost", () => {

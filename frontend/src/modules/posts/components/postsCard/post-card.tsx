@@ -6,25 +6,30 @@ import {
   NativeSyntheticEvent,
   NativeScrollEvent,
 } from "react-native";
-import { YStack, Text } from "tamagui";
+import { useTranslation } from "react-i18next";
+import { YStack, XStack, Text } from "tamagui";
+import { Ionicons } from "@expo/vector-icons";
 import { getImageUrl } from "@/src/modules/media";
 import { CommentsSection } from "../commentsSection/comments-section";
 import { PostHeader } from "../postHeader/post-header";
 import { PostActions } from "../postActions/post-actions";
 import { PostEditMenu } from "../postEditMenu/post-edit-menu";
-import { usePostComments, type Post } from "@/src/modules/posts";
+import { RepostDialog } from "../repostDialog/repost-dialog";
+import { RepostContent } from "../repostContent/repost-content";
+import type { Post } from "@/src/modules/posts/types";
 import {
   useDeletePost,
   useLikePost,
   useUnlikePost,
-  useCreateComment,
-  useUpdateComment,
-  useDeleteComment,
+  useCreateRepost,
+  useComments,
 } from "../../hooks/useContent";
 import { ConfirmDialog } from "@/src/shared/ui/confirmDialog/confirm-dialog";
 import { showAlert } from "@/src/core";
 import { useRouter } from "expo-router";
 import { useAuthStore } from "@/src/modules/auth/store/authStore";
+import { useThemeStore } from "@/src/core/store/themeStore";
+import { themes } from "@/src/core/theme/themes";
 
 export type { Post };
 
@@ -115,28 +120,30 @@ export function PostCard({
   isOwnPost = false,
   onDeleted,
 }: PostCardProps) {
+  const { t } = useTranslation();
   const router = useRouter();
+  const { theme } = useThemeStore();
+  const currentTheme = themes[theme];
   const [liked, setLiked] = useState(post.likedByMe);
   const [likeCount, setLikeCount] = useState(post.likes);
-  const [reposted, setReposted] = useState(false);
-  const [repostsCount, setRepostsCount] = useState(post.reposts || 0);
+  const [reposted, setReposted] = useState(post.repostedByMe);
+  const [repostsCount, setRepostsCount] = useState(post.reposts);
   const [showComments, setShowComments] = useState(false);
   const [showRepostDialog, setShowRepostDialog] = useState(false);
   const [showEditMenu, setShowEditMenu] = useState(false);
-  const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [postContent, setPostContent] = useState(post.content);
   const [postImages, setPostImages] = useState<string[]>(post.images);
   const authUser = useAuthStore((s) => s.user);
   const currentUserId = authUser?.accountId;
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
-  const {
-    comments,
-    handleAddComment,
-    handleAddReply,
-    handleEditComment,
-    handleDeleteComment,
-  } = usePostComments(post.commentsList || [], currentUserId);
+
+  // Always fetch top-level comments so the count is visible immediately
+  const { data: commentsPage } = useComments(post.id, {
+    limit: 100,
+    offset: 0,
+  });
+  const commentsCount = commentsPage?.items?.length ?? post.comments;
 
   const { mutate: deletePost } = useDeletePost({
     onSuccess: () => {
@@ -151,6 +158,11 @@ export function PostCard({
     setLiked(post.likedByMe);
     setLikeCount(post.likes);
   }, [post.likedByMe, post.likes]);
+
+  useEffect(() => {
+    setReposted(post.repostedByMe);
+    setRepostsCount(post.reposts);
+  }, [post.repostedByMe, post.reposts]);
 
   // Sync local state with post prop when it changes (e.g. after edit + query invalidation)
   useEffect(() => {
@@ -178,34 +190,14 @@ export function PostCard({
     },
   });
 
-  const { mutate: createComment } = useCreateComment({
+  const { mutate: createRepost } = useCreateRepost({
     onSuccess: () => {
-      // Comment successfully created, the hook will invalidate queries
-      // and the UI will update through usePostComments
+      setReposted(true);
+      setRepostsCount((current) => current + 1);
+      showAlert(t("repost.title"), t("repost.success"));
     },
     onError: () => {
-      showAlert(
-        "Ошибка",
-        "Не удалось добавить комментарий. Попробуйте ещё раз.",
-      );
-    },
-  });
-
-  const { mutate: updateComment } = useUpdateComment({
-    onError: () => {
-      showAlert(
-        "Ошибка",
-        "Не удалось обновить комментарий. Попробуйте ещё раз.",
-      );
-    },
-  });
-
-  const { mutate: deleteComment } = useDeleteComment({
-    onError: () => {
-      showAlert(
-        "Ошибка",
-        "Не удалось удалить комментарий. Попробуйте ещё раз.",
-      );
+      showAlert(t("common.error"), t("repost.error"));
     },
   });
 
@@ -219,53 +211,21 @@ export function PostCard({
 
   const handleRepost = () => {
     if (reposted) {
-      // Если уже репостнуто, отменяем репост без подтверждения
-      setRepostsCount(repostsCount - 1);
-      setReposted(false);
-    } else {
-      // Показываем диалог подтверждения для нового репоста
-      setShowRepostDialog(true);
+      // Already reposted — do nothing (reposts can't be undone)
+      return;
     }
+    setShowRepostDialog(true);
   };
 
-  const confirmRepost = () => {
-    setRepostsCount(repostsCount + 1);
-    setReposted(true);
+  const confirmRepost = (content?: string) => {
+    createRepost({
+      source_post_id: post.id,
+      ...(content && { content }),
+    });
   };
 
   const toggleComments = () => {
     setShowComments(!showComments);
-  };
-
-  const handleCommentSubmit = (content: string) => {
-    createComment({
-      post_id: post.id,
-      content,
-    });
-    // Also update local state for immediate UI feedback
-    handleAddComment(content);
-  };
-
-  const handleReplySubmit = (parentId: string, content: string) => {
-    createComment({
-      post_id: post.id,
-      content,
-      parent_id: parentId,
-    });
-    // Also update local state for immediate UI feedback
-    handleAddReply(parentId, content);
-  };
-
-  const handleCommentEdit = (commentId: string, newContent: string) => {
-    updateComment({ comment_id: commentId, content: newContent });
-    // Also update local state for immediate UI feedback
-    handleEditComment(commentId, newContent);
-  };
-
-  const handleCommentDelete = (commentId: string) => {
-    deleteComment({ comment_id: commentId });
-    // Also update local state for immediate UI feedback
-    handleDeleteComment(commentId);
   };
 
   const handleAuthorPress = useCallback(() => {
@@ -310,6 +270,16 @@ export function PostCard({
       borderRadius="$4"
       gap="$3"
     >
+      {/* Repost indicator */}
+      {post.isRepost && (
+        <XStack alignItems="center" gap="$1" marginBottom={-4}>
+          <Ionicons name="repeat" size={14} color={currentTheme.muted} />
+          <Text fontSize={12} color={currentTheme.muted}>
+            {t("repost.repostedBy")}
+          </Text>
+        </XStack>
+      )}
+
       <PostHeader
         authorName={post.author.name}
         authorAvatar={post.author.avatar}
@@ -319,11 +289,20 @@ export function PostCard({
         onAuthorPress={handleAuthorPress}
       />
 
-      <Text fontSize={16} color="$text" lineHeight={22}>
-        {postContent}
-      </Text>
+      {/* Post content (repost may have optional user comment) */}
+      {postContent ? (
+        <Text fontSize={16} color="$text" lineHeight={22}>
+          {postContent}
+        </Text>
+      ) : null}
 
-      {postImages.length === 1 && (
+      {/* If this is a repost, show the original post content */}
+      {post.isRepost && post.sourcePostId && (
+        <RepostContent sourcePostId={post.sourcePostId} />
+      )}
+
+      {/* Regular post images (only for non-reposts or reposts with own images) */}
+      {!post.isRepost && postImages.length === 1 && (
         <Image
           source={{ uri: postImages[0] }}
           style={{
@@ -336,12 +315,14 @@ export function PostCard({
         />
       )}
 
-      {postImages.length > 1 && <ImageSlider images={postImages} />}
+      {!post.isRepost && postImages.length > 1 && (
+        <ImageSlider images={postImages} />
+      )}
 
       <PostActions
         liked={liked}
         likeCount={likeCount}
-        commentsCount={comments.length}
+        commentsCount={commentsCount}
         reposted={reposted}
         repostsCount={repostsCount}
         onLike={handleLike}
@@ -351,14 +332,10 @@ export function PostCard({
 
       {showComments && (
         <CommentsSection
-          comments={comments}
+          postId={post.id}
           currentUserId={
             currentUserId || (isAuthenticated ? "__me__" : undefined)
           }
-          onAddComment={handleCommentSubmit}
-          onAddReply={handleReplySubmit}
-          onEditComment={handleCommentEdit}
-          onDeleteComment={handleCommentDelete}
         />
       )}
 
@@ -369,13 +346,9 @@ export function PostCard({
         onDelete={handleDeleteRequest}
       />
 
-      <ConfirmDialog
+      <RepostDialog
         open={showRepostDialog}
         onOpenChange={setShowRepostDialog}
-        title="Репост"
-        description="Вы уверены, что хотите репостнуть этот пост?"
-        confirmText="Репостнуть"
-        cancelText="Отмена"
         onConfirm={confirmRepost}
       />
 

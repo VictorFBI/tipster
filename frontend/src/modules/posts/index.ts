@@ -8,6 +8,10 @@ export { CommentInput } from "./components/commentInput/comment-input";
 export { CommentItem } from "./components/commentItem/comment-item";
 export { CommentEditMenu } from "./components/commentEditMenu/comment-edit-menu";
 
+export { CommentsSection } from "./components/commentsSection/comments-section";
+export { RepostDialog } from "./components/repostDialog/repost-dialog";
+export { RepostContent } from "./components/repostContent/repost-content";
+
 export { usePostComments } from "./hooks/usePostComments";
 export type { Post } from "./types";
 
@@ -24,6 +28,9 @@ export {
   useCreateComment,
   useUpdateComment,
   useDeleteComment,
+  useComments,
+  useCreateRepost,
+  usePostsByIds,
   useLikePost,
   useUnlikePost,
   usePosts,
@@ -38,12 +45,18 @@ export {
 export type {
   PostResponse,
   CommentResponse,
+  CommentListItem,
+  CommentsPage,
   CreatePostRequest,
   UpdatePostRequest,
   DeletePostRequest,
   CreateCommentRequest,
   UpdateCommentRequest,
   DeleteCommentRequest,
+  CreateRepostRequest,
+  GetPostsByIdsRequest,
+  PostsByIdsResponse,
+  GetCommentsRequest,
   LikeRequest,
   PaginationParams,
   GetPostsRequest,

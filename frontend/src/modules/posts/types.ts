@@ -17,7 +17,12 @@ export interface Post {
   likes: number;
   likedByMe: boolean;
   comments: number;
-  reposts?: number;
+  reposts: number;
+  repostedByMe: boolean;
+  /** Whether this post is a repost of another post */
+  isRepost: boolean;
+  /** Original post id for reposts; null/undefined for regular posts */
+  sourcePostId: string | null;
   commentsList?: Comment[];
 }
 
@@ -30,14 +35,14 @@ export interface Comment {
   };
   timestamp: string;
   content: string;
+  /** Whether this comment has at least one direct reply (from API) */
+  hasReplies?: boolean;
+  /** Parent comment id (null for top-level comments) */
+  parentId?: string | null;
   replies?: Comment[];
 }
 
 export interface CommentsSectionProps {
-  comments: Comment[];
+  postId: string;
   currentUserId?: string;
-  onAddComment: (content: string) => void;
-  onAddReply: (commentId: string, content: string) => void;
-  onEditComment: (commentId: string, newContent: string) => void;
-  onDeleteComment: (commentId: string) => void;
 }

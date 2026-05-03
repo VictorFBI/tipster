@@ -1,10 +1,11 @@
-import { useRef, useCallback, useState } from "react";
+import { useCallback, useState, useEffect } from "react";
 import {
   View,
   TouchableOpacity,
   Modal,
   UIManager,
   findNodeHandle,
+  Dimensions,
 } from "react-native";
 import { YStack, Text, Button } from "tamagui";
 import { Ionicons } from "@expo/vector-icons";
@@ -18,31 +19,51 @@ interface CommentEditMenuProps {
   onOpenChange: (open: boolean) => void;
   onEdit: () => void;
   onDelete: () => void;
+  /** Ref to the anchor element (the three-dot button) used for positioning */
+  anchorRef?: React.RefObject<View | null>;
 }
+
+const MENU_HEIGHT = 100; // approximate height of the popover menu
 
 export function CommentEditMenu({
   open,
   onOpenChange,
   onEdit,
   onDelete,
+  anchorRef,
 }: CommentEditMenuProps) {
   const { t } = useTranslation();
   const { theme } = useThemeStore();
   const currentTheme = themes[theme];
-  const anchorRef = useRef<View>(null);
   const [position, setPosition] = useState<{ top: number; right: number }>({
     top: 0,
     right: 0,
   });
+  const [measured, setMeasured] = useState(false);
 
-  const measure = useCallback(() => {
-    const node = findNodeHandle(anchorRef.current);
-    if (node) {
-      UIManager.measureInWindow(node, (x, y, width) => {
-        setPosition({ top: y, right: x + width });
-      });
+  // Measure anchor position every time the menu opens so the popover
+  // appears at the correct location even after the user has scrolled.
+  useEffect(() => {
+    if (open && anchorRef?.current) {
+      const node = findNodeHandle(anchorRef.current);
+      if (node) {
+        UIManager.measureInWindow(node, (x, y, width, height) => {
+          const screenHeight = Dimensions.get("window").height;
+          // If the menu would overflow the bottom of the screen, show it above the anchor
+          const wouldOverflow = y + height + MENU_HEIGHT > screenHeight;
+          const top = wouldOverflow ? y - MENU_HEIGHT : y + height;
+
+          setPosition({ top, right: x + width });
+          setMeasured(true);
+        });
+      } else {
+        // No anchor node — fall back to showing near the top-right
+        setMeasured(true);
+      }
+    } else if (!open) {
+      setMeasured(false);
     }
-  }, []);
+  }, [open, anchorRef]);
 
   const handleEdit = () => {
     onEdit();
@@ -60,8 +81,7 @@ export function CommentEditMenu({
 
   return (
     <>
-      <View ref={anchorRef} style={styles.anchor} onLayout={measure} />
-      {open && (
+      {open && measured && (
         <Modal
           visible={open}
           transparent

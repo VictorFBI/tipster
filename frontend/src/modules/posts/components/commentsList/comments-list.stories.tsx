@@ -12,6 +12,10 @@ const meta = {
       control: "object",
       description: "Array of comments",
     },
+    postId: {
+      control: "text",
+      description: "Post ID this comments list belongs to",
+    },
     replyingTo: {
       control: "text",
       description: "ID of the comment being replied to",
@@ -47,6 +51,7 @@ const mockComments: Comment[] = [
     },
     timestamp: "1h ago",
     content: "Great post! Thanks for sharing this information.",
+    hasReplies: true,
     replies: [
       {
         id: "r1",
@@ -68,6 +73,7 @@ const mockComments: Comment[] = [
     },
     timestamp: "30m ago",
     content: "I have a question about this. Can you elaborate?",
+    hasReplies: false,
     replies: [],
   },
 ];
@@ -75,6 +81,7 @@ const mockComments: Comment[] = [
 export const DefaultDark: Story = {
   args: {
     comments: mockComments,
+    postId: "post-1",
     replyingTo: null,
     replyText: "",
     onReplyTextChange: () => {},
@@ -90,6 +97,7 @@ export const DefaultDark: Story = {
 export const DefaultLight: Story = {
   args: {
     comments: mockComments,
+    postId: "post-1",
     replyingTo: null,
     replyText: "",
     onReplyTextChange: () => {},
@@ -106,6 +114,7 @@ export const DefaultLight: Story = {
 export const EmptyDark: Story = {
   args: {
     comments: [],
+    postId: "post-1",
     replyingTo: null,
     replyText: "",
     onReplyTextChange: () => {},
@@ -121,6 +130,7 @@ export const EmptyDark: Story = {
 export const EmptyLight: Story = {
   args: {
     comments: [],
+    postId: "post-1",
     replyingTo: null,
     replyText: "",
     onReplyTextChange: () => {},

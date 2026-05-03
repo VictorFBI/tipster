@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
+import { View } from "react-native";
 import { useTranslation } from "react-i18next";
 import { Avatar, XStack, YStack, Text, Button, Input } from "tamagui";
 import { Ionicons } from "@expo/vector-icons";
@@ -24,6 +25,7 @@ export function ReplyItem({
   const { theme } = useThemeStore();
   const currentTheme = themes[theme];
 
+  const menuButtonRef = useRef<View>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(reply.content);
@@ -67,20 +69,22 @@ export function ReplyItem({
               </Text>
             </XStack>
             {isOwnReply && !!onEdit && !!onDelete && (
-              <Button
-                unstyled
-                onPress={() => setMenuOpen(true)}
-                pressStyle={{ opacity: 0.7 }}
-                backgroundColor="transparent"
-                borderWidth={0}
-                padding="$1"
-              >
-                <Ionicons
-                  name="ellipsis-horizontal"
-                  size={14}
-                  color={currentTheme.muted}
-                />
-              </Button>
+              <View ref={menuButtonRef} collapsable={false}>
+                <Button
+                  unstyled
+                  onPress={() => setMenuOpen(true)}
+                  pressStyle={{ opacity: 0.7 }}
+                  backgroundColor="transparent"
+                  borderWidth={0}
+                  padding="$1"
+                >
+                  <Ionicons
+                    name="ellipsis-horizontal"
+                    size={14}
+                    color={currentTheme.muted}
+                  />
+                </Button>
+              </View>
             )}
           </XStack>
 
@@ -151,6 +155,7 @@ export function ReplyItem({
           onOpenChange={setMenuOpen}
           onEdit={handleEdit}
           onDelete={handleDelete}
+          anchorRef={menuButtonRef}
         />
       )}
     </YStack>

@@ -4,12 +4,16 @@ import contentService from "../api/content.service";
 import type {
   PostResponse,
   CommentResponse,
+  CommentsPage,
   CreatePostRequest,
   UpdatePostRequest,
   DeletePostRequest,
   CreateCommentRequest,
   UpdateCommentRequest,
   DeleteCommentRequest,
+  CreateRepostRequest,
+  GetPostsByIdsRequest,
+  PostsByIdsResponse,
   LikeRequest,
   PaginationParams,
   GetPostsRequest,
@@ -29,12 +33,16 @@ export const contentKeys = {
     limit: number,
     offset: number,
   ) => [...contentKeys.all, "posts", accountId ?? "me", limit, offset] as const,
+  postsByIds: (postIds: string[]) =>
+    [...contentKeys.all, "posts", "by-ids", ...postIds] as const,
   feed: (startedFrom: string, limit: number, offset: number) =>
     [...contentKeys.all, "feed", startedFrom, limit, offset] as const,
   likedPosts: (limit: number, offset: number) =>
     [...contentKeys.all, "posts", "liked", limit, offset] as const,
   comments: (postId: string) =>
     [...contentKeys.all, "comments", postId] as const,
+  commentsByParent: (postId: string, parentId?: string) =>
+    [...contentKeys.all, "comments", postId, parentId ?? "top-level"] as const,
   stats: (accountId?: string) =>
     [...contentKeys.all, "stats", accountId ?? "me"] as const,
 };
@@ -161,7 +169,9 @@ export const useDeletePost = (options?: {
   return useMutation({
     mutationFn: (data: DeletePostRequest) => contentService.deletePost(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: contentKeys.posts() });
+      // Invalidate all content queries: deleting a repost affects the source
+      // post's reposts_count, so feed / by-ids / posts all need a refresh.
+      queryClient.invalidateQueries({ queryKey: contentKeys.all });
       options?.onSuccess?.();
     },
     onError: options?.onError,
@@ -185,6 +195,13 @@ export const useCreateComment = (options?: {
         queryKey: contentKeys.comments(data.post_id),
       });
       queryClient.invalidateQueries({ queryKey: contentKeys.posts() });
+      // Also invalidate the paginated comment queries for the parent level
+      queryClient.invalidateQueries({
+        queryKey: contentKeys.commentsByParent(
+          data.post_id,
+          data.parent_id ?? undefined,
+        ),
+      });
       options?.onSuccess?.(data);
     },
     onError: options?.onError,
@@ -226,6 +243,28 @@ export const useDeleteComment = (options?: {
       options?.onSuccess?.();
     },
     onError: options?.onError,
+  });
+};
+
+/** GET /content/comments — paginated comments for a post, optionally filtered by parent */
+export const useComments = (
+  postId: string,
+  params: { limit: number; offset: number; parentId?: string },
+  options?: {
+    enabled?: boolean;
+    onError?: (error: ContentApiError) => void;
+  },
+) => {
+  return useQuery({
+    queryKey: contentKeys.commentsByParent(postId, params.parentId),
+    queryFn: () =>
+      contentService.getComments({
+        postId,
+        limit: params.limit,
+        offset: params.offset,
+        parentId: params.parentId,
+      }),
+    enabled: options?.enabled,
   });
 };
 
@@ -278,6 +317,44 @@ export const useUnlikePost = (options?: {
       options?.onSuccess?.();
     },
     onError: options?.onError,
+  });
+};
+
+// ── Reposts ──
+
+/** POST /content/posts/repost — create a repost */
+export const useCreateRepost = (options?: {
+  onSuccess?: (data: PostResponse) => void;
+  onError?: (error: ContentApiError) => void;
+}) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: CreateRepostRequest) =>
+      contentService.createRepost(data),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: contentKeys.posts() });
+      queryClient.invalidateQueries({ queryKey: [...contentKeys.all, "feed"] });
+      options?.onSuccess?.(data);
+    },
+    onError: options?.onError,
+  });
+};
+
+// ── Posts by IDs ──
+
+/** POST /content/posts/by-ids — get posts by id list (for repost source resolution) */
+export const usePostsByIds = (
+  postIds: string[],
+  options?: {
+    enabled?: boolean;
+    onError?: (error: ContentApiError) => void;
+  },
+) => {
+  return useQuery({
+    queryKey: contentKeys.postsByIds(postIds),
+    queryFn: () => contentService.getPostsByIds({ post_ids: postIds }),
+    enabled: (options?.enabled ?? true) && postIds.length > 0,
   });
 };
 

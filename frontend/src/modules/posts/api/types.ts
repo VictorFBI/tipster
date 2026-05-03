@@ -10,6 +10,10 @@ export interface PostResponse {
   updated_at: string;
   likes_count: number;
   liked_by_me: boolean;
+  reposts_count: number;
+  reposted_by_me: boolean;
+  is_repost: boolean;
+  source_post_id: string | null;
 }
 
 /** Paginated list of posts for the authenticated author (GET /content/posts) */
@@ -42,6 +46,18 @@ export interface CommentResponse {
   parent_id: string | null;
   created_at: string;
   updated_at: string;
+}
+
+/** Comment list item from GET /content/comments (includes has_replies flag) */
+export interface CommentListItem extends CommentResponse {
+  has_replies: boolean;
+}
+
+/** Paginated list of comments for one parent level (GET /content/comments) */
+export interface CommentsPage {
+  items: CommentListItem[];
+  limit: number;
+  offset: number;
 }
 
 // ── Request types ──
@@ -103,6 +119,28 @@ export interface DeleteCommentRequest {
 /** POST/DELETE /content/likes */
 export interface LikeRequest {
   post_id: string;
+}
+
+/** GET /content/comments — paginated comments for a post by parent */
+export interface GetCommentsRequest extends PaginationParams {
+  postId: string;
+  parentId?: string;
+}
+
+/** POST /content/posts/repost — create a repost */
+export interface CreateRepostRequest {
+  source_post_id: string;
+  content?: string;
+}
+
+/** POST /content/posts/by-ids — get posts by id list */
+export interface GetPostsByIdsRequest {
+  post_ids: string[];
+}
+
+/** Response from POST /content/posts/by-ids */
+export interface PostsByIdsResponse {
+  items: PostResponse[];
 }
 
 // ── Feed ──

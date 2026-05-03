@@ -34,6 +34,10 @@ export function mapPostResponseToPost(
     likes: response.likes_count,
     likedByMe: response.liked_by_me,
     comments: 0,
+    reposts: response.reposts_count ?? 0,
+    repostedByMe: response.reposted_by_me ?? false,
+    isRepost: response.is_repost ?? false,
+    sourcePostId: response.source_post_id ?? null,
   };
 }
 

@@ -56,7 +56,7 @@ export function ProfileHeader({ userId }: ProfileHeaderProps) {
 
   if (isLoading) {
     return (
-      <YStack paddingVertical="$8" alignItems="center" justifyContent="center">
+      <YStack paddingVertical="$3" alignItems="center" justifyContent="center">
         <Spinner size="large" color="$purple10" />
       </YStack>
     );
@@ -64,12 +64,12 @@ export function ProfileHeader({ userId }: ProfileHeaderProps) {
 
   if (isError || !profile) {
     return (
-      <YStack paddingVertical="$2" alignItems="center" gap="$3">
-        <Avatar circular size="$10" backgroundColor={currentTheme.surface}>
+      <YStack paddingVertical="$2" alignItems="center" gap="$2">
+        <Avatar circular size="$8" backgroundColor={currentTheme.surface}>
           <Avatar.Fallback backgroundColor={currentTheme.surface}>
             <Ionicons
               name="person-outline"
-              size={56}
+              size={40}
               color={currentTheme.muted}
             />
           </Avatar.Fallback>
@@ -87,15 +87,15 @@ export function ProfileHeader({ userId }: ProfileHeaderProps) {
       : profile.username || t("profile.anonymous") || "Anonymous";
 
   return (
-    <YStack paddingVertical="$2" alignItems="center" gap="$3">
-      <Avatar circular size="$10">
+    <YStack paddingVertical="$2" alignItems="center" gap="$1">
+      <Avatar circular size="$8">
         {profile.avatarUrl ? (
           <Avatar.Image src={profile.avatarUrl} />
         ) : (
           <Avatar.Fallback backgroundColor={currentTheme.surface}>
             <Ionicons
               name="person-outline"
-              size={56}
+              size={40}
               color={currentTheme.muted}
             />
           </Avatar.Fallback>
@@ -103,13 +103,13 @@ export function ProfileHeader({ userId }: ProfileHeaderProps) {
         <Avatar.Fallback backgroundColor={currentTheme.surface} />
       </Avatar>
 
-      <YStack alignItems="center" gap="$1">
-        <Text fontSize={20} fontWeight="600" color="$text">
+      <YStack alignItems="center" gap="$0.5">
+        <Text fontSize={18} fontWeight="600" color="$text">
           {displayName}
         </Text>
 
         {profile.username && (
-          <Text fontSize={15} fontWeight="600" color="$text">
+          <Text fontSize={14} fontWeight="600" color="$text">
             @{profile.username}
           </Text>
         )}
@@ -117,11 +117,11 @@ export function ProfileHeader({ userId }: ProfileHeaderProps) {
 
       {profile.bio && (
         <Text
-          fontSize={14}
+          fontSize={13}
           color={currentTheme.muted}
           textAlign="center"
           paddingHorizontal="$6"
-          lineHeight={20}
+          lineHeight={18}
         >
           {profile.bio}
         </Text>
@@ -148,31 +148,31 @@ export function ProfileHeader({ userId }: ProfileHeaderProps) {
         </StyledButton>
       )}
 
-      <XStack gap="$8" marginTop="$4">
-        <YStack alignItems="center" gap="$1">
-          <Text fontSize={20} fontWeight="700" color="$text">
+      <XStack gap="$8" marginTop="$2">
+        <YStack alignItems="center" gap="$0.5">
+          <Text fontSize={18} fontWeight="700" color="$text">
             {postsCount}
           </Text>
-          <Text fontSize={14} color={currentTheme.muted}>
+          <Text fontSize={13} color={currentTheme.muted}>
             {t("profile.postsLabel")}
           </Text>
         </YStack>
         <Pressable onPress={handleFollowersPress}>
-          <YStack alignItems="center" gap="$1">
-            <Text fontSize={20} fontWeight="700" color="$text">
+          <YStack alignItems="center" gap="$0.5">
+            <Text fontSize={18} fontWeight="700" color="$text">
               {followersCount}
             </Text>
-            <Text fontSize={14} color={currentTheme.muted}>
+            <Text fontSize={13} color={currentTheme.muted}>
               {t("profile.followersLabel")}
             </Text>
           </YStack>
         </Pressable>
         <Pressable onPress={handleFollowingPress}>
-          <YStack alignItems="center" gap="$1">
-            <Text fontSize={20} fontWeight="700" color="$text">
+          <YStack alignItems="center" gap="$0.5">
+            <Text fontSize={18} fontWeight="700" color="$text">
               {followingCount}
             </Text>
-            <Text fontSize={14} color={currentTheme.muted}>
+            <Text fontSize={13} color={currentTheme.muted}>
               {t("profile.followingLabel")}
             </Text>
           </YStack>

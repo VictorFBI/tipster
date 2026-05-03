@@ -224,7 +224,25 @@
     "send": "Send",
     "edit": "Edit",
     "delete": "Delete",
-    "editing": "Editing..."
+    "editing": "Editing...",
+    "showReplies": "Show replies",
+    "hideReplies": "Hide replies",
+    "loadMore": "Load more",
+    "loadingComments": "Loading comments...",
+    "createError": "Failed to add comment. Please try again.",
+    "updateError": "Failed to update comment. Please try again.",
+    "deleteError": "Failed to delete comment. Please try again."
+  },
+  "repost": {
+    "title": "Repost",
+    "description": "Share this post with your followers",
+    "addComment": "Add a comment (optional)...",
+    "confirm": "Repost",
+    "cancel": "Cancel",
+    "success": "Post reposted successfully!",
+    "error": "Failed to repost. Please try again.",
+    "repostedBy": "Reposted",
+    "originalPost": "Original post"
   },
   "createPost": {
     "title": "Create Post",

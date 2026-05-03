@@ -33,6 +33,9 @@ const mockPost = {
   likedByMe: false,
   comments: 8,
   reposts: 15,
+  repostedByMe: false,
+  isRepost: false,
+  sourcePostId: null,
   images: [] as string[],
   imageObjectIds: [] as string[],
   commentsList: [
@@ -44,6 +47,7 @@ const mockPost = {
       },
       timestamp: "1h ago",
       content: "Thanks for sharing! What's the protocol name?",
+      hasReplies: true,
       replies: [
         {
           id: "r1",

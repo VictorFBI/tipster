@@ -8,6 +8,7 @@ import { CommentItem } from "../commentItem/comment-item";
 
 interface CommentsListProps {
   comments: Comment[];
+  postId: string;
   currentUserId?: string;
   replyingTo: string | null;
   replyText: string;
@@ -21,6 +22,7 @@ interface CommentsListProps {
 
 export function CommentsList({
   comments,
+  postId,
   currentUserId,
   replyingTo,
   replyText,
@@ -50,9 +52,11 @@ export function CommentsList({
           <CommentItem
             key={comment.id}
             comment={comment}
+            postId={postId}
             isOwnComment={
               !!currentUserId &&
-              (!comment.author.id || comment.author.id === currentUserId)
+              !!comment.author.id &&
+              comment.author.id === currentUserId
             }
             currentUserId={currentUserId}
             isReplying={replyingTo === comment.id}

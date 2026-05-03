@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useMemo, useRef } from "react";
+import { ActivityIndicator, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import { Avatar, XStack, YStack, Text, Button, Input } from "tamagui";
 import { Ionicons } from "@expo/vector-icons";
@@ -6,12 +7,21 @@ import { useThemeStore } from "@/src/core/store/themeStore";
 import { themes } from "@/src/core/theme/themes";
 
 import type { Comment } from "@/src/modules/posts/types";
+import type { CommentListItem } from "../../api/types";
+import { useComments } from "../../hooks/useContent";
+import {
+  useAuthorProfiles,
+  resolveAuthor,
+} from "../../hooks/useAuthorProfiles";
 import { ReplyInput } from "../replyInput/reply-input";
 import { ReplyItem } from "../replyItem/reply-item";
 import { CommentEditMenu } from "../commentEditMenu/comment-edit-menu";
 
+const REPLIES_PAGE_SIZE = 10;
+
 interface CommentItemProps {
   comment: Comment;
+  postId: string;
   isOwnComment?: boolean;
   currentUserId?: string;
   isReplying: boolean;
@@ -26,6 +36,7 @@ interface CommentItemProps {
 
 export function CommentItem({
   comment,
+  postId,
   isOwnComment = false,
   currentUserId,
   isReplying,
@@ -41,9 +52,33 @@ export function CommentItem({
   const { theme } = useThemeStore();
   const currentTheme = themes[theme];
 
+  const menuButtonRef = useRef<View>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(comment.content);
+  const [showReplies, setShowReplies] = useState(false);
+  const [repliesOffset, setRepliesOffset] = useState(0);
+
+  // Fetch replies only when showReplies is true and comment has replies
+  const { data: repliesPage, isLoading: repliesLoading } = useComments(
+    postId,
+    {
+      limit: REPLIES_PAGE_SIZE,
+      offset: repliesOffset,
+      parentId: comment.id,
+    },
+    { enabled: showReplies && !!comment.hasReplies },
+  );
+
+  const replies = repliesPage?.items ?? [];
+  const hasMoreReplies = repliesPage && replies.length >= repliesPage.limit;
+
+  // Resolve author profiles for replies
+  const replyAuthorIds = useMemo(
+    () => replies.map((r) => r.author_id),
+    [replies],
+  );
+  const replyAuthorMap = useAuthorProfiles(replyAuthorIds);
 
   const handleEdit = () => {
     setEditText(comment.content);
@@ -66,6 +101,11 @@ export function CommentItem({
     onDelete?.(comment.id);
   };
 
+  const toggleReplies = () => {
+    setShowReplies((prev) => !prev);
+    setRepliesOffset(0);
+  };
+
   return (
     <YStack gap="$2" marginBottom="$6" position="relative">
       <XStack gap="$2">
@@ -84,20 +124,22 @@ export function CommentItem({
               </Text>
             </XStack>
             {isOwnComment && !!onEdit && !!onDelete && (
-              <Button
-                unstyled
-                onPress={() => setMenuOpen(true)}
-                pressStyle={{ opacity: 0.7 }}
-                backgroundColor="transparent"
-                borderWidth={0}
-                padding="$1"
-              >
-                <Ionicons
-                  name="ellipsis-horizontal"
-                  size={16}
-                  color={currentTheme.muted}
-                />
-              </Button>
+              <View ref={menuButtonRef} collapsable={false}>
+                <Button
+                  unstyled
+                  onPress={() => setMenuOpen(true)}
+                  pressStyle={{ opacity: 0.7 }}
+                  backgroundColor="transparent"
+                  borderWidth={0}
+                  padding="$1"
+                >
+                  <Ionicons
+                    name="ellipsis-horizontal"
+                    size={16}
+                    color={currentTheme.muted}
+                  />
+                </Button>
+              </View>
             )}
           </XStack>
 
@@ -161,19 +203,52 @@ export function CommentItem({
           )}
 
           {!isEditing && (
-            <Button
-              unstyled
-              onPress={onStartReply}
-              pressStyle={{ opacity: 0.7 }}
-              marginTop="$1"
-              backgroundColor="transparent"
-              borderWidth={0}
-              padding={0}
-            >
-              <Text fontSize={12} color={currentTheme.accent} fontWeight="600">
-                {t("comments.reply")}
-              </Text>
-            </Button>
+            <XStack gap="$3" marginTop="$1" alignItems="center">
+              <Button
+                unstyled
+                onPress={onStartReply}
+                pressStyle={{ opacity: 0.7 }}
+                backgroundColor="transparent"
+                borderWidth={0}
+                padding={0}
+              >
+                <Text
+                  fontSize={12}
+                  color={currentTheme.accent}
+                  fontWeight="600"
+                >
+                  {t("comments.reply")}
+                </Text>
+              </Button>
+
+              {comment.hasReplies && (
+                <Button
+                  unstyled
+                  onPress={toggleReplies}
+                  pressStyle={{ opacity: 0.7 }}
+                  backgroundColor="transparent"
+                  borderWidth={0}
+                  padding={0}
+                >
+                  <XStack alignItems="center" gap="$1">
+                    <Ionicons
+                      name={showReplies ? "chevron-up" : "chevron-down"}
+                      size={14}
+                      color={currentTheme.accent}
+                    />
+                    <Text
+                      fontSize={12}
+                      color={currentTheme.accent}
+                      fontWeight="600"
+                    >
+                      {showReplies
+                        ? t("comments.hideReplies")
+                        : t("comments.showReplies")}
+                    </Text>
+                  </XStack>
+                </Button>
+              )}
+            </XStack>
           )}
         </YStack>
       </XStack>
@@ -184,23 +259,51 @@ export function CommentItem({
           onOpenChange={setMenuOpen}
           onEdit={handleEdit}
           onDelete={handleDelete}
+          anchorRef={menuButtonRef}
         />
       )}
 
-      {comment.replies && comment.replies.length > 0 && (
+      {/* Threaded replies loaded from API */}
+      {showReplies && (
         <YStack marginLeft="$6" gap="$2" marginTop="$2">
-          {comment.replies.map((reply) => (
-            <ReplyItem
-              key={reply.id}
-              reply={reply}
-              isOwnReply={
-                !!currentUserId &&
-                (!reply.author.id || reply.author.id === currentUserId)
+          {repliesLoading && (
+            <ActivityIndicator size="small" color={currentTheme.accent} />
+          )}
+          {replies.map((reply: CommentListItem) => {
+            const replyAuthor = resolveAuthor(replyAuthorMap, reply.author_id);
+            return (
+              <ReplyItem
+                key={reply.id}
+                reply={{
+                  id: reply.id,
+                  author: replyAuthor,
+                  timestamp: formatTimestamp(reply.created_at),
+                  content: reply.content,
+                }}
+                isOwnReply={
+                  !!currentUserId && reply.author_id === currentUserId
+                }
+                onEdit={onEdit}
+                onDelete={onDelete}
+              />
+            );
+          })}
+          {hasMoreReplies && (
+            <Button
+              unstyled
+              onPress={() =>
+                setRepliesOffset((prev) => prev + REPLIES_PAGE_SIZE)
               }
-              onEdit={onEdit}
-              onDelete={onDelete}
-            />
-          ))}
+              pressStyle={{ opacity: 0.7 }}
+              backgroundColor="transparent"
+              borderWidth={0}
+              padding={0}
+            >
+              <Text fontSize={12} color={currentTheme.accent} fontWeight="600">
+                {t("comments.loadMore")}
+              </Text>
+            </Button>
+          )}
         </YStack>
       )}
 
@@ -214,4 +317,23 @@ export function CommentItem({
       )}
     </YStack>
   );
+}
+
+/** Format an ISO-8601 timestamp into a human-readable relative string. */
+function formatTimestamp(iso: string): string {
+  const date = new Date(iso);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffMin = Math.floor(diffMs / 60_000);
+
+  if (diffMin < 1) return "just now";
+  if (diffMin < 60) return `${diffMin}m ago`;
+
+  const diffHours = Math.floor(diffMin / 60);
+  if (diffHours < 24) return `${diffHours}h ago`;
+
+  const diffDays = Math.floor(diffHours / 24);
+  if (diffDays < 30) return `${diffDays}d ago`;
+
+  return date.toLocaleDateString();
 }

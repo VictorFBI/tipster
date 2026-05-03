@@ -12,6 +12,10 @@ const meta = {
       control: "object",
       description: "Comment data object",
     },
+    postId: {
+      control: "text",
+      description: "Post ID this comment belongs to",
+    },
     isOwnComment: {
       control: "boolean",
       description: "Whether the comment belongs to the current user",
@@ -57,40 +61,25 @@ const mockComment: Comment = {
   },
   timestamp: "1h ago",
   content: "Great post! Thanks for sharing this information.",
-  replies: [],
+  hasReplies: true,
 };
 
-const mockCommentWithReplies: Comment = {
-  ...mockComment,
-  replies: [
-    {
-      id: "r1",
-      author: {
-        id: "user-2",
-        name: "CryptoKing",
-        avatar: "https://i.pravatar.cc/150?img=1",
-      },
-      timestamp: "45m ago",
-      content: "You're welcome! Glad you found it helpful.",
-      replies: [],
-    },
-    {
-      id: "r2",
-      author: {
-        id: "user-3",
-        name: "BlockchainBoss",
-        avatar: "https://i.pravatar.cc/150?img=3",
-      },
-      timestamp: "30m ago",
-      content: "Agreed, the fundamentals are strong.",
-      replies: [],
-    },
-  ],
+const mockCommentNoReplies: Comment = {
+  id: "2",
+  author: {
+    id: "user-2",
+    name: "CryptoKing",
+    avatar: "https://i.pravatar.cc/150?img=1",
+  },
+  timestamp: "30m ago",
+  content: "I have a question about this. Can you elaborate?",
+  hasReplies: false,
 };
 
 export const DefaultDark: Story = {
   args: {
     comment: mockComment,
+    postId: "post-1",
     isOwnComment: false,
     isReplying: false,
     replyText: "",
@@ -109,6 +98,7 @@ export const DefaultDark: Story = {
 export const DefaultLight: Story = {
   args: {
     comment: mockComment,
+    postId: "post-1",
     isOwnComment: false,
     isReplying: false,
     replyText: "",
@@ -128,6 +118,7 @@ export const DefaultLight: Story = {
 export const OwnCommentDark: Story = {
   args: {
     comment: mockComment,
+    postId: "post-1",
     isOwnComment: true,
     isReplying: false,
     replyText: "",
@@ -146,6 +137,7 @@ export const OwnCommentDark: Story = {
 export const OwnCommentLight: Story = {
   args: {
     comment: mockComment,
+    postId: "post-1",
     isOwnComment: true,
     isReplying: false,
     replyText: "",
@@ -165,6 +157,7 @@ export const OwnCommentLight: Story = {
 export const ReplyingDark: Story = {
   args: {
     comment: mockComment,
+    postId: "post-1",
     isOwnComment: false,
     isReplying: true,
     replyText: "",
@@ -183,6 +176,7 @@ export const ReplyingDark: Story = {
 export const ReplyingLight: Story = {
   args: {
     comment: mockComment,
+    postId: "post-1",
     isOwnComment: false,
     isReplying: true,
     replyText: "",
@@ -201,7 +195,8 @@ export const ReplyingLight: Story = {
 
 export const WithRepliesDark: Story = {
   args: {
-    comment: mockCommentWithReplies,
+    comment: mockComment,
+    postId: "post-1",
     isOwnComment: true,
     isReplying: false,
     replyText: "",
@@ -211,6 +206,25 @@ export const WithRepliesDark: Story = {
     onCancelReply: () => {},
     onEdit: (id, content) => console.log("Edit:", id, content),
     onDelete: (id) => console.log("Delete:", id),
+  },
+  parameters: {
+    backgrounds: { default: "dark" },
+  },
+};
+
+export const NoRepliesDark: Story = {
+  args: {
+    comment: mockCommentNoReplies,
+    postId: "post-1",
+    isOwnComment: false,
+    isReplying: false,
+    replyText: "",
+    onReplyTextChange: () => {},
+    onStartReply: () => {},
+    onSubmitReply: () => {},
+    onCancelReply: () => {},
+    onEdit: () => {},
+    onDelete: () => {},
   },
   parameters: {
     backgrounds: { default: "dark" },

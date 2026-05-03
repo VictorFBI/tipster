@@ -74,7 +74,7 @@ export function BalanceBlock({ balance }: BalanceBlockProps) {
   }, [address, isConnected]);
 
   const handleButtonPress = useCallback(async () => {
-    if (isConnected) {
+    if (walletAddress) {
       // Set the flag before mutating to prevent the sync effect from
       // re-sending the old address while disconnect is in progress
       isDisconnectingRef.current = true;
@@ -95,7 +95,7 @@ export function BalanceBlock({ balance }: BalanceBlockProps) {
     }
 
     return open();
-  }, [isConnected, provider, open, updateAccountProfileMutation]);
+  }, [walletAddress, provider, open, updateAccountProfileMutation]);
 
   const formatAddress = (addr: string) => {
     return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
@@ -152,12 +152,12 @@ export function BalanceBlock({ balance }: BalanceBlockProps) {
       >
         <XStack gap="$2" alignItems="center">
           <Ionicons
-            name={isConnected ? "wallet" : "wallet-outline"}
+            name={walletAddress ? "wallet" : "wallet-outline"}
             size={20}
             color={currentTheme.accent}
           />
           <Text color={currentTheme.tabActive} fontSize={16} fontWeight="600">
-            {isConnected
+            {walletAddress
               ? t("settings.disconnectWallet")
               : t("settings.connectWallet")}
           </Text>
