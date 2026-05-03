@@ -33,7 +33,7 @@ export function ProfileFillingScreen() {
         paddingBottom: 40,
       }}
       showsVerticalScrollIndicator={false}
-      backgroundColor="$background"
+      backgroundColor="$background2"
     >
       <YStack paddingHorizontal="$4" paddingTop="$12" gap="$4">
         <WelcomeHeader />

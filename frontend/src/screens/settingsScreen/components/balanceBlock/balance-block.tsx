@@ -83,7 +83,11 @@ export function BalanceBlock({ balance }: BalanceBlockProps) {
         {
           onSuccess: async () => {
             lastSyncedAddressRef.current = null;
-            await provider?.disconnect();
+            try {
+              await provider?.disconnect();
+            } catch {
+              // WalletConnect may throw session-related errors on disconnect
+            }
             isDisconnectingRef.current = false;
           },
           onError: () => {
@@ -94,7 +98,11 @@ export function BalanceBlock({ balance }: BalanceBlockProps) {
       return;
     }
 
-    return open();
+    try {
+      return await open();
+    } catch {
+      // WalletConnect may throw internal errors during modal open
+    }
   }, [walletAddress, provider, open, updateAccountProfileMutation]);
 
   const formatAddress = (addr: string) => {

@@ -8,6 +8,7 @@ import { themes } from "@/src/core/theme/themes";
 import { usePostsByIds } from "../../hooks/useContent";
 import { getImageUrl } from "@/src/modules/media";
 import { useAccountProfile } from "@/src/modules/user";
+import { ImageSlider } from "../imageSlider/image-slider";
 import type { PostResponse } from "../../api/types";
 
 interface RepostContentProps {
@@ -115,8 +116,8 @@ export function RepostContent({ sourcePostId }: RepostContentProps) {
         </Text>
       ) : null}
 
-      {/* Source post first image (preview) */}
-      {images.length > 0 && (
+      {/* Source post images */}
+      {images.length === 1 && (
         <Image
           source={{ uri: images[0] }}
           style={{
@@ -128,6 +129,7 @@ export function RepostContent({ sourcePostId }: RepostContentProps) {
           resizeMode="cover"
         />
       )}
+      {images.length > 1 && <ImageSlider images={images} height={150} />}
     </YStack>
   );
 }

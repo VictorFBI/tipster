@@ -37,16 +37,18 @@ export function EditPost() {
     initialContent: string;
     initialImages: string;
     initialImageObjectIds: string;
+    isRepost: string;
   }>();
 
   const postId = params.postId;
   const initialContent = params.initialContent ?? "";
-  const initialImageUrls: string[] = params.initialImages
-    ? JSON.parse(params.initialImages)
-    : [];
-  const initialObjectIds: string[] = params.initialImageObjectIds
-    ? JSON.parse(params.initialImageObjectIds)
-    : [];
+  const isRepost = params.isRepost === "true";
+  const initialImageUrls: string[] =
+    !isRepost && params.initialImages ? JSON.parse(params.initialImages) : [];
+  const initialObjectIds: string[] =
+    !isRepost && params.initialImageObjectIds
+      ? JSON.parse(params.initialImageObjectIds)
+      : [];
 
   // Build paired existing images (url + objectKey)
   const initialExistingImages: ExistingImage[] = initialImageUrls.map(
@@ -119,7 +121,8 @@ export function EditPost() {
   const isSaving = updatePostMutation.isPending || isUploading;
 
   const handleSave = async () => {
-    if (content.trim().length === 0) {
+    // For reposts, allow empty content (caption is optional)
+    if (!isRepost && content.trim().length === 0) {
       return;
     }
 
@@ -163,8 +166,9 @@ export function EditPost() {
     }
   };
 
-  const canSave =
-    content.trim().length > 0 && content.length <= MAX_POST_CONTENT_LENGTH;
+  const canSave = isRepost
+    ? content.length <= MAX_POST_CONTENT_LENGTH
+    : content.trim().length > 0 && content.length <= MAX_POST_CONTENT_LENGTH;
 
   const uploadProgressPercent = Math.round(progress * 100);
 
@@ -266,88 +270,92 @@ export function EditPost() {
               </Text>
             </XStack>
 
-            {/* Images grid — horizontal scroll, 2 rows */}
-            {(existingImages.length > 0 || newImages.length > 0) && (
-              <RNScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                style={{
-                  maxHeight: totalImageCount <= 1 ? 160 : 320,
-                }}
-              >
-                <View
+            {/* Images grid — horizontal scroll, 2 rows (hidden for reposts) */}
+            {!isRepost &&
+              (existingImages.length > 0 || newImages.length > 0) && (
+                <RNScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
                   style={{
-                    flexDirection: "column",
-                    flexWrap: "wrap",
-                    gap: 8,
-                    height: totalImageCount <= 1 ? 150 : 310,
+                    maxHeight: totalImageCount <= 1 ? 160 : 320,
                   }}
                 >
-                  {/* Existing images */}
-                  {existingImages.map((img, index) => (
-                    <View
-                      key={`existing-${index}`}
-                      style={{ position: "relative" }}
-                    >
-                      <Image
-                        source={{ uri: img.url }}
-                        style={{
-                          width: totalImageCount === 1 ? 300 : 145,
-                          height: totalImageCount === 1 ? 150 : 145,
-                          borderRadius: 8,
-                        }}
-                      />
-                      <TouchableOpacity
-                        onPress={() => removeExistingImage(index)}
-                        style={{
-                          position: "absolute",
-                          top: 8,
-                          right: 8,
-                          backgroundColor: "rgba(0,0,0,0.6)",
-                          borderRadius: 15,
-                          width: 30,
-                          height: 30,
-                          alignItems: "center",
-                          justifyContent: "center",
-                        }}
+                  <View
+                    style={{
+                      flexDirection: "column",
+                      flexWrap: "wrap",
+                      gap: 8,
+                      height: totalImageCount <= 1 ? 150 : 310,
+                    }}
+                  >
+                    {/* Existing images */}
+                    {existingImages.map((img, index) => (
+                      <View
+                        key={`existing-${index}`}
+                        style={{ position: "relative" }}
                       >
-                        <Ionicons name="close" size={20} color="white" />
-                      </TouchableOpacity>
-                    </View>
-                  ))}
+                        <Image
+                          source={{ uri: img.url }}
+                          style={{
+                            width: totalImageCount === 1 ? 300 : 145,
+                            height: totalImageCount === 1 ? 150 : 145,
+                            borderRadius: 8,
+                          }}
+                        />
+                        <TouchableOpacity
+                          onPress={() => removeExistingImage(index)}
+                          style={{
+                            position: "absolute",
+                            top: 8,
+                            right: 8,
+                            backgroundColor: "rgba(0,0,0,0.6)",
+                            borderRadius: 15,
+                            width: 30,
+                            height: 30,
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <Ionicons name="close" size={20} color="white" />
+                        </TouchableOpacity>
+                      </View>
+                    ))}
 
-                  {/* Newly picked images */}
-                  {newImages.map((asset, index) => (
-                    <View key={`new-${index}`} style={{ position: "relative" }}>
-                      <Image
-                        source={{ uri: asset.uri }}
-                        style={{
-                          width: totalImageCount === 1 ? 300 : 145,
-                          height: totalImageCount === 1 ? 150 : 145,
-                          borderRadius: 8,
-                        }}
-                      />
-                      <TouchableOpacity
-                        onPress={() => removeNewImage(index)}
-                        style={{
-                          position: "absolute",
-                          top: 8,
-                          right: 8,
-                          backgroundColor: "rgba(0,0,0,0.6)",
-                          borderRadius: 15,
-                          width: 30,
-                          height: 30,
-                          alignItems: "center",
-                          justifyContent: "center",
-                        }}
+                    {/* Newly picked images */}
+                    {newImages.map((asset, index) => (
+                      <View
+                        key={`new-${index}`}
+                        style={{ position: "relative" }}
                       >
-                        <Ionicons name="close" size={20} color="white" />
-                      </TouchableOpacity>
-                    </View>
-                  ))}
-                </View>
-              </RNScrollView>
-            )}
+                        <Image
+                          source={{ uri: asset.uri }}
+                          style={{
+                            width: totalImageCount === 1 ? 300 : 145,
+                            height: totalImageCount === 1 ? 150 : 145,
+                            borderRadius: 8,
+                          }}
+                        />
+                        <TouchableOpacity
+                          onPress={() => removeNewImage(index)}
+                          style={{
+                            position: "absolute",
+                            top: 8,
+                            right: 8,
+                            backgroundColor: "rgba(0,0,0,0.6)",
+                            borderRadius: 15,
+                            width: 30,
+                            height: 30,
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <Ionicons name="close" size={20} color="white" />
+                        </TouchableOpacity>
+                      </View>
+                    ))}
+                  </View>
+                </RNScrollView>
+              )}
 
             {isUploading && (
               <XStack alignItems="center" gap="$2" paddingVertical="$2">
@@ -359,7 +367,7 @@ export function EditPost() {
               </XStack>
             )}
 
-            {totalImageCount < MAX_POST_IMAGES && (
+            {!isRepost && totalImageCount < MAX_POST_IMAGES && (
               <Button
                 backgroundColor="$surface"
                 borderWidth={1}

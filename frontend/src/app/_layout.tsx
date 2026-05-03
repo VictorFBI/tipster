@@ -1,3 +1,7 @@
+// WalletConnect polyfills – must be imported before any WalletConnect code.
+// Provides crypto.getRandomValues, TextEncoder/TextDecoder, Buffer, etc.
+import "@walletconnect/react-native-compat";
+
 import {
   DarkTheme,
   DefaultTheme,
@@ -28,6 +32,8 @@ if (typeof bh.removeEventListener !== "function") {
 LogBox.ignoreLogs([
   "react-native-compat",
   "Application module is not available",
+  "Cannot convert undefined value to object",
+  "No matching key. session topic doesn't exist",
 ]);
 
 function RootLayoutContent() {

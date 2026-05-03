@@ -1,11 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
-import {
-  Image,
-  View,
-  ScrollView,
-  NativeSyntheticEvent,
-  NativeScrollEvent,
-} from "react-native";
+import { Image } from "react-native";
 import { useTranslation } from "react-i18next";
 import { YStack, XStack, Text } from "tamagui";
 import { Ionicons } from "@expo/vector-icons";
@@ -16,6 +10,7 @@ import { PostActions } from "../postActions/post-actions";
 import { PostEditMenu } from "../postEditMenu/post-edit-menu";
 import { RepostDialog } from "../repostDialog/repost-dialog";
 import { RepostContent } from "../repostContent/repost-content";
+import { ImageSlider } from "../imageSlider/image-slider";
 import type { Post } from "@/src/modules/posts/types";
 import {
   useDeletePost,
@@ -32,82 +27,6 @@ import { useThemeStore } from "@/src/core/store/themeStore";
 import { themes } from "@/src/core/theme/themes";
 
 export type { Post };
-
-const SLIDER_HEIGHT = 250;
-
-/** Horizontal image slider with page indicator dots */
-function ImageSlider({ images }: { images: string[] }) {
-  const [containerWidth, setContainerWidth] = useState(0);
-  const [activeIndex, setActiveIndex] = useState(0);
-
-  const handleScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-    if (containerWidth === 0) return;
-    const offsetX = e.nativeEvent.contentOffset.x;
-    const index = Math.round(offsetX / containerWidth);
-    setActiveIndex(index);
-  };
-
-  return (
-    <View
-      style={{ marginTop: 8 }}
-      onLayout={(e) => setContainerWidth(e.nativeEvent.layout.width)}
-    >
-      {containerWidth > 0 && (
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          onScroll={handleScroll}
-          scrollEventThrottle={16}
-          decelerationRate="fast"
-          snapToInterval={containerWidth}
-          snapToAlignment="start"
-          disableIntervalMomentum
-        >
-          {images.map((uri, index) => (
-            <Image
-              key={index}
-              source={{ uri }}
-              style={{
-                width: containerWidth,
-                height: SLIDER_HEIGHT,
-                borderRadius: 12,
-              }}
-              resizeMode="cover"
-            />
-          ))}
-        </ScrollView>
-      )}
-
-      {/* Page indicator dots */}
-      {images.length > 1 && (
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "center",
-            alignItems: "center",
-            marginTop: 8,
-            gap: 6,
-          }}
-        >
-          {images.map((_, index) => (
-            <View
-              key={index}
-              style={{
-                width: index === activeIndex ? 8 : 6,
-                height: index === activeIndex ? 8 : 6,
-                borderRadius: index === activeIndex ? 4 : 3,
-                backgroundColor:
-                  index === activeIndex
-                    ? "rgba(255,255,255,0.9)"
-                    : "rgba(255,255,255,0.4)",
-              }}
-            />
-          ))}
-        </View>
-      )}
-    </View>
-  );
-}
 
 interface PostCardProps {
   post: Post;
@@ -249,6 +168,7 @@ export function PostCard({
         initialContent: postContent,
         initialImages: JSON.stringify(postImages),
         initialImageObjectIds: JSON.stringify(post.imageObjectIds),
+        isRepost: post.isRepost ? "true" : "false",
       },
     });
   };
