@@ -95,7 +95,7 @@ func GetUsersSearch(w http.ResponseWriter, r *http.Request) {
 	svc := usersservice.New(r.Context())
 	defer svc.Close(r.Context())
 
-	rows, err := svc.SearchUsersByUsernamePrefix(r.Context(), query, limit, offset)
+	rows, err := svc.SearchUsersByUsernamePrefix(r.Context(), query, limit, offset, sub)
 	if err != nil {
 		log.Error("search_users_failed", slog.String("error", err.Error()))
 		w.WriteHeader(http.StatusInternalServerError)

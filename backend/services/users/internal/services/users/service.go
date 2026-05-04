@@ -107,16 +107,18 @@ func (as *UsersService) IsSubscribed(ctx context.Context, subscriberID, authorID
 }
 
 // SearchUsersByUsernamePrefix returns users whose username starts with prefix (case-insensitive), ordered by lower(username).
-func (as *UsersService) SearchUsersByUsernamePrefix(ctx context.Context, prefix string, limit, offset int) ([]UserSearchRow, error) {
+// excludeAccountID, if non-empty, excludes that user id from results (e.g. caller).
+func (as *UsersService) SearchUsersByUsernamePrefix(ctx context.Context, prefix string, limit, offset int, excludeAccountID string) ([]UserSearchRow, error) {
 	rows, err := as.postgres.Query(ctx,
 		`SELECT id::text, username, first_name, last_name, avatar_url
 		 FROM users
 		 WHERE username IS NOT NULL
 		   AND char_length(username) >= char_length($1::text)
 		   AND substr(lower(username), 1, char_length($1::text)) = lower($1)
+		   AND id::text <> $4::text
 		 ORDER BY lower(username) ASC
 		 LIMIT $2 OFFSET $3`,
-		prefix, limit, offset,
+		prefix, limit, offset, excludeAccountID,
 	)
 	if err != nil {
 		return nil, err
