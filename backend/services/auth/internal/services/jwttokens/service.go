@@ -40,6 +40,12 @@ type JwtTokensService struct {
 	redis *redis.Client
 }
 
+const refreshTokenTTL = 7 * 24 * time.Hour
+
+func (jts *JwtTokensService) refreshTokenLookupKey(userId, deviceId string) string {
+	return fmt.Sprintf("refresh_token_lookup:%s:%s", userId, deviceId)
+}
+
 func New(ctx context.Context) *JwtTokensService {
 	redis, err := redisdb.Connect(ctx)
 	if err != nil {
@@ -54,24 +60,58 @@ func (jts *JwtTokensService) Close() error {
 	return jts.redis.Close()
 }
 
-// SaveRefreshToken saves the refresh token to the Redis database
+// SaveRefreshToken saves the refresh token in Redis. If a token already exists for the same
+// user_id and device_id (via refresh_token_lookup), the old refresh_token:* entry is removed (rotation).
 func (jts *JwtTokensService) SaveRefreshToken(ctx context.Context, refreshToken string, userId string, deviceId string) error {
-	hashedPassword := sha256.Sum256([]byte(refreshToken))
+	sum := sha256.Sum256([]byte(refreshToken))
+	newHex := fmt.Sprintf("%x", sum)
+	newKey := fmt.Sprintf("refresh_token:%s", newHex)
 
-	key := fmt.Sprintf("refresh_token:%x", hashedPassword)
-	err := jts.redis.HSet(ctx, key, "user_id", userId, "device_id", deviceId, "expires_at", time.Now().Add(7*24*time.Hour).Unix()).Err()
+	lookupKey := jts.refreshTokenLookupKey(userId, deviceId)
+	oldHex, err := jts.redis.Get(ctx, lookupKey).Result()
+	if err != nil && err != redis.Nil {
+		return err
+	}
+
+	err = jts.redis.HSet(ctx, newKey, "user_id", userId, "device_id", deviceId, "expires_at", time.Now().Add(refreshTokenTTL).Unix()).Err()
 	if err != nil {
 		return err
 	}
-	return jts.redis.Expire(ctx, key, 7*24*time.Hour).Err()
+	if err := jts.redis.Expire(ctx, newKey, refreshTokenTTL).Err(); err != nil {
+		return err
+	}
+	if err := jts.redis.Set(ctx, lookupKey, newHex, refreshTokenTTL).Err(); err != nil {
+		return err
+	}
+	if oldHex != "" && oldHex != newHex {
+		_ = jts.redis.Del(ctx, fmt.Sprintf("refresh_token:%s", oldHex)).Err()
+	}
+	return nil
 }
 
-// DeleteRefreshToken deletes the refresh token from the Redis database
+// DeleteRefreshToken deletes the refresh token from the Redis database and clears lookup when it still points at this token.
 func (jts *JwtTokensService) DeleteRefreshToken(ctx context.Context, refreshToken string) error {
-	hashedRefreshToken := sha256.Sum256([]byte(refreshToken))
+	sum := sha256.Sum256([]byte(refreshToken))
+	hex := fmt.Sprintf("%x", sum)
+	key := fmt.Sprintf("refresh_token:%s", hex)
 
-	key := fmt.Sprintf("refresh_token:%x", hashedRefreshToken)
-	return jts.redis.Del(ctx, key).Err()
+	claims, err := jts.redis.HGetAll(ctx, key).Result()
+	if err != nil {
+		return err
+	}
+
+	if err := jts.redis.Del(ctx, key).Err(); err != nil {
+		return err
+	}
+
+	if claims["user_id"] != "" && claims["device_id"] != "" {
+		lookupKey := jts.refreshTokenLookupKey(claims["user_id"], claims["device_id"])
+		cur, err := jts.redis.Get(ctx, lookupKey).Result()
+		if err == nil && cur == hex {
+			return jts.redis.Del(ctx, lookupKey).Err()
+		}
+	}
+	return nil
 }
 
 // GetRefreshTokenClaims gets the refresh token claims from the Redis database
