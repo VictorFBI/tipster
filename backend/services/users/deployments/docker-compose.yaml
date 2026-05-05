@@ -8,7 +8,7 @@ services:
     restart: unless-stopped
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: users
     ports:
       - "5433:5432"
@@ -33,7 +33,7 @@ services:
       DB_HOST: postgres
       DB_PORT: "5432"
       DB_NAME: users
-      DB_PASSWORD: postgres
+      DB_PASSWORD: ${DB_PASSWORD}
       KAFKA_BROKERS: kafka:29092
     depends_on:
       postgres:
