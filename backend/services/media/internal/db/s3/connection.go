@@ -24,9 +24,14 @@ type Client struct {
 }
 
 func newMinioClient(endpoint, accessKey, secretKey string, useSSL bool) (*minio.Client, error) {
+	// Region must be set explicitly so the SDK does not make a live GetBucketLocation
+	// call against the endpoint when signing presigned URLs. Otherwise the presign
+	// client (which may point to a publicly-reachable host like localhost:9000 that is
+	// not reachable from inside this container) would fail with connection refused.
 	return minio.New(endpoint, &minio.Options{
 		Creds:  credentials.NewStaticV4(accessKey, secretKey, ""),
 		Secure: useSSL,
+		Region: "us-east-1",
 	})
 }
 
