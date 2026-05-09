@@ -2,6 +2,7 @@ import { create } from "zustand";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { STORAGE_KEYS } from "../api/client";
 import authService from "../api/auth.service";
+import { setOnSessionExpired } from "@/src/core/api/authInterceptor";
 
 interface User {
   email: string;
@@ -86,3 +87,9 @@ export const useAuthStore = create<AuthState>((set) => ({
 
 // Initialize auth check on app start
 useAuthStore.getState().checkAuth();
+
+// When the auth interceptor detects that the refresh token is invalid,
+// reset the Zustand store so the UI redirects back to the login screen.
+setOnSessionExpired(() => {
+  useAuthStore.getState().logout();
+});

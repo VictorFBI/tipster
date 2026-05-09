@@ -4,7 +4,7 @@ import type { PostResponse } from "../../api/types";
 // Mock the media module's getImageUrl
 jest.mock("@/src/modules/media", () => ({
   getImageUrl: (key: string | undefined) =>
-    key ? `http://localhost:9000/dev-permanent/${key}` : undefined,
+    key ? `http://api-tipster.ru:9000/dev-permanent/${key}` : undefined,
 }));
 
 const baseAuthor = {
@@ -50,10 +50,10 @@ describe("mapPostResponseToPost", () => {
     const result = mapPostResponseToPost(response, baseAuthor);
 
     expect(result.images).toEqual([
-      "http://localhost:9000/dev-permanent/img1.jpg",
-      "http://localhost:9000/dev-permanent/img2.png",
+      "http://api-tipster.ru:9000/dev-permanent/img1.jpg",
+      "http://api-tipster.ru:9000/dev-permanent/img2.png",
     ]);
-    expect(result.image).toBe("http://localhost:9000/dev-permanent/img1.jpg");
+    expect(result.image).toBe("http://api-tipster.ru:9000/dev-permanent/img1.jpg");
     expect(result.imageObjectIds).toEqual(["img1.jpg", "img2.png"]);
   });
 

@@ -1,4 +1,5 @@
 import { Stack } from "expo-router";
+import { Platform } from "react-native";
 import { useThemeStore, themes } from "@/src/core";
 
 export default function ProfileLayout() {
@@ -9,6 +10,8 @@ export default function ProfileLayout() {
     <Stack
       screenOptions={{
         headerShown: false,
+        animation: Platform.OS === "android" ? "fade" : "default",
+        animationDuration: Platform.OS === "android" ? 200 : undefined,
         contentStyle: {
           backgroundColor: currentTheme.surface,
         },

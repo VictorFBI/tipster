@@ -3,7 +3,7 @@ import { setupAuthInterceptors } from "@/src/core/api/authInterceptor";
 
 // Content API base URL
 const CONTENT_API_URL =
-  process.env.EXPO_PUBLIC_CONTENT_API_URL || "http://localhost:8083";
+  process.env.EXPO_PUBLIC_CONTENT_API_URL || "http://api-tipster.ru:8083";
 
 // Create axios instance for content service
 export const contentClient: AxiosInstance = axios.create({

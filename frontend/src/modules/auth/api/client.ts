@@ -3,7 +3,16 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { setupAuthInterceptors } from "@/src/core/api/authInterceptor";
 
 // API base URL - adjust this to your backend URL
-const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || "http://localhost:8080";
+const API_BASE_URL =
+  process.env.EXPO_PUBLIC_API_URL || "http://api-tipster.ru:8080";
+
+if (__DEV__) {
+  console.log("[Auth API] Base URL:", API_BASE_URL);
+  console.log(
+    "[Auth API] EXPO_PUBLIC_API_URL:",
+    process.env.EXPO_PUBLIC_API_URL,
+  );
+}
 
 // Storage keys
 export const STORAGE_KEYS = {
@@ -15,7 +24,7 @@ export const STORAGE_KEYS = {
 // Create axios instance
 export const apiClient: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 10000,
+  timeout: 15000,
   headers: {
     "Content-Type": "application/json",
   },

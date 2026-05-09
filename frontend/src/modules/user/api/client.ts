@@ -3,7 +3,7 @@ import { setupAuthInterceptors } from "@/src/core/api/authInterceptor";
 
 // Accounts API base URL
 const ACCOUNTS_API_URL =
-  process.env.EXPO_PUBLIC_ACCOUNTS_API_URL || "http://localhost:8081";
+  process.env.EXPO_PUBLIC_ACCOUNTS_API_URL || "http://api-tipster.ru:8081";
 
 // Create axios instance for accounts service
 export const accountsClient: AxiosInstance = axios.create({

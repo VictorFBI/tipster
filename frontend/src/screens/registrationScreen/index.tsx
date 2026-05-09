@@ -60,7 +60,7 @@ export function Registration() {
 
       router.push({
         pathname: "/verify-email",
-        params: { email: data.email },
+        params: { email: data.email, password: data.password },
       });
     } catch (error) {
       const errorMessage = getErrorMessage(error);

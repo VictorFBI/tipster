@@ -22,6 +22,7 @@ import type {
   LikedPostsPage,
   ContentStats,
   GetContentStatsRequest,
+  TokensResponse,
 } from "./types";
 
 const contentService = {
@@ -175,6 +176,14 @@ const contentService = {
         ...(params?.accountId && { account_id: params.accountId }),
       },
     });
+    return response.data;
+  },
+
+  // ── Tokens ──
+
+  /** GET /content/tokens — earned TPSTR crypto tokens for the authenticated user */
+  getTokens: async (): Promise<TokensResponse> => {
+    const response = await contentClient.get<TokensResponse>("/content/tokens");
     return response.data;
   },
 };

@@ -21,7 +21,8 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "lint": "eslint src --ext .ts,.tsx",
-    "lint:fix": "eslint src --ext .ts,.tsx --fix"
+    "lint:fix": "eslint src --ext .ts,.tsx --fix",
+    "postinstall": "patch-package"
   },
   "dependencies": {
     "@gorhom/bottom-sheet": "^5.2.6",
@@ -36,9 +37,9 @@
     "@walletconnect/react-native-compat": "^2.23.9",
     "axios": "^1.13.6",
     "expo": "^55.0.14",
+    "expo-build-properties": "~55.0.13",
     "expo-clipboard": "~55.0.13",
     "expo-constants": "~55.0.13",
-    "expo-dev-menu": "^55.0.11",
     "expo-haptics": "~55.0.14",
     "expo-image-picker": "~55.0.18",
     "expo-linking": "~55.0.12",
@@ -96,6 +97,7 @@
     "eslint-config-expo": "^8.0.0",
     "jest": "^30.3.0",
     "jest-expo": "^55.0.16",
+    "patch-package": "^8.0.1",
     "react-test-renderer": "^19.2.0",
     "storybook": "^10.0.0",
     "ts-jest": "^29.4.9",

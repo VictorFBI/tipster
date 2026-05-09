@@ -166,6 +166,13 @@ export interface ContentStats {
   posts_count: number;
 }
 
+// ── Tokens ──
+
+/** Response from GET /content/tokens — earned TPSTR crypto tokens */
+export interface TokensResponse {
+  balance: number;
+}
+
 export interface GetContentStatsRequest {
   accountId?: string;
 }

@@ -9,16 +9,20 @@ export function useStorybookDevMenu() {
   useEffect(() => {
     if (__DEV__ && ENABLE_STORYBOOK && Platform.OS !== "web") {
       // Add Storybook option to dev menu
-      const DevMenu = require("expo-dev-menu");
+      try {
+        const DevMenu = require("expo-dev-menu");
 
-      DevMenu.registerDevMenuItems([
-        {
-          name: "Open Storybook",
-          callback: () => {
-            router.push("/storybook");
+        DevMenu.registerDevMenuItems([
+          {
+            name: "Open Storybook",
+            callback: () => {
+              router.push("/storybook");
+            },
           },
-        },
-      ]);
+        ]);
+      } catch {
+        // expo-dev-menu is not installed — skip dev menu registration
+      }
     }
   }, [router]);
 }

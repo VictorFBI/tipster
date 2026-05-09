@@ -1,0 +1,28 @@
+{
+  "build": {
+    "preview": {
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_API_URL": "http://api-tipster.ru:8080",
+        "EXPO_PUBLIC_ACCOUNTS_API_URL": "http://api-tipster.ru:8081",
+        "EXPO_PUBLIC_MEDIA_API_URL": "http://api-tipster.ru:8082",
+        "EXPO_PUBLIC_CONTENT_API_URL": "http://api-tipster.ru:8083",
+        "EXPO_PUBLIC_S3_PUBLIC_URL": "http://api-tipster.ru:9000"
+      }
+    },
+    "preview2": {
+      "android": {
+        "gradleCommand": ":app:assembleRelease"
+      }
+    },
+    "preview3": {
+      "developmentClient": true
+    },
+    "preview4": {
+      "distribution": "internal"
+    },
+    "production": {}
+  }
+}

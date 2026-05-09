@@ -8,7 +8,7 @@
  */
 
 const S3_PUBLIC_URL =
-  process.env.EXPO_PUBLIC_S3_PUBLIC_URL || "http://localhost:9000";
+  process.env.EXPO_PUBLIC_S3_PUBLIC_URL || "http://api-tipster.ru:9000";
 
 const S3_PERMANENT_BUCKET =
   process.env.EXPO_PUBLIC_S3_PERMANENT_BUCKET || "dev-permanent";

@@ -182,6 +182,7 @@ export function CreatePost() {
               autoFocus
               // @ts-ignore
               placeholderTextColor={currentTheme.muted}
+              textAlignVertical="top"
             />
 
             <XStack justifyContent="flex-end">

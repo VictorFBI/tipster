@@ -254,6 +254,7 @@ export function EditPost() {
               autoFocus
               // @ts-ignore
               placeholderTextColor={currentTheme.muted}
+              textAlignVertical="top"
             />
 
             <XStack justifyContent="flex-end">

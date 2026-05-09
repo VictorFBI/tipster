@@ -3,6 +3,18 @@ import type { ApiError } from "@/src/modules/auth";
 
 export const getErrorMessage = (error: unknown): string => {
   if (error instanceof AxiosError) {
+    // Network-level error (no response from server at all)
+    if (!error.response && error.code === "ERR_NETWORK") {
+      console.error(
+        "[Network Error] URL:",
+        error.config?.baseURL,
+        error.config?.url,
+        "| Message:",
+        error.message,
+      );
+      return "Ошибка сети. Проверьте подключение к интернету и попробуйте снова.";
+    }
+
     const apiError = error.response?.data as ApiError | undefined;
 
     // Check for specific API error messages first

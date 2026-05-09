@@ -47,6 +47,8 @@ export function ProfileHeader({ userId }: ProfileHeaderProps) {
     isError,
   } = isOwnProfile ? myProfileQuery : accountProfileQuery;
 
+  console.log("profile", profile);
+
   const { data: userStats } = useUserStats(userId);
   const { data: contentStats } = useContentStats(userId);
 

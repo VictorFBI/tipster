@@ -16,6 +16,7 @@ import {
   clearAuthTokens,
 } from "@/src/modules/auth";
 import { useDeleteMyAccount } from "@/src/modules/user";
+import { useTokens } from "@/src/modules/posts";
 import { ReferalBlock } from "./components/referalBlock/referal-block";
 
 export default function Settings() {
@@ -27,7 +28,11 @@ export default function Settings() {
   const deleteAccountMutation = useDeleteMyAccount();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-  const balance = 5420;
+  const {
+    data: tokensData,
+    isLoading: isBalanceLoading,
+    isError: isBalanceError,
+  } = useTokens({ enabled: true });
 
   const referralCode = "TIPSTER2026";
   const totalReferrals = 12;
@@ -80,7 +85,11 @@ export default function Settings() {
 
       <ScrollView>
         <YStack padding="$4" gap="$4">
-          <BalanceBlock balance={balance} />
+          <BalanceBlock
+            balance={tokensData?.tokens ?? 0}
+            isLoading={isBalanceLoading}
+            isError={isBalanceError}
+          />
 
           <SettingsBlock />
 
@@ -157,7 +166,7 @@ export default function Settings() {
             onConfirm={handleDeleteAccount}
           />
 
-          <InfoBlock
+          {/* <InfoBlock
             text={t("settings.securityInfo")}
             icon={
               <Ionicons
@@ -167,7 +176,7 @@ export default function Settings() {
               />
             }
             header={t("settings.security")}
-          />
+          /> */}
         </YStack>
       </ScrollView>
     </YStack>

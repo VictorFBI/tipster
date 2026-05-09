@@ -5,7 +5,8 @@ import { SearchInput } from "./components/searchInput/search-input";
 import { useTranslation } from "react-i18next";
 import { Pressable } from "react-native";
 import { useRouter } from "expo-router";
-import { useMemo, useState } from "react";
+import { useNavigation } from "@react-navigation/native";
+import { useEffect, useMemo, useState } from "react";
 import { UserSearchItem } from "@/src/modules/user/api/types";
 import { Ionicons } from "@expo/vector-icons";
 import { useThemeStore } from "@/src/core/store/themeStore";
@@ -27,6 +28,19 @@ export default function Search() {
   const { theme } = useThemeStore();
   const currentTheme = themes[theme];
   const [searchQuery, setSearchQuery] = useState("");
+  const tabNavigation = useNavigation().getParent();
+
+  useEffect(() => {
+    if (!tabNavigation) return;
+    const unsubscribe = tabNavigation.addListener("state", (e: any) => {
+      const state = tabNavigation.getState();
+      const activeRoute = state.routes[state.index];
+      if (activeRoute?.name !== "search") {
+        setSearchQuery("");
+      }
+    });
+    return unsubscribe;
+  }, [tabNavigation]);
 
   const searchParams = useMemo(
     () => ({ query: searchQuery, limit: SEARCH_LIMIT, offset: 0 }),

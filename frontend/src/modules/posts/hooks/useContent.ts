@@ -23,6 +23,7 @@ import type {
   LikedPostsPage,
   ContentStats,
   ContentApiError,
+  TokensResponse,
 } from "../api/types";
 
 export const contentKeys = {
@@ -45,6 +46,7 @@ export const contentKeys = {
     [...contentKeys.all, "comments", postId, parentId ?? "top-level"] as const,
   stats: (accountId?: string) =>
     [...contentKeys.all, "stats", accountId ?? "me"] as const,
+  tokens: () => [...contentKeys.all, "tokens"] as const,
 };
 
 // ── Posts ──
@@ -389,4 +391,18 @@ export const useContentStats = (
   }, [query.isError, query.error]);
 
   return query;
+};
+
+// ── Tokens ──
+
+/** GET /content/tokens — earned TPSTR crypto tokens for the authenticated user */
+export const useTokens = (options?: {
+  enabled?: boolean;
+  onError?: (error: ContentApiError) => void;
+}) => {
+  return useQuery<TokensResponse, ContentApiError>({
+    queryKey: contentKeys.tokens(),
+    queryFn: () => contentService.getTokens(),
+    enabled: options?.enabled,
+  });
 };

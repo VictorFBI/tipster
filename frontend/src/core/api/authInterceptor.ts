@@ -12,7 +12,20 @@ const STORAGE_KEYS = {
 } as const;
 
 // API base URL for the refresh endpoint
-const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || "http://localhost:8080";
+const API_BASE_URL =
+  process.env.EXPO_PUBLIC_API_URL || "http://api-tipster.ru:8080";
+
+// Callback invoked when token refresh fails and the user must re-authenticate.
+// Set via `setOnSessionExpired` to avoid circular imports with the auth store.
+let onSessionExpired: (() => void) | null = null;
+
+/**
+ * Register a callback that will be called when the refresh token is invalid
+ * and the user session can no longer be restored.
+ */
+export function setOnSessionExpired(cb: () => void): void {
+  onSessionExpired = cb;
+}
 
 // Shared refresh state (singleton across all clients)
 let isRefreshing = false;
@@ -92,6 +105,7 @@ export function setupAuthInterceptors(client: AxiosInstance): void {
 
       if (!refreshToken) {
         await clearAuthTokens();
+        onSessionExpired?.();
         processQueue(new Error("No refresh token available"), null);
         isRefreshing = false;
         return Promise.reject(error);
@@ -124,6 +138,7 @@ export function setupAuthInterceptors(client: AxiosInstance): void {
         processQueue(refreshError as Error, null);
         isRefreshing = false;
         await clearAuthTokens();
+        onSessionExpired?.();
         return Promise.reject(refreshError);
       }
     },

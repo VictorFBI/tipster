@@ -1,5 +1,4 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useEffect } from "react";
 import {
   NormalizedProfile,
   NormalizedUserStats,
@@ -24,11 +23,12 @@ export const userKeys = {
   profile: (accountId: string) =>
     [...userKeys.all, "profile", accountId] as const,
   myProfile: () => [...userKeys.all, "myProfile"] as const,
-  search: (query: string) => [...userKeys.all, "search", query] as const,
-  followers: (accountId?: string) =>
-    [...userKeys.all, "followers", accountId ?? "me"] as const,
-  following: (accountId?: string) =>
-    [...userKeys.all, "following", accountId ?? "me"] as const,
+  search: (query: string, limit: number, offset: number) =>
+    [...userKeys.all, "search", query, limit, offset] as const,
+  followers: (accountId?: string, limit?: number, offset?: number) =>
+    [...userKeys.all, "followers", accountId ?? "me", limit, offset] as const,
+  following: (accountId?: string, limit?: number, offset?: number) =>
+    [...userKeys.all, "following", accountId ?? "me", limit, offset] as const,
   stats: (accountId?: string) =>
     [...userKeys.all, "stats", accountId ?? "me"] as const,
 };
@@ -41,11 +41,9 @@ export const useAccountProfile = (
   accountId: string,
   options?: {
     enabled?: boolean;
-    onSuccess?: (data: NormalizedProfile) => void;
-    onError?: (error: ApiError) => void;
   },
 ) => {
-  const query = useQuery({
+  return useQuery<NormalizedProfile, ApiError>({
     queryKey: userKeys.profile(accountId),
     queryFn: async () => {
       const raw = await userService.getAccountProfile(accountId);
@@ -53,32 +51,14 @@ export const useAccountProfile = (
     },
     enabled: options?.enabled ?? !!accountId,
   });
-
-  useEffect(() => {
-    if (query.isSuccess && query.data && options?.onSuccess) {
-      options.onSuccess(query.data);
-    }
-  }, [query.isSuccess, query.data]);
-
-  useEffect(() => {
-    if (query.isError && query.error && options?.onError) {
-      options.onError(query.error as ApiError);
-    }
-  }, [query.isError, query.error]);
-
-  return query;
 };
 
 /**
  * GET /users/profile/me — fetch own profile (with secure claims like wallet_address)
  * Returns normalized profile data
  */
-export const useMyProfile = (options?: {
-  enabled?: boolean;
-  onSuccess?: (data: NormalizedProfile) => void;
-  onError?: (error: ApiError) => void;
-}) => {
-  const query = useQuery({
+export const useMyProfile = (options?: { enabled?: boolean }) => {
+  return useQuery<NormalizedProfile, ApiError>({
     queryKey: userKeys.myProfile(),
     queryFn: async () => {
       const raw = await userService.getMyProfile();
@@ -86,20 +66,6 @@ export const useMyProfile = (options?: {
     },
     enabled: options?.enabled,
   });
-
-  useEffect(() => {
-    if (query.isSuccess && query.data && options?.onSuccess) {
-      options.onSuccess(query.data);
-    }
-  }, [query.isSuccess, query.data]);
-
-  useEffect(() => {
-    if (query.isError && query.error && options?.onError) {
-      options.onError(query.error as ApiError);
-    }
-  }, [query.isError, query.error]);
-
-  return query;
 };
 
 /**
@@ -148,29 +114,13 @@ export const useSearchUsers = (
   params: SearchUsersRequest,
   options?: {
     enabled?: boolean;
-    onSuccess?: (data: UserSearchResponse) => void;
-    onError?: (error: ApiError) => void;
   },
 ) => {
-  const query = useQuery({
-    queryKey: userKeys.search(params.query),
+  return useQuery<UserSearchResponse, ApiError>({
+    queryKey: userKeys.search(params.query, params.limit, params.offset),
     queryFn: () => userService.searchUsers(params),
     enabled: options?.enabled ?? !!params.query,
   });
-
-  useEffect(() => {
-    if (query.isSuccess && query.data && options?.onSuccess) {
-      options.onSuccess(query.data);
-    }
-  }, [query.isSuccess, query.data]);
-
-  useEffect(() => {
-    if (query.isError && query.error && options?.onError) {
-      options.onError(query.error as ApiError);
-    }
-  }, [query.isError, query.error]);
-
-  return query;
 };
 
 /**
@@ -219,29 +169,13 @@ export const useFollowers = (
   params: GetFollowersRequest,
   options?: {
     enabled?: boolean;
-    onSuccess?: (data: GetFollowersResponse) => void;
-    onError?: (error: ApiError) => void;
   },
 ) => {
-  const query = useQuery({
-    queryKey: userKeys.followers(params.accountId),
+  return useQuery<GetFollowersResponse, ApiError>({
+    queryKey: userKeys.followers(params.accountId, params.limit, params.offset),
     queryFn: () => userService.getFollowers(params),
     enabled: options?.enabled,
   });
-
-  useEffect(() => {
-    if (query.isSuccess && query.data && options?.onSuccess) {
-      options.onSuccess(query.data);
-    }
-  }, [query.isSuccess, query.data]);
-
-  useEffect(() => {
-    if (query.isError && query.error && options?.onError) {
-      options.onError(query.error as ApiError);
-    }
-  }, [query.isError, query.error]);
-
-  return query;
 };
 
 /**
@@ -252,29 +186,13 @@ export const useFollowing = (
   params: GetFollowingRequest,
   options?: {
     enabled?: boolean;
-    onSuccess?: (data: GetFollowingResponse) => void;
-    onError?: (error: ApiError) => void;
   },
 ) => {
-  const query = useQuery({
-    queryKey: userKeys.following(params.accountId),
+  return useQuery<GetFollowingResponse, ApiError>({
+    queryKey: userKeys.following(params.accountId, params.limit, params.offset),
     queryFn: () => userService.getFollowing(params),
     enabled: options?.enabled,
   });
-
-  useEffect(() => {
-    if (query.isSuccess && query.data && options?.onSuccess) {
-      options.onSuccess(query.data);
-    }
-  }, [query.isSuccess, query.data]);
-
-  useEffect(() => {
-    if (query.isError && query.error && options?.onError) {
-      options.onError(query.error as ApiError);
-    }
-  }, [query.isError, query.error]);
-
-  return query;
 };
 
 /**
@@ -285,11 +203,9 @@ export const useUserStats = (
   accountId?: string,
   options?: {
     enabled?: boolean;
-    onSuccess?: (data: NormalizedUserStats) => void;
-    onError?: (error: ApiError) => void;
   },
 ) => {
-  const query = useQuery({
+  return useQuery<NormalizedUserStats, ApiError>({
     queryKey: userKeys.stats(accountId),
     queryFn: async () => {
       const raw = await userService.getUserStats(
@@ -299,18 +215,4 @@ export const useUserStats = (
     },
     enabled: options?.enabled,
   });
-
-  useEffect(() => {
-    if (query.isSuccess && query.data && options?.onSuccess) {
-      options.onSuccess(query.data);
-    }
-  }, [query.isSuccess, query.data]);
-
-  useEffect(() => {
-    if (query.isError && query.error && options?.onError) {
-      options.onError(query.error as ApiError);
-    }
-  }, [query.isError, query.error]);
-
-  return query;
 };

@@ -16,42 +16,36 @@ export function useProfileForm() {
   const [bio, setBio] = useState("");
   const [avatar, setAvatar] = useState<string | null>(null);
 
-  const { mutate: updateProfile, isPending } = useUpdateAccountProfile({
-    onSuccess: () => {
-      router.replace("/(tabs)");
-    },
-    onError: (error) => {
-      showAlert(
-        t("profile.filling.errorTitle") || "Error",
-        error.message ||
-          t("profile.filling.updateError") ||
-          "Failed to update profile",
-      );
-    },
-  });
+  const { mutateAsync: updateProfileAsync, isPending } =
+    useUpdateAccountProfile({
+      onSuccess: () => {
+        router.replace("/(tabs)");
+      },
+      onError: (error) => {
+        showAlert(
+          t("profile.filling.errorTitle") || "Error",
+          error.message ||
+            t("profile.filling.updateError") ||
+            "Failed to update profile",
+        );
+      },
+    });
 
   const isFormValid = !!username.trim();
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (username.trim()) {
-      console.log("Profile data:", {
-        username: username.trim(),
-        firstName: firstName.trim(),
-        lastName: lastName.trim(),
-        bio: bio.trim(),
-        avatar,
-      });
-
-      updateProfile({
-        username: username.trim(),
-        first_name: firstName.trim(),
-        last_name: lastName.trim(),
-        bio: bio.trim(),
-        avatar_url: avatar || undefined,
-      });
-
-      // Navigate to tabs after profile completion
-      router.replace("/(tabs)");
+      try {
+        await updateProfileAsync({
+          username: username.trim(),
+          first_name: firstName.trim(),
+          last_name: lastName.trim(),
+          bio: bio.trim(),
+          avatar_url: avatar || undefined,
+        });
+      } catch {
+        // Error is handled by onError callback
+      }
     }
   };
 

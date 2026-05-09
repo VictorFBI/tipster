@@ -110,32 +110,54 @@ describe("userKeys", () => {
     expect(userKeys.myProfile()).toEqual(["user", "myProfile"]);
   });
 
-  it("generates search key with query", () => {
-    expect(userKeys.search("john")).toEqual(["user", "search", "john"]);
+  it("generates search key with query, limit, and offset", () => {
+    expect(userKeys.search("john", 20, 0)).toEqual([
+      "user",
+      "search",
+      "john",
+      20,
+      0,
+    ]);
   });
 
-  it("generates followers key with accountId", () => {
-    expect(userKeys.followers("user-123")).toEqual([
+  it("generates followers key with accountId, limit, and offset", () => {
+    expect(userKeys.followers("user-123", 20, 0)).toEqual([
       "user",
       "followers",
       "user-123",
+      20,
+      0,
     ]);
   });
 
   it("generates followers key with default 'me'", () => {
-    expect(userKeys.followers()).toEqual(["user", "followers", "me"]);
+    expect(userKeys.followers()).toEqual([
+      "user",
+      "followers",
+      "me",
+      undefined,
+      undefined,
+    ]);
   });
 
-  it("generates following key with accountId", () => {
-    expect(userKeys.following("user-123")).toEqual([
+  it("generates following key with accountId, limit, and offset", () => {
+    expect(userKeys.following("user-123", 20, 0)).toEqual([
       "user",
       "following",
       "user-123",
+      20,
+      0,
     ]);
   });
 
   it("generates following key with default 'me'", () => {
-    expect(userKeys.following()).toEqual(["user", "following", "me"]);
+    expect(userKeys.following()).toEqual([
+      "user",
+      "following",
+      "me",
+      undefined,
+      undefined,
+    ]);
   });
 
   it("generates stats key with accountId", () => {

@@ -1,5 +1,6 @@
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { Platform } from "react-native";
 import { useTranslation } from "react-i18next";
 import { useThemeStore, themes } from "@/src/core";
 
@@ -7,6 +8,8 @@ export default function TabLayout() {
   const { t } = useTranslation();
   const { theme } = useThemeStore();
   const currentTheme = themes[theme];
+
+  const isAndroid = Platform.OS === "android";
 
   return (
     <Tabs
@@ -17,8 +20,8 @@ export default function TabLayout() {
           backgroundColor: currentTheme.surface,
           borderTopColor: currentTheme.border,
           borderTopWidth: 1,
-          height: 80,
-          paddingBottom: 20,
+          height: isAndroid ? 80 : 80,
+          paddingBottom: isAndroid ? 86 : 20,
           paddingTop: 10,
         },
         tabBarLabelStyle: {

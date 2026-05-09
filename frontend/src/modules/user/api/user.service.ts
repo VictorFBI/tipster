@@ -1,4 +1,4 @@
-import { AxiosResponse } from "axios";
+import { AxiosResponse, AxiosError } from "axios";
 import accountsClient from "./client";
 import {
   GetAccountProfileResponse,
@@ -76,15 +76,22 @@ export const userService = {
   searchUsers: async (
     params: SearchUsersRequest,
   ): Promise<UserSearchResponse> => {
-    const response: AxiosResponse<UserSearchResponse> =
-      await accountsClient.get("/users/search", {
-        params: {
-          query: params.query,
-          limit: params.limit,
-          offset: params.offset,
-        },
-      });
-    return response.data;
+    try {
+      const response: AxiosResponse<UserSearchResponse> =
+        await accountsClient.get("/users/search", {
+          params: {
+            query: params.query,
+            limit: params.limit,
+            offset: params.offset,
+          },
+        });
+      return response.data;
+    } catch (error) {
+      if (error instanceof AxiosError && error.response?.status === 404) {
+        return { items: [] };
+      }
+      throw error;
+    }
   },
 
   /**

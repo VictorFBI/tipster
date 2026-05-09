@@ -18,6 +18,11 @@ jest.mock("../../api/client", () => ({
   },
 }));
 
+// Mock the auth interceptor
+jest.mock("@/src/core/api/authInterceptor", () => ({
+  setOnSessionExpired: jest.fn(),
+}));
+
 import authService from "../../api/auth.service";
 
 beforeEach(() => {

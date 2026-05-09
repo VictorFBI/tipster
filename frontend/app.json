@@ -19,8 +19,12 @@
       "foregroundImage": "./assets/icon.png",
       "backgroundColor": "#FFFFFF"
     },
-    "edgeToEdgeEnabled": true,
-    "package": "com.mayaffia.AwesomeStorybook"
+    "edgeToEdgeEnabled": false,
+    "package": "com.mayaffia.AwesomeStorybook",
+    "permissions": [
+      "android.permission.INTERNET",
+      "android.permission.ACCESS_NETWORK_STATE"
+    ]
   },
   "web": {
     "favicon": "./assets/favicon.png",
@@ -37,11 +41,32 @@
         "resizeMode": "contain",
         "backgroundColor": "#ffffff"
       }
+    ],
+    [
+      "expo-build-properties",
+      {
+        "android": {
+          "usesCleartextTraffic": true
+        },
+        "ios": {
+          "infoPlist": {
+            "NSAppTransportSecurity": {
+              "NSAllowsArbitraryLoads": true
+            }
+          }
+        }
+      }
     ]
   ],
   "experiments": {
     "reactCompiler": true,
     "typedRoutes": true,
     "tsconfigPaths": true
+  },
+  "extra": {
+    "router": {},
+    "eas": {
+      "projectId": "e87295c7-ca7b-498c-ba81-c2b2cf282617"
+    }
   }
 }

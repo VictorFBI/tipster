@@ -3,7 +3,12 @@ import { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator } from "react-native";
 import { useTranslation } from "react-i18next";
 import { XStack, YStack, Text } from "tamagui";
-import { mapPostResponseToPost, PostsList, useFeed } from "@/src/modules/posts";
+import {
+  mapPostResponseToPost,
+  PostsList,
+  useFeed,
+  useTokens,
+} from "@/src/modules/posts";
 import { useMyProfile } from "@/src/modules/user";
 import { userService } from "@/src/modules/user/api/user.service";
 import type { NormalizedProfile } from "@/src/modules/user/api/types";
@@ -23,6 +28,8 @@ export default function Feed() {
   const router = useRouter();
 
   const { data: profile } = useMyProfile();
+  const { data: tokensData } = useTokens({ enabled: true });
+
   const {
     data: feedPage,
     isLoading,
@@ -148,7 +155,7 @@ export default function Feed() {
 
   return (
     <YStack flex={1} backgroundColor={"$background"}>
-      <Header balance={5420} headerText="Tipster" />
+      <Header balance={tokensData?.tokens} headerText="Tipster" />
       <InfoBlock
         text={t("feed.activityTip")}
         icon={<Ionicons name="bulb" size={20} color={currentTheme.accent} />}

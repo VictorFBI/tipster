@@ -1,5 +1,10 @@
 import React, { useState } from "react";
-import { Platform, KeyboardAvoidingView, TouchableOpacity } from "react-native";
+import {
+  Platform,
+  KeyboardAvoidingView,
+  TouchableOpacity,
+  Alert,
+} from "react-native";
 import { Link, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useForm } from "react-hook-form";
@@ -8,6 +13,7 @@ import { useTranslation } from "react-i18next";
 import { PasswordInput, EmailInput, useLogin } from "@/src/modules/auth";
 import { ErrorMessage, StyledButton } from "@/src/shared";
 import { getErrorMessage } from "@/src/core";
+import axios from "axios";
 
 type LoginFormData = {
   email: string;

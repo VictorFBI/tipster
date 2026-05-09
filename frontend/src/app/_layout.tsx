@@ -10,7 +10,7 @@ import {
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import "react-native-reanimated";
-import { TamaguiProvider, PortalProvider } from "tamagui";
+import { TamaguiProvider } from "tamagui";
 import tamaguiConfig from "../../tamagui.config";
 import { useFonts } from "expo-font";
 import "../core/utils/i18n";
@@ -18,7 +18,7 @@ import { useThemeStore } from "../core/store/themeStore";
 import { QueryProvider } from "../core/providers/QueryProvider";
 import { ENABLE_STORYBOOK } from "../core/config/storybook";
 import { useStorybookDevMenu } from "../core/config/devMenu";
-import { LogBox, BackHandler } from "react-native";
+import { LogBox, BackHandler, Platform } from "react-native";
 import { AlertProvider } from "../shared";
 
 // Polyfill for BackHandler.removeEventListener removed in newer React Native versions.
@@ -54,23 +54,23 @@ function RootLayoutContent() {
 
   return (
     <TamaguiProvider config={tamaguiConfig} defaultTheme={theme}>
-      <PortalProvider>
-        <ThemeProvider value={theme === "dark" ? DarkTheme : DefaultTheme}>
-          <Stack
-            screenOptions={{
-              headerShown: false,
-            }}
-          >
-            {ENABLE_STORYBOOK && (
-              <Stack.Screen name="storybook" options={{ headerShown: false }} />
-            )}
-            <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          </Stack>
-          <StatusBar style={theme === "dark" ? "light" : "dark"} />
-          <AlertProvider />
-        </ThemeProvider>
-      </PortalProvider>
+      <ThemeProvider value={theme === "dark" ? DarkTheme : DefaultTheme}>
+        <Stack
+          screenOptions={{
+            headerShown: false,
+            animation: Platform.OS === "android" ? "ios_from_right" : "default",
+            animationDuration: Platform.OS === "android" ? 200 : undefined,
+          }}
+        >
+          {ENABLE_STORYBOOK && (
+            <Stack.Screen name="storybook" options={{ headerShown: false }} />
+          )}
+          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        </Stack>
+        <StatusBar style={theme === "dark" ? "light" : "dark"} />
+        <AlertProvider />
+      </ThemeProvider>
     </TamaguiProvider>
   );
 }
