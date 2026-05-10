@@ -10,6 +10,7 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 
 	"tipster/backend/auth/internal/consumers"
+	"tipster/backend/auth/internal/cron"
 	"tipster/backend/auth/internal/db/kafka"
 	"tipster/backend/auth/internal/db/postgresql"
 	"tipster/backend/auth/internal/db/redis"
@@ -100,6 +101,7 @@ func main() {
 		os.Exit(1)
 	}
 	go consumers.RunUsersUserDeleted(ctx, kafkaClient)
+	cron.RunStaleUnverifiedCleanup(ctx)
 
 	r := chi.NewRouter()
 	slog.Info("server_starting")

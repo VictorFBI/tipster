@@ -3,6 +3,7 @@ package usersservice
 import (
 	"context"
 	"errors"
+	"time"
 
 	"tipster/backend/auth/internal/db/postgresql"
 
@@ -138,6 +139,28 @@ func (us *UsersService) DeleteUserById(ctx context.Context, id string) error {
 		id,
 	)
 	return err
+}
+
+// DeleteUnverifiedUsersOlderThan deletes users with is_email_verified = false whose created_at is before now minus olderThan. Returns ids of deleted rows.
+func (us *UsersService) DeleteUnverifiedUsersOlderThan(ctx context.Context, olderThan time.Duration) ([]string, error) {
+	cutoff := time.Now().Add(-olderThan)
+	rows, err := us.postgres.Query(ctx,
+		`DELETE FROM users WHERE is_email_verified = FALSE AND created_at < $1 RETURNING id`,
+		cutoff,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var ids []string
+	for rows.Next() {
+		var id string
+		if err := rows.Scan(&id); err != nil {
+			return nil, err
+		}
+		ids = append(ids, id)
+	}
+	return ids, rows.Err()
 }
 
 // Close closes the PostgreSQL postgresection
