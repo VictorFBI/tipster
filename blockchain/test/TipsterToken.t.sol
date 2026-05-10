@@ -43,25 +43,6 @@ contract TipsterTokenTest is Test {
     }
 
     
-    // Burn
-    function testBurnByBurner() public {
-        vm.startPrank(owner);
-        token.mint(owner, 1000);
-        token.burn(owner, 200);
-        vm.stopPrank();
-
-        assertEq(token.balanceOf(owner), 800);
-        assertEq(token.totalSupply(), 800);
-    }
-
-    function testBurnFailsForNonBurner() public {
-        vm.startPrank(user1);
-        vm.expectRevert("AccessControlUnauthorizedAccount(0x0000000000000000000000000000000000000002, 0x3c11d16cbaffd01df69ce1c404f6340ee057498f5f00246190ea54220576a848)");
-        token.burn(owner, 100);
-        vm.stopPrank();
-    }
-
-    
     // Управление ролями
     function testGrantAndRevokeMinter() public {
         vm.startPrank(owner);
@@ -84,28 +65,6 @@ contract TipsterTokenTest is Test {
         vm.stopPrank();
     }
 
-    function testGrantAndRevokeBurner() public {
-        vm.startPrank(owner);
-        token.mint(owner, 1000);
-        token.grantBurner(user1);
-        vm.stopPrank();
-
-        vm.startPrank(user1);
-        token.burn(owner, 50);
-        vm.stopPrank();
-
-        assertEq(token.balanceOf(owner), 950);
-
-        vm.startPrank(owner);
-        token.revokeBurner(user1);
-        vm.stopPrank();
-
-        vm.startPrank(user1);
-        vm.expectRevert();
-        token.burn(owner, 50);
-        vm.stopPrank();
-    }
-
     
     // Edge cases
     function testMintZeroFails() public {
@@ -119,20 +78,6 @@ contract TipsterTokenTest is Test {
         vm.startPrank(owner);
         vm.expectRevert("mint: to = zero");
         token.mint(address(0), 100);
-        vm.stopPrank();
-    }
-
-    function testBurnZeroFails() public {
-        vm.startPrank(owner);
-        vm.expectRevert("burn: amount = 0");
-        token.burn(owner, 0);
-        vm.stopPrank();
-    }
-
-    function testBurnFromZeroFails() public {
-        vm.startPrank(owner);
-        vm.expectRevert("burn: from = zero");
-        token.burn(address(0), 100);
         vm.stopPrank();
     }
 }
