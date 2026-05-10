@@ -43,6 +43,15 @@ func (c *Client) NewWriter(topic string) *kafka.Writer {
 	})
 }
 
+// NewReader creates a kafka.Reader for the given topic and group using client brokers
+func (c *Client) NewReader(topic, groupID string) *kafka.Reader {
+	return kafka.NewReader(kafka.ReaderConfig{
+		Brokers: c.Brokers,
+		Topic:   topic,
+		GroupID: groupID,
+	})
+}
+
 // Close is a no-op for Client that only holds broker list
 func (c *Client) Close() error {
 	return nil

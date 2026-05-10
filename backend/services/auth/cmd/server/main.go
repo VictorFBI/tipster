@@ -9,9 +9,10 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 
+	"tipster/backend/auth/internal/consumers"
+	"tipster/backend/auth/internal/db/kafka"
 	"tipster/backend/auth/internal/db/postgresql"
 	"tipster/backend/auth/internal/db/redis"
-	"tipster/backend/auth/internal/db/kafka"
 	"tipster/backend/auth/internal/handlers"
 	applogging "tipster/backend/auth/internal/logging"
 
@@ -93,6 +94,13 @@ func main() {
 	checkRedisConnection(ctx)
 	checkKafkaConnection(ctx)
 
+	kafkaClient, err := kafka.Connect(ctx)
+	if err != nil {
+		slog.Error("kafka_consumer_connect_failed", slog.String("error", err.Error()))
+		os.Exit(1)
+	}
+	go consumers.RunUsersUserDeleted(ctx, kafkaClient)
+
 	r := chi.NewRouter()
 	slog.Info("server_starting")
 	r.Use(middleware.RequestID)
@@ -115,7 +123,7 @@ func main() {
 	r.Post("/auth/reset-password", handlers.ResetPassword)
 
 	slog.Info("server_listening", slog.String("addr", ":8080"))
-	err := http.ListenAndServe(":8080", r)
+	err = http.ListenAndServe(":8080", r)
 	if err != nil {
 		slog.Error("server_failed", slog.String("error", err.Error()))
 		os.Exit(1)

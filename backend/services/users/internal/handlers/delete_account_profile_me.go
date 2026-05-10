@@ -7,9 +7,12 @@ import (
 	"net/http"
 
 	api "tipster/backend/users/internal/generated"
+	kafkadb "tipster/backend/users/internal/db/kafka"
 	"tipster/backend/users/internal/logging"
 	middlewares "tipster/backend/users/internal/middlewares"
 	usersservice "tipster/backend/users/internal/services/users"
+
+	kafka "github.com/segmentio/kafka-go"
 )
 
 func DeleteAccountProfileMe(w http.ResponseWriter, r *http.Request) {
@@ -46,6 +49,27 @@ func DeleteAccountProfileMe(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusInternalServerError)
 		_ = json.NewEncoder(w).Encode(api.ErrorResponse{Message: "Failed to delete account"})
+		return
+	}
+
+	kafkaClient, err := kafkadb.Connect(r.Context())
+	if err != nil {
+		log.Error("kafka_connect_failed", slog.String("error", err.Error()))
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusInternalServerError)
+		_ = json.NewEncoder(w).Encode(api.ErrorResponse{Message: "Failed to connect to Kafka"})
+		return
+	}
+	defer kafkaClient.Close()
+
+	err = kafkaClient.NewWriter("users.user.deleted").WriteMessages(r.Context(), kafka.Message{
+		Key: []byte(accountId),
+	})
+	if err != nil {
+		log.Error("kafka_write_failed", slog.String("error", err.Error()))
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusInternalServerError)
+		_ = json.NewEncoder(w).Encode(api.ErrorResponse{Message: "Failed to write to Kafka: " + err.Error()})
 		return
 	}
 
