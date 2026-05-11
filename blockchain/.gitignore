@@ -13,3 +13,6 @@ lib/
 
 # Dotenv file
 .env
+
+# Airdrop recipients list (may contain private addresses)
+airdrop/airdrop.csv
