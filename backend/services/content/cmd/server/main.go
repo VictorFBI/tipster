@@ -9,7 +9,6 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 
-	"tipster/backend/content/internal/db/kafka"
 	"tipster/backend/content/internal/db/postgresql"
 	"tipster/backend/content/internal/handlers"
 	"tipster/backend/content/internal/handlers/comments"
@@ -48,21 +47,6 @@ func checkPostgreSQLConnection(ctx context.Context) {
 	slog.Info("postgresql_ok")
 }
 
-func checkKafkaConnection(ctx context.Context) {
-	slog.Info("checking_kafka")
-	kafkaConn, err := kafka.Connect(ctx)
-	if err != nil {
-		slog.Error("kafka_failed", slog.String("error", err.Error()))
-		os.Exit(1)
-	}
-	err = kafkaConn.Close()
-	if err != nil {
-		slog.Error("kafka_close_failed", slog.String("error", err.Error()))
-		os.Exit(1)
-	}
-	slog.Info("kafka_ok")
-}
-
 func checkMediaServiceURL() {
 	if os.Getenv("MEDIA_SERVICE_BASE_URL") == "" {
 		slog.Warn("media_service_skipped", slog.String("reason", "MEDIA_SERVICE_BASE_URL unset; image attachments will fail until configured"))
@@ -92,7 +76,6 @@ func main() {
 	slog.Info("migrations_ok")
 
 	checkPostgreSQLConnection(ctx)
-	checkKafkaConnection(ctx)
 	checkMediaServiceURL()
 	checkUsersServiceURL()
 

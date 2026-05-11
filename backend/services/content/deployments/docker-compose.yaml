@@ -34,7 +34,6 @@ services:
       DB_PORT: "5432"
       DB_NAME: content
       DB_PASSWORD: ${DB_PASSWORD}
-      KAFKA_BROKERS: kafka:29092
       USERS_SERVICE_BASE_URL: http://users:8081
       MEDIA_SERVICE_BASE_URL: http://media:8082
     depends_on:
