@@ -35,6 +35,7 @@ services:
       DB_NAME: users
       DB_PASSWORD: ${DB_PASSWORD}
       KAFKA_BROKERS: kafka:29092
+      MEDIA_SERVICE_BASE_URL: http://media:8082
     depends_on:
       postgres:
         condition: service_healthy
