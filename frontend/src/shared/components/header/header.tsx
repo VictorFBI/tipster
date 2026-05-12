@@ -36,7 +36,7 @@ export function Header({
           {headerText}
         </Text>
       </XStack>
-      {balance && (
+      {balance !== undefined && balance !== null && (
         <XStack
           backgroundColor={"$accent"}
           paddingHorizontal="$3"

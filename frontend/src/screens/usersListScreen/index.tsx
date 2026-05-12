@@ -9,7 +9,6 @@ import type { UserSearchItem } from "@/src/modules/user/api/types";
 
 const PAGE_LIMIT = 50;
 
-/** Map API item to the shape UserCard expects */
 function toUserCardUser(item: UserSearchItem): UserCardUser {
   return {
     id: item.user_id,

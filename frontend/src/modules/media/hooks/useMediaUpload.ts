@@ -1,10 +1,7 @@
 import { useState, useCallback } from "react";
 import * as ImagePicker from "expo-image-picker";
-import { readAsStringAsync, EncodingType } from "expo-file-system/legacy";
-import axios from "axios";
-import { Buffer } from "buffer";
 import mediaService from "../api/media.service";
-import type { PresignedUploadFile } from "../api/types";
+import type { PresignedUploadFile, MediaUploadPurpose } from "../api/types";
 
 function inferContentType(uri: string): string {
   const ext = uri.split(".").pop()?.toLowerCase();
@@ -27,34 +24,33 @@ function inferContentType(uri: string): string {
 /**
  * PUT a local file to a presigned upload URL.
  *
- * 1. Reads the file as base64 via expo-file-system's legacy API.
- * 2. Converts base64 to a binary Buffer.
- * 3. PUTs the raw binary to the presigned S3 URL via axios.
+ * Uses React Native's native fetch + blob support:
+ * 1. fetch() the local file:// URI to get a Blob.
+ * 2. PUT the Blob directly to the presigned S3 URL.
  */
 async function putFileToPresignedUrl(
   presignedUrl: string,
   fileUri: string,
   contentType: string,
 ): Promise<void> {
-  const base64 = await readAsStringAsync(fileUri, {
-    encoding: EncodingType.Base64,
-  });
+  const fileResponse = await fetch(fileUri);
+  const blob = await fileResponse.blob();
 
-  const buffer = Buffer.from(base64, "base64");
-  // console.log(
-  //   `[putFile] curl equivalent:\ncurl -X PUT \\\n  -H "Content-Type: ${contentType}" \\\n  --data-binary @./local-file.jpg \\\n  "${presignedUrl}"`,
-  // );
-
-  const response = await axios({
+  const response = await fetch(presignedUrl, {
     method: "PUT",
-    url: presignedUrl,
-    data: buffer,
     headers: {
       "Content-Type": contentType,
     },
+    body: blob,
   });
 
-  console.log("[putFile] response status:", response.status);
+  console.log("S3 upload response", response);
+
+  if (!response.ok) {
+    throw new Error(
+      `S3 upload failed: ${response.status} ${response.statusText}`,
+    );
+  }
 }
 
 export interface UploadImagesResult {
@@ -62,13 +58,9 @@ export interface UploadImagesResult {
 }
 
 interface UseMediaUploadReturn {
-  /**
-   * Upload picked images via presigned URLs.
-   * Returns the object_keys to pass to the post/comment creation endpoint.
-   */
   uploadImages: (
     assets: ImagePicker.ImagePickerAsset[],
-    purpose: "post_images" | "comment_images",
+    purpose: MediaUploadPurpose,
   ) => Promise<UploadImagesResult>;
   isUploading: boolean;
   progress: number;
@@ -76,13 +68,6 @@ interface UseMediaUploadReturn {
   resetError: () => void;
 }
 
-/**
- * Hook that encapsulates the full media upload flow:
- * 1. POST /media/presigned-url — get presigned upload URLs from backend
- * 2. PUT each file to its presigned URL
- * 3. Return the object_keys to pass to the post/comment creation endpoint
- *    (the backend content service calls /media/commit internally)
- */
 export function useMediaUpload(): UseMediaUploadReturn {
   const [isUploading, setIsUploading] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -93,7 +78,7 @@ export function useMediaUpload(): UseMediaUploadReturn {
   const uploadImages = useCallback(
     async (
       assets: ImagePicker.ImagePickerAsset[],
-      purpose: "post_images" | "comment_images",
+      purpose: MediaUploadPurpose,
     ): Promise<UploadImagesResult> => {
       if (assets.length === 0) {
         return { objectKeys: [] };
@@ -136,8 +121,7 @@ export function useMediaUpload(): UseMediaUploadReturn {
 
         return { objectKeys };
       } catch (err: any) {
-        const message =
-          err?.response?.data?.message || err?.message || "Upload failed";
+        const message = err?.message || "Upload failed";
         const uploadError = new Error(message);
         setError(uploadError);
         throw uploadError;

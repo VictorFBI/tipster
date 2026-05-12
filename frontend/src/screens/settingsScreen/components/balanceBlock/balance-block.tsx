@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { XStack, YStack, Text, Spinner } from "tamagui";
 import { useNavigation } from "@react-navigation/native";
@@ -24,13 +24,13 @@ interface BalanceBlockProps {
 const projectId = "d67a278a81c58b1b3a5f99dcad1adef7";
 
 const providerMetadata = {
-  name: "YOUR_PROJECT_NAME",
-  description: "YOUR_PROJECT_DESCRIPTION",
-  url: "https://your-project-website.com/",
-  icons: ["https://your-project-logo.com/"],
+  name: "Tipster",
+  description: "Tipster wallet connection",
+  url: "https://tipster.app",
+  icons: ["https://tipster.app/icon.png"],
   redirect: {
-    native: "YOUR_APP_SCHEME://",
-    universal: "YOUR_APP_UNIVERSAL_LINK.com",
+    native: "tipster://",
+    universal: "tipster://",
   },
 };
 
@@ -45,15 +45,13 @@ export function BalanceBlock({
 
   const [isConnecting, setIsConnecting] = useState(false);
   const navigation = useNavigation();
-  // Ref that always reflects the current focus state (no re-render lag)
+
   const isFocusedRef = useRef(true);
-  // Whether we initiated a wallet connect open from this component
   const pendingOpenRef = useRef(false);
 
   const { isOpen, open, close, isConnected, address, provider } =
     useWalletConnectModal();
 
-  // Keep isFocusedRef in sync with navigation focus/blur events
   useEffect(() => {
     const unsubFocus = navigation.addListener("focus", () => {
       isFocusedRef.current = true;
@@ -98,14 +96,12 @@ export function BalanceBlock({
   const lastSyncedAddressRef = useRef<string | null>(null);
   const isDisconnectingRef = useRef(false);
 
-  // Set to true only when the user explicitly taps "Connect Wallet".
-  // This distinguishes an intentional connection from a stale WalletConnect
-  // session that was auto-restored from a previous user.
   const userInitiatedConnectRef = useRef(false);
+  const shouldRenderWalletModal = useMemo(
+    () => isFocusedRef.current || isOpen,
+    [isOpen],
+  );
 
-  // Use the backend profile as the source of truth.
-  // Fall back to the live WalletConnect address only when the user explicitly
-  // initiated the connection in this session (not from a stale auto-restored session).
   const walletAddress =
     myProfile?.walletAddress ??
     (userInitiatedConnectRef.current && isConnected ? address : null) ??
@@ -121,8 +117,6 @@ export function BalanceBlock({
   const mutateRef = useRef(updateAccountProfileMutation.mutate);
   mutateRef.current = updateAccountProfileMutation.mutate;
 
-  // Sync wallet address to backend when a new address is connected.
-  // Only sync if the user explicitly initiated the connection (not a stale session).
   useEffect(() => {
     if (
       isDisconnectingRef.current ||
@@ -146,8 +140,6 @@ export function BalanceBlock({
 
   const handleButtonPress = useCallback(async () => {
     if (walletAddress) {
-      // Set the flag before mutating to prevent the sync effect from
-      // re-sending the old address while disconnect is in progress
       isDisconnectingRef.current = true;
       userInitiatedConnectRef.current = false;
       updateAccountProfileMutation.mutate(
@@ -170,20 +162,12 @@ export function BalanceBlock({
       return;
     }
 
-    // Mark that the user explicitly initiated the wallet connection.
-    // This flag prevents stale WalletConnect sessions (from a previous user)
-    // from being treated as active connections.
     userInitiatedConnectRef.current = true;
     pendingOpenRef.current = true;
     setIsConnecting(true);
     try {
-      // Await the open() promise — it resolves only when the WalletConnect SDK
-      // is fully initialized and wallet data is loaded, so the modal will open
-      // with content already visible (no blank dimmed screen).
       await open({ route: "ConnectWallet" });
 
-      // After open() resolves, check if the screen is still focused.
-      // If the user navigated away, close the modal immediately.
       if (!isFocusedRef.current) {
         close();
         pendingOpenRef.current = false;
@@ -207,20 +191,22 @@ export function BalanceBlock({
         {t("settings.tokenBalance")}
       </Text>
 
-      <WalletConnectModal
-        explorerRecommendedWalletIds={[
-          "c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96",
-        ]}
-        explorerExcludedWalletIds={"ALL"}
-        projectId={projectId}
-        providerMetadata={providerMetadata}
-      />
+      {shouldRenderWalletModal ? (
+        <WalletConnectModal
+          explorerRecommendedWalletIds={[
+            "c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96",
+          ]}
+          explorerExcludedWalletIds={"ALL"}
+          projectId={projectId}
+          providerMetadata={providerMetadata}
+        />
+      ) : null}
 
       <XStack alignItems="center" gap="$2">
         <Ionicons name="logo-bitcoin" size={32} color="white" />
         {isLoading ? (
           <Spinner size="large" color="white" />
-        ) : isError || !isConnected ? (
+        ) : isError ? (
           <Text color="white" fontSize={24} fontWeight="bold">
             —
           </Text>

@@ -11,5 +11,6 @@ export type {
   PresignedUploadRequest,
   PresignedUploadResponse,
   PresignedUploadItem,
+  MediaUploadPurpose,
   MediaApiError,
 } from "./api/types";

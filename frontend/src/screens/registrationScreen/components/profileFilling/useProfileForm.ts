@@ -3,6 +3,7 @@ import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import * as ImagePicker from "expo-image-picker";
 import { useUpdateAccountProfile } from "@/src/modules/user";
+import { useMediaUpload, getImageUrl } from "@/src/modules/media";
 import { showAlert } from "@/src/core";
 import { MAX_BIO_LENGTH } from "@/src/shared/constants/limits";
 
@@ -14,9 +15,19 @@ export function useProfileForm() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [bio, setBio] = useState("");
+  /** Local file:// URI for preview; after upload replaced with S3 URL */
   const [avatar, setAvatar] = useState<string | null>(null);
+  /** The picked ImagePickerAsset (needed for upload) */
+  const [avatarAsset, setAvatarAsset] =
+    useState<ImagePicker.ImagePickerAsset | null>(null);
 
-  const { mutateAsync: updateProfileAsync, isPending } =
+  const {
+    uploadImages,
+    isUploading: isAvatarUploading,
+    error: avatarUploadError,
+  } = useMediaUpload();
+
+  const { mutateAsync: updateProfileAsync, isPending: isProfileUpdating } =
     useUpdateAccountProfile({
       onSuccess: () => {
         router.replace("/(tabs)");
@@ -31,21 +42,35 @@ export function useProfileForm() {
       },
     });
 
+  const isPending = isProfileUpdating || isAvatarUploading;
   const isFormValid = !!username.trim();
 
   const handleSave = async () => {
-    if (username.trim()) {
-      try {
-        await updateProfileAsync({
-          username: username.trim(),
-          first_name: firstName.trim(),
-          last_name: lastName.trim(),
-          bio: bio.trim(),
-          avatar_url: avatar || undefined,
-        });
-      } catch {
-        // Error is handled by onError callback
+    if (!username.trim()) return;
+
+    try {
+      let avatarUrl: string | undefined;
+
+      // Upload avatar to S3 if a new image was picked
+      if (avatarAsset) {
+        const { objectKeys } = await uploadImages([avatarAsset], "post_images");
+        if (objectKeys[0]) {
+          avatarUrl = getImageUrl(objectKeys[0]);
+        }
+      } else if (avatar) {
+        // Keep existing avatar URL (already an S3 URL)
+        avatarUrl = avatar;
       }
+
+      await updateProfileAsync({
+        username: username.trim(),
+        first_name: firstName.trim(),
+        last_name: lastName.trim(),
+        bio: bio.trim(),
+        avatar_url: avatarUrl,
+      });
+    } catch {
+      // Error is handled by onError callback or avatarUploadError
     }
   };
 
@@ -74,6 +99,7 @@ export function useProfileForm() {
 
       if (!result.canceled && result.assets[0]) {
         setAvatar(result.assets[0].uri);
+        setAvatarAsset(result.assets[0]);
       }
     } catch (error) {
       console.warn("Error picking image:", error);
@@ -102,6 +128,8 @@ export function useProfileForm() {
     avatar,
     isPending,
     isFormValid,
+    isAvatarUploading,
+    avatarUploadError,
     handleSave,
     handleAddAvatar,
     maxBioLength: MAX_BIO_LENGTH,

@@ -1,8 +1,6 @@
 import { renderHook, act } from "@testing-library/react-native";
 import { useMediaUpload } from "../useMediaUpload";
 import mediaService from "../../api/media.service";
-import axios from "axios";
-import { readAsStringAsync } from "expo-file-system/legacy";
 
 // Mock media service
 jest.mock("../../api/media.service", () => ({
@@ -11,26 +9,6 @@ jest.mock("../../api/media.service", () => ({
     getPresignedUrls: jest.fn(),
   },
 }));
-
-// Mock axios as a callable function (overrides global mock for this file)
-jest.mock("axios", () => {
-  const mockFn = jest.fn();
-  (mockFn as any).__esModule = true;
-  (mockFn as any).default = mockFn;
-  return mockFn;
-});
-
-// Mock buffer
-jest.mock("buffer", () => ({
-  Buffer: {
-    from: jest.fn((data: string, encoding: string) => {
-      // Return a simple Uint8Array to simulate a Buffer
-      return new Uint8Array([0x89, 0x50, 0x4e, 0x47]);
-    }),
-  },
-}));
-
-const mockReadAsStringAsync = readAsStringAsync as jest.Mock;
 
 // Mock expo-image-picker types
 const createMockAsset = (uri: string, fileSize = 1024) => ({
@@ -47,8 +25,54 @@ const createMockAsset = (uri: string, fileSize = 1024) => ({
   mimeType: "image/jpeg",
 });
 
+// Mock blob
+const mockBlob = { size: 1024, type: "image/jpeg" };
+
+// Track S3 PUT calls
+let s3PutCalls: Array<{ url: string; init: RequestInit }> = [];
+let s3PutStatus = 200;
+let s3PutStatusText = "OK";
+let s3PutShouldReject = false;
+
 beforeEach(() => {
   jest.clearAllMocks();
+  s3PutCalls = [];
+  s3PutStatus = 200;
+  s3PutStatusText = "OK";
+  s3PutShouldReject = false;
+
+  // Mock fetch: handles both local file:// reads and S3 PUT uploads
+  global.fetch = jest
+    .fn()
+    .mockImplementation((url: string, init?: RequestInit) => {
+      // Local file read (no init or GET)
+      if (!init || !init.method) {
+        return Promise.resolve({
+          blob: jest.fn().mockResolvedValue(mockBlob),
+        });
+      }
+
+      // S3 PUT upload
+      if (init.method === "PUT") {
+        s3PutCalls.push({ url, init });
+
+        if (s3PutShouldReject) {
+          return Promise.reject(new Error("Upload network error"));
+        }
+
+        return Promise.resolve({
+          ok: s3PutStatus >= 200 && s3PutStatus < 300,
+          status: s3PutStatus,
+          statusText: s3PutStatusText,
+        });
+      }
+
+      return Promise.resolve({ ok: true });
+    });
+});
+
+afterEach(() => {
+  jest.restoreAllMocks();
 });
 
 describe("useMediaUpload", () => {
@@ -82,12 +106,6 @@ describe("useMediaUpload", () => {
         ],
       });
 
-      // Mock readAsStringAsync to return fake base64
-      mockReadAsStringAsync.mockResolvedValue("aGVsbG8=");
-
-      // Mock axios PUT to succeed
-      (axios as unknown as jest.Mock).mockResolvedValue({ status: 200 });
-
       const { result } = renderHook(() => useMediaUpload());
 
       const assets = [
@@ -112,30 +130,16 @@ describe("useMediaUpload", () => {
         purpose: "post_images",
       });
 
-      // Verify readAsStringAsync was called for each file
-      expect(mockReadAsStringAsync).toHaveBeenCalledWith("file:///photo1.jpg", {
-        encoding: "base64",
-      });
-      expect(mockReadAsStringAsync).toHaveBeenCalledWith("file:///photo2.png", {
-        encoding: "base64",
-      });
+      // Verify fetch was called to read each local file
+      expect(global.fetch).toHaveBeenCalledWith("file:///photo1.jpg");
+      expect(global.fetch).toHaveBeenCalledWith("file:///photo2.png");
 
-      // Verify axios PUT was called for each presigned URL
-      expect(axios).toHaveBeenCalledTimes(2);
-      expect(axios).toHaveBeenCalledWith(
-        expect.objectContaining({
-          method: "PUT",
-          url: "https://s3.example.com/key1",
-          headers: { "Content-Type": "image/jpeg" },
-        }),
-      );
-      expect(axios).toHaveBeenCalledWith(
-        expect.objectContaining({
-          method: "PUT",
-          url: "https://s3.example.com/key2",
-          headers: { "Content-Type": "image/png" },
-        }),
-      );
+      // Verify S3 PUT calls
+      expect(s3PutCalls).toHaveLength(2);
+      expect(s3PutCalls[0].url).toBe("https://s3.example.com/key1");
+      expect(s3PutCalls[0].init.method).toBe("PUT");
+      expect(s3PutCalls[0].init.body).toBe(mockBlob);
+      expect(s3PutCalls[1].url).toBe("https://s3.example.com/key2");
 
       expect(result.current.isUploading).toBe(false);
       expect(result.current.progress).toBe(1);
@@ -165,20 +169,15 @@ describe("useMediaUpload", () => {
       expect(result.current.isUploading).toBe(false);
     });
 
-    it("sets error on axios PUT failure", async () => {
+    it("sets error on upload failure (non-2xx status)", async () => {
       (mediaService.getPresignedUrls as jest.Mock).mockResolvedValueOnce({
         uploads: [
           { object_key: "key1", upload_url: "https://s3.example.com/key1" },
         ],
       });
 
-      mockReadAsStringAsync.mockResolvedValue("aGVsbG8=");
-
-      // Mock axios to reject with a 403 error
-      (axios as unknown as jest.Mock).mockRejectedValueOnce({
-        response: { status: 403, data: { message: "Access Denied" } },
-        message: "Request failed with status code 403",
-      });
+      s3PutStatus = 403;
+      s3PutStatusText = "Forbidden";
 
       const { result } = renderHook(() => useMediaUpload());
       const assets = [createMockAsset("file:///photo1.jpg")];
@@ -192,8 +191,35 @@ describe("useMediaUpload", () => {
         }
       });
 
-      expect(caughtError?.message).toBe("Access Denied");
-      expect(result.current.error?.message).toBe("Access Denied");
+      expect(caughtError?.message).toBe("S3 upload failed: 403 Forbidden");
+      expect(result.current.error?.message).toBe(
+        "S3 upload failed: 403 Forbidden",
+      );
+      expect(result.current.isUploading).toBe(false);
+    });
+
+    it("sets error on fetch network error", async () => {
+      (mediaService.getPresignedUrls as jest.Mock).mockResolvedValueOnce({
+        uploads: [
+          { object_key: "key1", upload_url: "https://s3.example.com/key1" },
+        ],
+      });
+
+      s3PutShouldReject = true;
+
+      const { result } = renderHook(() => useMediaUpload());
+      const assets = [createMockAsset("file:///photo1.jpg")];
+
+      let caughtError: Error | undefined;
+      await act(async () => {
+        try {
+          await result.current.uploadImages(assets as any, "post_images");
+        } catch (err) {
+          caughtError = err as Error;
+        }
+      });
+
+      expect(caughtError?.message).toContain("Upload network error");
       expect(result.current.isUploading).toBe(false);
     });
 

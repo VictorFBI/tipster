@@ -64,10 +64,8 @@ export default function Settings() {
 
   const handleDeleteAccount = async () => {
     try {
-      // Call DELETE /users/profile/me to delete the account on the server
       await deleteAccountMutation.mutateAsync();
 
-      // Clear local auth state after successful deletion
       await clearAuthTokens();
       useAuthStore.getState().logout();
 

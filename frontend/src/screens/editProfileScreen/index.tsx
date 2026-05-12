@@ -1,7 +1,15 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useState, useEffect } from "react";
-import { TouchableOpacity, ScrollView, Alert } from "react-native";
-import { Avatar, YStack, Text, TextArea, Button, Spinner } from "tamagui";
+import { TouchableOpacity, ScrollView, ActivityIndicator } from "react-native";
+import {
+  Avatar,
+  YStack,
+  XStack,
+  Text,
+  TextArea,
+  Button,
+  Spinner,
+} from "tamagui";
 import { useTranslation } from "react-i18next";
 import * as ImagePicker from "expo-image-picker";
 import { Header } from "@/src/shared/components/header/header";
@@ -10,6 +18,7 @@ import { useThemeStore } from "@/src/core/store/themeStore";
 import { themes } from "@/src/core/theme/themes";
 import { StyledInput } from "@/src/shared";
 import { useMyProfile, useUpdateAccountProfile } from "@/src/modules/user";
+import { useMediaUpload, getImageUrl } from "@/src/modules/media";
 import { showAlert } from "@/src/core";
 import { MAX_BIO_LENGTH } from "@/src/shared/constants/limits";
 
@@ -26,6 +35,14 @@ export default function EditProfileScreen() {
   const [username, setUsername] = useState("");
   const [bio, setBio] = useState("");
   const [avatar, setAvatar] = useState<string | null>(null);
+  const [avatarAsset, setAvatarAsset] =
+    useState<ImagePicker.ImagePickerAsset | null>(null);
+
+  const {
+    uploadImages,
+    isUploading: isAvatarUploading,
+    error: avatarUploadError,
+  } = useMediaUpload();
 
   useEffect(() => {
     if (profile) {
@@ -37,37 +54,57 @@ export default function EditProfileScreen() {
     }
   }, [profile]);
 
-  const { mutate: updateProfile, isPending } = useUpdateAccountProfile({
-    onSuccess: () => {
-      showAlert(
-        t("profile.edit.successTitle") || "Успешно",
-        t("profile.edit.successMessage") || "Профиль обновлен",
-        [
-          {
-            text: "OK",
-            onPress: () => router.back(),
-          },
-        ],
-      );
-    },
-    onError: (error) => {
-      showAlert(
-        t("profile.filling.errorTitle") || "Ошибка",
-        error.message ||
-          t("profile.filling.updateError") ||
-          "Не удалось обновить профиль",
-      );
-    },
-  });
-
-  const handleSave = () => {
-    updateProfile({
-      first_name: firstName.trim(),
-      last_name: lastName.trim(),
-      username: username.trim(),
-      bio: bio.trim(),
-      avatar_url: avatar || undefined,
+  const { mutateAsync: updateProfileAsync, isPending: isProfileUpdating } =
+    useUpdateAccountProfile({
+      onSuccess: () => {
+        showAlert(
+          t("profile.edit.successTitle") || "Успешно",
+          t("profile.edit.successMessage") || "Профиль обновлен",
+          [
+            {
+              text: "OK",
+              onPress: () => router.back(),
+            },
+          ],
+        );
+      },
+      onError: (error) => {
+        showAlert(
+          t("profile.filling.errorTitle") || "Ошибка",
+          error.message ||
+            t("profile.filling.updateError") ||
+            "Не удалось обновить профиль",
+        );
+      },
     });
+
+  const isPending = isProfileUpdating || isAvatarUploading;
+
+  const handleSave = async () => {
+    try {
+      let avatarUrl: string | undefined;
+
+      // Upload avatar to S3 if a new image was picked
+      if (avatarAsset) {
+        const { objectKeys } = await uploadImages([avatarAsset], "post_images");
+        if (objectKeys[0]) {
+          //avatarUrl = getImageUrl(objectKeys[0]);
+          avatarUrl = objectKeys[0];
+        }
+      } else if (avatar) {
+        avatarUrl = avatar;
+      }
+
+      await updateProfileAsync({
+        first_name: firstName.trim(),
+        last_name: lastName.trim(),
+        username: username.trim(),
+        bio: bio.trim(),
+        avatar_url: avatarUrl,
+      });
+    } catch {
+      // Error is handled by onError callback or avatarUploadError
+    }
   };
 
   const handleAddAvatar = async () => {
@@ -93,6 +130,7 @@ export default function EditProfileScreen() {
 
       if (!result.canceled && result.assets[0]) {
         setAvatar(result.assets[0].uri);
+        setAvatarAsset(result.assets[0]);
       }
     } catch (error) {
       console.warn("Error picking image:", error);
@@ -127,7 +165,7 @@ export default function EditProfileScreen() {
         <YStack paddingHorizontal="$4" paddingTop="$4" gap="$4">
           {/* Avatar */}
           <YStack alignItems="center" gap="$2">
-            <TouchableOpacity onPress={handleAddAvatar}>
+            <TouchableOpacity onPress={handleAddAvatar} disabled={isPending}>
               <Avatar
                 circular
                 size="$10"
@@ -153,6 +191,19 @@ export default function EditProfileScreen() {
             <Text fontSize={14} color={currentTheme.muted}>
               {t("profile.edit.changeAvatar") || "Изменить фото"}
             </Text>
+            {isAvatarUploading && (
+              <XStack alignItems="center" gap="$2">
+                <ActivityIndicator size="small" color={currentTheme.accent} />
+                <Text fontSize={13} color={currentTheme.muted}>
+                  {t("common.loading") || "Загрузка..."}
+                </Text>
+              </XStack>
+            )}
+            {avatarUploadError && (
+              <Text fontSize={13} color="$red10">
+                {avatarUploadError.message}
+              </Text>
+            )}
           </YStack>
 
           {/* First Name */}

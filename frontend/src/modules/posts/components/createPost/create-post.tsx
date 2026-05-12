@@ -82,7 +82,6 @@ export function CreatePost() {
       // Upload images via presigned URLs if any are selected
       if (images.length > 0) {
         const result = await uploadImages(images, "post_images");
-        console.log("result", result);
         imageObjectIds = result.objectKeys;
       }
 

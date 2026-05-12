@@ -6,10 +6,13 @@ export interface PresignedUploadFile {
   size_bytes: number;
 }
 
+/** Allowed purpose values for presigned URL requests */
+export type MediaUploadPurpose = "post_images" | "comment_images" | "avatar";
+
 /** POST /media/presigned-url */
 export interface PresignedUploadRequest {
   files: PresignedUploadFile[];
-  purpose: "post_images" | "comment_images";
+  purpose: MediaUploadPurpose;
 }
 
 // ── Response types ──

@@ -7,12 +7,15 @@ import { Pressable } from "react-native";
 import { useRouter } from "expo-router";
 import { useNavigation } from "@react-navigation/native";
 import { useEffect, useMemo, useState } from "react";
+import { useDebounce } from "@/src/shared/hooks/useDebounce";
 import { UserSearchItem } from "@/src/modules/user/api/types";
 import { Ionicons } from "@expo/vector-icons";
 import { useThemeStore } from "@/src/core/store/themeStore";
 import { themes } from "@/src/core/theme/themes";
 
 const SEARCH_LIMIT = 20;
+const SEARCH_DEBOUNCE_MS = 300;
+const MIN_SEARCH_QUERY_LENGTH = 2;
 
 function mapSearchItemToUser(item: UserSearchItem) {
   return {
@@ -28,7 +31,12 @@ export default function Search() {
   const { theme } = useThemeStore();
   const currentTheme = themes[theme];
   const [searchQuery, setSearchQuery] = useState("");
+  const debouncedSearchQuery = useDebounce(
+    searchQuery.trim(),
+    SEARCH_DEBOUNCE_MS,
+  );
   const tabNavigation = useNavigation().getParent();
+  const shouldSearch = debouncedSearchQuery.length >= MIN_SEARCH_QUERY_LENGTH;
 
   useEffect(() => {
     if (!tabNavigation) return;
@@ -43,8 +51,8 @@ export default function Search() {
   }, [tabNavigation]);
 
   const searchParams = useMemo(
-    () => ({ query: searchQuery, limit: SEARCH_LIMIT, offset: 0 }),
-    [searchQuery],
+    () => ({ query: debouncedSearchQuery, limit: SEARCH_LIMIT, offset: 0 }),
+    [debouncedSearchQuery],
   );
 
   const {
@@ -52,7 +60,7 @@ export default function Search() {
     isLoading,
     isError,
   } = useSearchUsers(searchParams, {
-    enabled: searchQuery.length > 0,
+    enabled: shouldSearch,
   });
 
   const users = useMemo(
@@ -107,7 +115,7 @@ export default function Search() {
             </YStack>
           )}
 
-          {isLoading && searchQuery.length > 0 && (
+          {isLoading && shouldSearch && (
             <YStack
               alignItems="center"
               justifyContent="center"
@@ -154,45 +162,42 @@ export default function Search() {
             </YStack>
           )}
 
-          {!isLoading &&
-            !isError &&
-            searchQuery.length > 0 &&
-            users.length === 0 && (
+          {!isLoading && !isError && shouldSearch && users.length === 0 && (
+            <YStack
+              alignItems="center"
+              justifyContent="center"
+              paddingVertical="$8"
+              gap="$3"
+            >
               <YStack
+                width={72}
+                height={72}
+                borderRadius={36}
+                backgroundColor="$surface"
                 alignItems="center"
                 justifyContent="center"
-                paddingVertical="$8"
-                gap="$3"
               >
-                <YStack
-                  width={72}
-                  height={72}
-                  borderRadius={36}
-                  backgroundColor="$surface"
-                  alignItems="center"
-                  justifyContent="center"
-                >
-                  <Ionicons
-                    name="search-outline"
-                    size={32}
-                    color={currentTheme.muted}
-                  />
-                </YStack>
-                <YStack alignItems="center" gap="$1">
-                  <Text color="$textSecondary" fontSize={16} fontWeight="600">
-                    {t("search.noResults")}
-                  </Text>
-                  <Text
-                    color="$muted"
-                    fontSize={14}
-                    textAlign="center"
-                    paddingHorizontal="$4"
-                  >
-                    {t("search.noResultsHint")}
-                  </Text>
-                </YStack>
+                <Ionicons
+                  name="search-outline"
+                  size={32}
+                  color={currentTheme.muted}
+                />
               </YStack>
-            )}
+              <YStack alignItems="center" gap="$1">
+                <Text color="$textSecondary" fontSize={16} fontWeight="600">
+                  {t("search.noResults")}
+                </Text>
+                <Text
+                  color="$muted"
+                  fontSize={14}
+                  textAlign="center"
+                  paddingHorizontal="$4"
+                >
+                  {t("search.noResultsHint")}
+                </Text>
+              </YStack>
+            </YStack>
+          )}
 
           {users.map((user) => (
             <Pressable key={user.id} onPress={() => handleUserPress(user.id)}>

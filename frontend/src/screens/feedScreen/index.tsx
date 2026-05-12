@@ -155,7 +155,7 @@ export default function Feed() {
 
   return (
     <YStack flex={1} backgroundColor={"$background"}>
-      <Header balance={tokensData?.tokens} headerText="Tipster" />
+      <Header balance={tokensData?.tokens || 0} headerText="Tipster" />
       <InfoBlock
         text={t("feed.activityTip")}
         icon={<Ionicons name="bulb" size={20} color={currentTheme.accent} />}

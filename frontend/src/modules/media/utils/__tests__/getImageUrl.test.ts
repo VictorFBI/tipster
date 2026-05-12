@@ -23,6 +23,18 @@ describe("getImageUrl", () => {
 
   it("handles object keys with special characters", () => {
     const result = getImageUrl("file%20name.jpg");
-    expect(result).toBe("http://api-tipster.ru:9000/dev-permanent/file%20name.jpg");
+    expect(result).toBe(
+      "http://api-tipster.ru:9000/dev-permanent/file%20name.jpg",
+    );
+  });
+
+  it("returns http URL as-is without double-prefixing", () => {
+    const fullUrl = "http://api-tipster.ru:9000/dev-permanent/abc123.jpg";
+    expect(getImageUrl(fullUrl)).toBe(fullUrl);
+  });
+
+  it("returns https URL as-is without double-prefixing", () => {
+    const fullUrl = "https://cdn.example.com/images/abc123.jpg";
+    expect(getImageUrl(fullUrl)).toBe(fullUrl);
   });
 });
