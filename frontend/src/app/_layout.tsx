@@ -35,6 +35,7 @@ LogBox.ignoreLogs([
   "Cannot convert undefined value to object",
   "No matching key. session topic doesn't exist",
 ]);
+LogBox.ignoreAllLogs(true);
 
 function RootLayoutContent() {
   const theme = useThemeStore((state) => state.theme);
