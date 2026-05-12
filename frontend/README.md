@@ -7,8 +7,6 @@
 - Node.js
 - npm
 
-Версии лучше брать совместимые с зависимостями из [`frontend/package.json`](frontend/package.json).
-
 ## Установка зависимостей
 
 Из корня репозитория:
@@ -17,8 +15,6 @@
 cd frontend
 npm install
 ```
-
-Основные npm-скрипты описаны в [`scripts`](frontend/package.json:6).
 
 ## Запуск приложения
 
