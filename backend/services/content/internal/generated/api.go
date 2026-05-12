@@ -70,7 +70,7 @@ type ContentStats struct {
 
 // ContentTokens Aggregate reward tokens for the authenticated user from their authored posts (GET /content/tokens)
 type ContentTokens struct {
-	// Tokens Sum over posts by the JWT subject of (1 + comment_count + floor(like_count / 100)); comments with deleted_at set are excluded
+	// Tokens Sum over posts by the JWT subject of (1 + comment_count + floor(like_count / 100)); comments with deleted_at set are excluded; the author's own comments on their posts and the author's own likes on their posts do not count toward comment_count or like_count
 	Tokens int64 `json:"tokens"`
 }
 

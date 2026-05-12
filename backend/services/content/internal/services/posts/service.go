@@ -430,14 +430,15 @@ func (s *Service) GetStatsByAuthor(ctx context.Context, authorID string) (int, e
 }
 
 // GetEarnedTokensByAuthor sums reward tokens for all posts whose author_id equals authorID.
-// Per post: 1 token for the post, 1 per comment with deleted_at IS NULL, plus floor(like_count / 100).
+// Per post: 1 token for the post, 1 per non-deleted comment by someone other than the post author,
+// plus floor(like_count / 100) counting only likes from users other than the post author.
 func (s *Service) GetEarnedTokensByAuthor(ctx context.Context, authorID string) (int64, error) {
 	var n int64
 	err := s.postgres.QueryRow(ctx, `
 SELECT COALESCE(SUM(
 	1::bigint
-	+ (SELECT COUNT(*)::bigint FROM comments c WHERE c.post_id = p.id AND c.deleted_at IS NULL)
-	+ ((SELECT COUNT(*)::bigint FROM likes l WHERE l.post_id = p.id) / 100::bigint)
+	+ (SELECT COUNT(*)::bigint FROM comments c WHERE c.post_id = p.id AND c.deleted_at IS NULL AND c.author_id <> p.author_id)
+	+ ((SELECT COUNT(*)::bigint FROM likes l WHERE l.post_id = p.id AND l.user_id <> p.author_id) / 100::bigint)
 ), 0)::bigint
 FROM posts p
 WHERE p.author_id = $1::uuid`,
