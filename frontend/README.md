@@ -1,57 +1,119 @@
-![picture of storybook](https://github.com/user-attachments/assets/cf98766d-8b90-44ab-b718-94ab16e63205)
+# Frontend README
 
-# getting started
+## Требования
 
-```sh
-npx create-expo-app --template expo-template-storybook AwesomeStorybook
-```
+Перед запуском убедитесь, что установлены:
 
-or
+- Node.js
+- npm
 
-```sh
-yarn create expo-app --template expo-template-storybook AwesomeStorybook
-```
+Версии лучше брать совместимые с зависимостями из [`frontend/package.json`](frontend/package.json).
 
-# app
+## Установка зависимостей
 
-```sh
-yarn start
-```
-
-# RN Storybook (ondevice)
-
-In this template you can now run `yarn storybook` to start ondevice storybook or `yarn start` to start your expo app.
-This works via env variables and expo constants.
+Из корня репозитория:
 
 ```sh
-# either
-yarn storybook
-
-# ios
-yarn storybook:ios
-
-# android
-yarn storybook:android
+cd frontend
+npm install
 ```
 
-If you add new stories on the native (ondevice version) you either need to have the watcher running or run the stories loader
+Основные npm-скрипты описаны в [`scripts`](frontend/package.json:6).
 
-To update the stories one time
+## Запуск приложения
+
+### Обычный dev-режим
 
 ```sh
-yarn storybook-generate
+cd frontend
+npm run start
 ```
 
-# Web
-
-Start react native web storybook:
-
-```
-yarn storybook:web
-```
-
-build react native web storybook:
+### Production-like запуск
 
 ```sh
-yarn build-storybook
+cd frontend
+npm run start:prod
 ```
+
+Команда использует [`start:prod`](frontend/package.json:19): старт без dev-режима и с минификацией.
+
+## Тесты
+
+В проекте настроен [`jest`](frontend/package.json:20).
+
+### Запустить все тесты один раз
+
+```sh
+cd frontend
+npm test
+```
+
+или
+
+```sh
+cd frontend
+npm run test
+```
+
+### Запустить тесты с coverage
+
+```sh
+cd frontend
+npm run test:coverage
+```
+
+Скрипт: [`test:coverage`](frontend/package.json:22).
+
+Примеры тестов лежат в папках [`__tests__`](frontend/src/core/utils/__tests__) и рядом с модулями, например [`frontend/src/modules/auth/api/__tests__/`](frontend/src/modules/auth/api/__tests__).
+
+## Линтинг
+
+### Проверка
+
+```sh
+cd frontend
+npm run lint
+```
+
+Скрипт: [`lint`](frontend/package.json:23).
+
+### Автоисправление
+
+```sh
+cd frontend
+npm run lint:fix
+```
+
+Скрипт: [`lint:fix`](frontend/package.json:24).
+
+## Storybook
+
+В проекте также настроен Storybook.
+
+### Web Storybook
+
+```sh
+cd frontend
+npm run storybook:web
+```
+
+Скрипт: [`storybook:web`](frontend/package.json:12).
+
+### Сборка Storybook
+
+```sh
+cd frontend
+npm run build-storybook
+```
+
+Скрипт: [`build-storybook`](frontend/package.json:13).
+
+Если добавили новые stories для native-режима, обновите генерацию через:
+
+```sh
+cd frontend
+npm run storybook-generate
+```
+
+Скрипт: [`storybook-generate`](frontend/package.json:14).
