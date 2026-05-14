@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { XStack, YStack, Text, Spinner } from "tamagui";
 import { useNavigation } from "@react-navigation/native";
@@ -10,10 +10,12 @@ import {
   useMyProfile,
   useUpdateAccountProfile,
 } from "@/src/modules/user/hooks/useUser";
+import "@walletconnect/react-native-compat";
 import {
   WalletConnectModal,
   useWalletConnectModal,
 } from "@walletconnect/modal-react-native";
+import { WalletAddressDialog } from "./wallet-address-dialog";
 
 interface BalanceBlockProps {
   balance: number;
@@ -22,6 +24,15 @@ interface BalanceBlockProps {
 }
 
 const projectId = "d67a278a81c58b1b3a5f99dcad1adef7";
+
+/**
+ * DEV TESTING: set to `true` to skip WalletConnect entirely and
+ * immediately show the manual wallet address dialog. Set to `false`
+ * for normal behavior (try WC first, fallback after 4s). Remove before release.
+ */
+const SIMULATE_WC_FAILURE = __DEV__ && false;
+
+const WC_OPEN_TIMEOUT_MS = 4000;
 
 const providerMetadata = {
   name: "Tipster",
@@ -34,6 +45,10 @@ const providerMetadata = {
   },
 };
 
+function formatAddress(addr: string): string {
+  return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
+}
+
 export function BalanceBlock({
   balance,
   isLoading,
@@ -42,26 +57,46 @@ export function BalanceBlock({
   const { t } = useTranslation();
   const { theme } = useThemeStore();
   const currentTheme = themes[theme];
-
-  const [isConnecting, setIsConnecting] = useState(false);
   const navigation = useNavigation();
 
+  const [isConnecting, setIsConnecting] = useState(false);
+  const [showManualDialog, setShowManualDialog] = useState(false);
+
   const isFocusedRef = useRef(true);
-  const pendingOpenRef = useRef(false);
+  const isDisconnectingRef = useRef(false);
+  const lastSyncedAddressRef = useRef<string | null>(null);
+  const wcTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  /** Whether the WC modal was opened during the current connect flow */
+  const wcModalOpenedRef = useRef(false);
+  /** Whether the user initiated a connect flow */
+  const userInitiatedRef = useRef(false);
+  /** Whether the sync mutation is in-flight (prevents duplicate calls) */
+  const syncInFlightRef = useRef(false);
 
   const { isOpen, open, close, isConnected, address, provider } =
     useWalletConnectModal();
 
+  const { data: myProfile } = useMyProfile({ enabled: true });
+
+  const updateAccountProfileMutation = useUpdateAccountProfile({
+    onError: () => {
+      showAlert(t("common.error"), t("settings.walletAttachError"));
+    },
+  });
+
+  // Keep a stable ref to the mutation so effects don't re-run when it changes
+  const mutationRef = useRef(updateAccountProfileMutation);
+  mutationRef.current = updateAccountProfileMutation;
+
+  // Track screen focus to prevent modal from appearing on wrong screens
   useEffect(() => {
     const unsubFocus = navigation.addListener("focus", () => {
       isFocusedRef.current = true;
     });
     const unsubBlur = navigation.addListener("blur", () => {
       isFocusedRef.current = false;
-      // If the modal is already open when we lose focus, close it
-      if (pendingOpenRef.current) {
+      if (isConnecting) {
         close();
-        pendingOpenRef.current = false;
         setIsConnecting(false);
       }
     });
@@ -69,79 +104,103 @@ export function BalanceBlock({
       unsubFocus();
       unsubBlur();
     };
-  }, [navigation, close]);
+  }, [navigation, close, isConnecting]);
 
-  // When the modal opens, check if the screen is still focused.
-  // If not, close it immediately before it becomes visible.
+  // When WC modal opens successfully, clear the fallback timeout
+  // and reset connecting state
   useEffect(() => {
-    if (isOpen && pendingOpenRef.current && !isFocusedRef.current) {
+    if (!isOpen) return;
+
+    // WC modal opened — cancel the fallback timer
+    if (wcTimeoutRef.current) {
+      clearTimeout(wcTimeoutRef.current);
+      wcTimeoutRef.current = null;
+    }
+
+    // Mark that the modal was opened during this connect flow
+    if (userInitiatedRef.current) {
+      wcModalOpenedRef.current = true;
+    }
+
+    if (!isFocusedRef.current) {
       close();
-      pendingOpenRef.current = false;
       setIsConnecting(false);
       return;
     }
-    if (isOpen && isConnecting) {
+
+    if (isConnecting) {
       setIsConnecting(false);
     }
   }, [isOpen, isConnecting, close]);
 
-  // Reset pending flag when modal closes
-  useEffect(() => {
-    if (!isOpen) {
-      pendingOpenRef.current = false;
-    }
-  }, [isOpen]);
-
-  const { data: myProfile } = useMyProfile({ enabled: true });
-  const lastSyncedAddressRef = useRef<string | null>(null);
-  const isDisconnectingRef = useRef(false);
-
-  const userInitiatedConnectRef = useRef(false);
-  const shouldRenderWalletModal = useMemo(
-    () => isFocusedRef.current || isOpen,
-    [isOpen],
-  );
-
-  const walletAddress =
-    myProfile?.walletAddress ??
-    (userInitiatedConnectRef.current && isConnected ? address : null) ??
-    null;
-
-  const updateAccountProfileMutation = useUpdateAccountProfile({
-    onError: () => {
-      showAlert(t("common.error"), "Failed to attach wallet");
-    },
-  });
-
-  // Stable reference to the mutate function to avoid re-triggering the sync effect
-  const mutateRef = useRef(updateAccountProfileMutation.mutate);
-  mutateRef.current = updateAccountProfileMutation.mutate;
+  const walletAddress = myProfile?.walletAddress ?? null;
 
   useEffect(() => {
     if (
       isDisconnectingRef.current ||
-      !userInitiatedConnectRef.current ||
+      !userInitiatedRef.current ||
+      !wcModalOpenedRef.current ||
       !isConnected ||
       !address ||
-      lastSyncedAddressRef.current === address
+      lastSyncedAddressRef.current === address ||
+      syncInFlightRef.current
     ) {
       return;
     }
 
-    mutateRef.current(
+    syncInFlightRef.current = true;
+
+    mutationRef.current.mutate(
       { wallet_address: address },
       {
         onSuccess: () => {
           lastSyncedAddressRef.current = address;
+          syncInFlightRef.current = false;
+          // Reset the flow flags — connection is complete
+          userInitiatedRef.current = false;
+          wcModalOpenedRef.current = false;
+        },
+        onError: () => {
+          syncInFlightRef.current = false;
         },
       },
     );
   }, [address, isConnected]);
 
+  // Handle manual address submission (fallback flow)
+  const handleManualConnect = useCallback(
+    (manualAddress: string) => {
+      if (lastSyncedAddressRef.current === manualAddress) {
+        return;
+      }
+
+      updateAccountProfileMutation.mutate(
+        { wallet_address: manualAddress },
+        {
+          onSuccess: () => {
+            lastSyncedAddressRef.current = manualAddress;
+          },
+        },
+      );
+    },
+    [updateAccountProfileMutation],
+  );
+
+  // Clean up timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (wcTimeoutRef.current) {
+        clearTimeout(wcTimeoutRef.current);
+      }
+    };
+  }, []);
+
   const handleButtonPress = useCallback(async () => {
     if (walletAddress) {
+      // Disconnect flow
       isDisconnectingRef.current = true;
-      userInitiatedConnectRef.current = false;
+      userInitiatedRef.current = false;
+      wcModalOpenedRef.current = false;
       updateAccountProfileMutation.mutate(
         { wallet_address: null },
         {
@@ -162,28 +221,60 @@ export function BalanceBlock({
       return;
     }
 
-    userInitiatedConnectRef.current = true;
-    pendingOpenRef.current = true;
+    // DEV: skip WalletConnect entirely and show manual dialog
+    if (SIMULATE_WC_FAILURE) {
+      setShowManualDialog(true);
+      return;
+    }
+
+    // Connect flow
+    userInitiatedRef.current = true;
+    wcModalOpenedRef.current = false;
     setIsConnecting(true);
+
+    // Start a fallback timer — if WC modal doesn't open within the timeout,
+    // show the manual address dialog instead
+    wcTimeoutRef.current = setTimeout(() => {
+      wcTimeoutRef.current = null;
+      // Only fallback if the WC modal hasn't opened yet
+      if (!isOpen) {
+        try {
+          close();
+        } catch {
+          // ignore close errors
+        }
+        setIsConnecting(false);
+        userInitiatedRef.current = false;
+        wcModalOpenedRef.current = false;
+        setShowManualDialog(true);
+      }
+    }, WC_OPEN_TIMEOUT_MS);
+
     try {
       await open({ route: "ConnectWallet" });
 
       if (!isFocusedRef.current) {
         close();
-        pendingOpenRef.current = false;
       }
     } catch {
-      // WalletConnect may throw internal errors during modal open
-      userInitiatedConnectRef.current = false;
-      pendingOpenRef.current = false;
-    } finally {
+      // WC open failed — clear timeout and show manual dialog
+      if (wcTimeoutRef.current) {
+        clearTimeout(wcTimeoutRef.current);
+        wcTimeoutRef.current = null;
+      }
+      userInitiatedRef.current = false;
+      wcModalOpenedRef.current = false;
       setIsConnecting(false);
+      setShowManualDialog(true);
     }
-  }, [walletAddress, provider, open, close, updateAccountProfileMutation]);
-
-  const formatAddress = (addr: string) => {
-    return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
-  };
+  }, [
+    walletAddress,
+    provider,
+    open,
+    close,
+    updateAccountProfileMutation,
+    isOpen,
+  ]);
 
   return (
     <YStack borderRadius="$4" padding="$4" gap="$3" backgroundColor="$accent">
@@ -191,16 +282,14 @@ export function BalanceBlock({
         {t("settings.tokenBalance")}
       </Text>
 
-      {shouldRenderWalletModal ? (
-        <WalletConnectModal
-          explorerRecommendedWalletIds={[
-            "c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96",
-          ]}
-          explorerExcludedWalletIds={"ALL"}
-          projectId={projectId}
-          providerMetadata={providerMetadata}
-        />
-      ) : null}
+      <WalletConnectModal
+        explorerRecommendedWalletIds={[
+          "c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96",
+        ]}
+        explorerExcludedWalletIds={"ALL"}
+        projectId={projectId}
+        providerMetadata={providerMetadata}
+      />
 
       <XStack alignItems="center" gap="$2">
         <Ionicons name="logo-bitcoin" size={32} color="white" />
@@ -262,6 +351,12 @@ export function BalanceBlock({
           </Text>
         </XStack>
       </YStack>
+
+      <WalletAddressDialog
+        open={showManualDialog}
+        onOpenChange={setShowManualDialog}
+        onConfirm={handleManualConnect}
+      />
     </YStack>
   );
 }

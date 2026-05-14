@@ -3396,6 +3396,11 @@
             },
             "variants": {
               "unstyled": {
+                "true": {
+                  "outlineWidth": 0,
+                  "borderWidth": 0,
+                  "backgroundColor": "transparent"
+                },
                 "false": {
                   "size": "$true",
                   "justifyContent": "center",
@@ -12909,6 +12914,11 @@
             },
             "variants": {
               "unstyled": {
+                "true": {
+                  "outlineWidth": 0,
+                  "borderWidth": 0,
+                  "backgroundColor": "transparent"
+                },
                 "false": {
                   "size": "$true",
                   "fontFamily": "$body",
